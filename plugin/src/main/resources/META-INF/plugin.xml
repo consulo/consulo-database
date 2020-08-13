@@ -22,11 +22,21 @@
 	<vendor>consulo.io</vendor>
 	<localize>consulo.database.DatabaseLocalize</localize>
 
+	<extensionPoints>
+		<extensionPoint name="provider" interface="consulo.database.datasource.provider.DataSourceProvider"/>
+	</extensionPoints>
+
+	<extensions defaultExtensionNs="consulo.database">
+		<provider implementation="consulo.database.mysql.MysqJdbcDataSourceProvider"/>
+	</extensions>
+
 	<extensions defaultExtensionNs="com.intellij">
+		<projectService serviceInterface="consulo.database.datasource.DataSourceManager" serviceImplementation="consulo.database.impl.DataSourceManagerImpl"/>
+
 		<toolWindow id="Database"
 					icon="/toolwindows/problems.png"
 					dispayName="consulo.database.DatabaseLocalize@toolwindow.title"
 					anchor="right"
-					factoryClass="consulo.database.impl.toolWindow.DatabaseToolWindowFactory" />
+					factoryClass="consulo.database.impl.toolWindow.DatabaseToolWindowFactory"/>
 	</extensions>
 </consulo-plugin>

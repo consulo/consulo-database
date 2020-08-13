@@ -1,5 +1,6 @@
 package consulo.database.datasource.provider;
 
+import com.intellij.openapi.extensions.ExtensionPointName;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 
@@ -11,6 +12,8 @@ import javax.annotation.Nonnull;
  */
 public interface DataSourceProvider
 {
+	ExtensionPointName<DataSourceProvider> EP_NAME = ExtensionPointName.create("consulo.database.provider");
+
 	@Nonnull
 	String getId();
 

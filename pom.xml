@@ -42,6 +42,9 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>datasource-api</module>
+		<module>datasource-jdbc-api</module>
+		<module>impl/mysql-jdbc-impl</module>
 		<module>plugin</module>
 	</modules>
 </project>

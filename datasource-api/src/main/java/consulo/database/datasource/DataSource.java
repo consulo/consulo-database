@@ -1,7 +1,6 @@
 package consulo.database.datasource;
 
-import consulo.localize.LocalizeValue;
-import consulo.ui.image.Image;
+import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
 
@@ -11,5 +10,9 @@ import javax.annotation.Nonnull;
  */
 public interface DataSource
 {
+	@Nonnull
+	DataSourceProvider getProvider();
 
+	@Nonnull
+	String getName();
 }

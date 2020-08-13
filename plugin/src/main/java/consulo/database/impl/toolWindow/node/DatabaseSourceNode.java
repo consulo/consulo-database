@@ -1,6 +1,5 @@
 package consulo.database.impl.toolWindow.node;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
@@ -26,8 +25,10 @@ public class DatabaseSourceNode extends AbstractTreeNode<DataSource>
 	@Override
 	protected void update(PresentationData presentationData)
 	{
-		presentationData.addText("DataSource", SimpleTextAttributes.REGULAR_ATTRIBUTES);
-		presentationData.setIcon(AllIcons.Providers.Mysql);
+		DataSource dataSource = getValue();
+
+		presentationData.addText(dataSource.getName(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
+		presentationData.setIcon(dataSource.getProvider().getIcon());
 	}
 
 	@RequiredReadAction

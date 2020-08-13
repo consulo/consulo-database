@@ -1,4 +1,4 @@
-package consulo.database.impl.toolWindow.node;
+package consulo.database.impl.editor.node;
 
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
@@ -7,6 +7,7 @@ import com.intellij.util.ObjectUtil;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.DataSource;
 import consulo.database.datasource.DataSourceManager;
+import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -15,11 +16,11 @@ import java.util.List;
 
 /**
  * @author VISTALL
- * @since 2020-08-12
+ * @since 2020-08-13
  */
-public class DatabaseRootNode extends AbstractTreeNode<Object>
+public class DataSourceEditorRootNode extends AbstractTreeNode<Object>
 {
-	public DatabaseRootNode(Project project)
+	public DataSourceEditorRootNode(Project project)
 	{
 		super(project, ObjectUtil.NULL);
 	}
@@ -39,8 +40,7 @@ public class DatabaseRootNode extends AbstractTreeNode<Object>
 	}
 
 	@Override
-	protected void update(PresentationData presentationData)
+	protected void update(PresentationData presentation)
 	{
-
 	}
 }
