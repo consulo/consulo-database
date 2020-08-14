@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   - Copyright 2013-2020 consulo.io
   -
@@ -20,7 +21,7 @@
 
 	<parent>
 		<groupId>consulo</groupId>
-		<artifactId>arch.managment</artifactId>
+		<artifactId>arch.ide-provided</artifactId>
 		<version>2-SNAPSHOT</version>
 		<relativePath/>
 	</parent>
@@ -36,17 +37,35 @@
 		</repository>
 	</repositories>
 
-	<groupId>consulo.plugin</groupId>
-	<artifactId>consulo.database.parent</artifactId>
-	<version>2-SNAPSHOT</version>
-	<packaging>pom</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>consulo.maven</groupId>
+				<artifactId>consulo-maven-plugin</artifactId>
+				<version>2-SNAPSHOT</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate-localize</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-	<modules>
-		<module>datasource-api</module>
-		<module>datasource-jdbc-api</module>
-		<module>datasource-json-api</module>
-		<module>impl/mysql-jdbc-impl</module>
-		<module>impl/mongo-impl</module>
-		<module>plugin</module>
-	</modules>
+	<groupId>consulo.plugin</groupId>
+	<artifactId>consulo.database-mongo.impl</artifactId>
+	<version>2-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>consulo.database-datasource.json.api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>
