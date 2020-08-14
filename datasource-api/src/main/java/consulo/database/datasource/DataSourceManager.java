@@ -2,6 +2,7 @@ package consulo.database.datasource;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.messages.Topic;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.List;
  */
 public interface DataSourceManager
 {
+	Topic<DataSourceListener> TOPIC = Topic.create("datasource change listener", DataSourceListener.class);
+
 	@Nonnull
 	public static DataSourceManager getInstance(@Nonnull Project project)
 	{

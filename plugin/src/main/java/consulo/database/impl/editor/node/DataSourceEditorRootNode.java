@@ -5,12 +5,10 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ObjectUtil;
 import consulo.annotation.access.RequiredReadAction;
-import consulo.database.datasource.DataSource;
-import consulo.database.datasource.DataSourceManager;
-import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
+import consulo.database.datasource.EditableDataSource;
+import consulo.database.impl.toolWindow.node.DatabaseProviderNode;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,9 +18,12 @@ import java.util.List;
  */
 public class DataSourceEditorRootNode extends AbstractTreeNode<Object>
 {
-	public DataSourceEditorRootNode(Project project)
+	private final List<EditableDataSource> myEditableDataSources;
+
+	public DataSourceEditorRootNode(Project project, List<EditableDataSource> editableDataSources)
 	{
 		super(project, ObjectUtil.NULL);
+		myEditableDataSources = editableDataSources;
 	}
 
 	@RequiredReadAction
@@ -30,13 +31,7 @@ public class DataSourceEditorRootNode extends AbstractTreeNode<Object>
 	@Override
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		DataSourceManager dataSourceManager = DataSourceManager.getInstance(myProject);
-		List<AbstractTreeNode> list = new ArrayList<>();
-		for(DataSource source : dataSourceManager.getDataSources())
-		{
-			list.add(new DatabaseSourceNode(myProject, source));
-		}
-		return list;
+		return DatabaseProviderNode.split(getProject(), myEditableDataSources);
 	}
 
 	@Override

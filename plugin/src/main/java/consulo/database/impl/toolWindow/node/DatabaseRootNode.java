@@ -5,13 +5,10 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ObjectUtil;
 import consulo.annotation.access.RequiredReadAction;
-import consulo.database.datasource.DataSource;
 import consulo.database.datasource.DataSourceManager;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author VISTALL
@@ -30,12 +27,7 @@ public class DatabaseRootNode extends AbstractTreeNode<Object>
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
 		DataSourceManager dataSourceManager = DataSourceManager.getInstance(myProject);
-		List<AbstractTreeNode> list = new ArrayList<>();
-		for(DataSource source : dataSourceManager.getDataSources())
-		{
-			list.add(new DatabaseSourceNode(myProject, source));
-		}
-		return list;
+		return DatabaseProviderNode.split(getProject(), dataSourceManager.getDataSources());
 	}
 
 	@Override

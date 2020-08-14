@@ -15,4 +15,7 @@ public interface DataSource
 
 	@Nonnull
 	String getName();
+
+	@Nonnull
+	EditableDataSource wantEdit();
 }

@@ -8,7 +8,7 @@ import consulo.database.datasource.provider.DataSourceProvider;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,18 +20,28 @@ public class DataSourceManagerImpl implements DataSourceManager
 {
 	private final Project myProject;
 
+	private List<DataSource> myDataSources = new ArrayList<>();
+
 	@Inject
 	public DataSourceManagerImpl(Project project)
 	{
 		myProject = project;
+
+		for(DataSourceProvider dataSourceProvider : DataSourceProvider.EP_NAME.getExtensionList())
+		{
+			myDataSources.add(new DataSourceImpl(dataSourceProvider.getName().get() + " Test", dataSourceProvider, this));
+		}
 	}
 
 	@Nonnull
 	@Override
 	public List<DataSource> getDataSources()
 	{
-		DataSourceProvider provider = DataSourceProvider.EP_NAME.getExtensionList().get(0);
+		return myDataSources;
+	}
 
-		return Collections.singletonList(new DataSourceImpl("Test", provider));
+	public void notifyChanged(@Nonnull DataSource dataSource)
+	{
+		myProject.getMessageBus().syncPublisher(TOPIC).dataSourceChanged(dataSource);
 	}
 }

@@ -15,16 +15,20 @@ import java.util.List;
  */
 public class DatabaseTreeStructure extends AbstractTreeStructureBase
 {
+
+	private DatabaseRootNode myRootNode;
+
 	public DatabaseTreeStructure(Project project)
 	{
 		super(project);
+		myRootNode = new DatabaseRootNode(myProject);
 	}
 
 	@Nonnull
 	@Override
 	public Object getRootElement()
 	{
-		return new DatabaseRootNode(myProject);
+		return myRootNode;
 	}
 
 	@Nullable
