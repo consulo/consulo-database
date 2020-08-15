@@ -7,6 +7,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.containers.MultiMap;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.DataSource;
+import consulo.database.datasource.DataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
@@ -21,10 +22,10 @@ import java.util.stream.Collectors;
 public class DatabaseProviderNode extends AbstractTreeNode<DataSourceProvider>
 {
 	@Nonnull
-	public static List<? extends AbstractTreeNode> split(@Nonnull Project project, @Nonnull Collection<? extends DataSource> dataSources)
+	public static List<? extends AbstractTreeNode> split(@Nonnull Project project, @Nonnull DataSourceModel dataSourceModel)
 	{
 		MultiMap<DataSourceProvider, DataSource> providers = MultiMap.createLinked();
-		for(DataSource dataSource : dataSources)
+		for(DataSource dataSource : dataSourceModel.getDataSources())
 		{
 			providers.putValue(dataSource.getProvider(), dataSource);
 		}

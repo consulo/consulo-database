@@ -3,7 +3,7 @@ package consulo.database.impl.editor;
 import com.intellij.ide.projectView.TreeStructureProvider;
 import com.intellij.ide.util.treeView.AbstractTreeStructureBase;
 import com.intellij.openapi.project.Project;
-import consulo.database.datasource.EditableDataSource;
+import consulo.database.datasource.DataSourceModel;
 import consulo.database.impl.editor.node.DataSourceEditorRootNode;
 
 import javax.annotation.Nonnull;
@@ -16,14 +16,14 @@ import java.util.List;
  */
 public class DataSourceTreeStructure extends AbstractTreeStructureBase
 {
-	private final List<EditableDataSource> myEditableDataSources;
+	private final DataSourceModel myDataSourceModel;
 	private final DataSourceEditorRootNode myRoot;
 
-	public DataSourceTreeStructure(Project project, List<EditableDataSource> editableDataSources)
+	public DataSourceTreeStructure(Project project, DataSourceModel dataSourceModel)
 	{
 		super(project);
-		myEditableDataSources = editableDataSources;
-		myRoot = new DataSourceEditorRootNode(myProject, myEditableDataSources);
+		myDataSourceModel = dataSourceModel;
+		myRoot = new DataSourceEditorRootNode(myProject, dataSourceModel);
 	}
 
 	@Nullable

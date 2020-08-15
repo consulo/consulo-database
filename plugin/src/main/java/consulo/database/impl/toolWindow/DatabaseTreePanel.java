@@ -8,7 +8,7 @@ import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.tree.TreeUtil;
-import consulo.database.datasource.DataSource;
+import consulo.database.datasource.DataSourceEvent;
 import consulo.database.datasource.DataSourceListener;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.tree.DataSourceKeys;
@@ -40,7 +40,7 @@ public class DatabaseTreePanel implements Disposable
 		connection.subscribe(DataSourceManager.TOPIC, new DataSourceListener()
 		{
 			@Override
-			public void dataSourceChanged(@Nonnull DataSource dataSource)
+			public void dataSourceEvent(DataSourceEvent event)
 			{
 				treeModel.invalidate(structure.getRootElement(), true);
 			}

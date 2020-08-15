@@ -27,7 +27,7 @@ public class DatabaseRootNode extends AbstractTreeNode<Object>
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
 		DataSourceManager dataSourceManager = DataSourceManager.getInstance(myProject);
-		return DatabaseProviderNode.split(getProject(), dataSourceManager.getDataSources());
+		return DatabaseProviderNode.split(getProject(), dataSourceManager.getModel());
 	}
 
 	@Override

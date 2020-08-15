@@ -9,6 +9,4 @@ import javax.annotation.Nonnull;
 public interface EditableDataSource extends DataSource
 {
 	void setName(@Nonnull String name);
-
-	void commit();
 }

@@ -3,6 +3,7 @@ package consulo.database.datasource;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.Topic;
+import consulo.annotation.access.RequiredReadAction;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -22,5 +23,19 @@ public interface DataSourceManager
 	}
 
 	@Nonnull
-	List<DataSource> getDataSources();
+	@RequiredReadAction
+	default List<? extends DataSource> getDataSources()
+	{
+		 return getModel().getDataSources();
+	}
+
+	/**
+	 * @return readonly datasource model
+	 */
+	@Nonnull
+	@RequiredReadAction
+	DataSourceModel getModel();
+
+	@Nonnull
+	EditableDataSourceModel createEditableModel();
 }

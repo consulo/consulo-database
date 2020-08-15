@@ -1,5 +1,6 @@
 package consulo.database.impl.editor;
 
+import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -12,9 +13,8 @@ import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.util.ui.tree.TreeUtil;
-import consulo.database.datasource.DataSource;
-import consulo.database.datasource.DataSourceManager;
-import consulo.database.datasource.EditableDataSource;
+import consulo.database.datasource.*;
+import consulo.database.datasource.tree.DataSourceKeys;
 import consulo.database.impl.action.RemoveDataSourceAction;
 import consulo.database.impl.editor.action.AddDataSourcePopupAction;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
@@ -27,9 +27,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author VISTALL
@@ -42,7 +41,7 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 
 	private Wrapper myConfigurableWrapper;
 
-	private List<EditableDataSource> myDataSources;
+	private EditableDataSourceModel myEditableDataSourceModel;
 
 	public DataSourcesDialog(@Nonnull Project project)
 	{
@@ -51,14 +50,7 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 
 		setTitle("Edit DataSources");
 
-		myDataSources = new ArrayList<>();
-
-		List<DataSource> dataSources = DataSourceManager.getInstance(project).getDataSources();
-
-		for(DataSource dataSource : dataSources)
-		{
-			myDataSources.add(dataSource.wantEdit());
-		}
+		myEditableDataSourceModel = DataSourceManager.getInstance(project).createEditableModel();
 
 		init();
 	}
@@ -81,7 +73,7 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 	@Override
 	public Couple<JComponent> createSplitterComponents(JPanel rootPanel)
 	{
-		DataSourceTreeStructure structure = new DataSourceTreeStructure(myProject, myDataSources);
+		DataSourceTreeStructure structure = new DataSourceTreeStructure(myProject, myEditableDataSourceModel);
 
 		StructureTreeModel<DataSourceTreeStructure> structureModel = new StructureTreeModel<>(structure, myProject);
 		AsyncTreeModel model = new AsyncTreeModel(structureModel, myProject);
@@ -91,6 +83,32 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 		{
 			structureModel.invalidate(structure.getRootElement(), true);
 		};
+
+		myEditableDataSourceModel.addListener(new DataSourceListener()
+		{
+			@Override
+			public void dataSourceEvent(DataSourceEvent event)
+			{
+				if(event.getAction() == DataSourceEvent.Action.ADD)
+				{
+					structureModel.invalidate(structure.getRootElement(), true).onSuccess(treePath ->
+					{
+						TreeUtil.expandAll(tree);
+					});
+
+					selectConfigurable((EditableDataSource) event.getDataSource(), treeUpdater);
+				}
+				else if(event.getAction() == DataSourceEvent.Action.REMOVE)
+				{
+					structureModel.invalidate(structure.getRootElement(), true).onSuccess(treePath ->
+					{
+						TreeUtil.expandAll(tree);
+					});
+
+					selectConfigurable(null, treeUpdater);
+				}
+			}
+		});
 
 		tree.addTreeSelectionListener(e ->
 		{
@@ -115,8 +133,8 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 		TreeUtil.expandAll(tree);
 
 		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
-		builder.add(new AddDataSourcePopupAction());
-		builder.add(new RemoveDataSourceAction());
+		builder.add(new AddDataSourcePopupAction(myEditableDataSourceModel));
+		builder.add(new RemoveDataSourceAction(myEditableDataSourceModel));
 
 		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
 		toolbar.setTargetComponent(tree);
@@ -132,6 +150,23 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 
 		myConfigurableWrapper = new Wrapper();
 
+		DataManager.registerDataProvider(panel, dataId ->
+		{
+			if(dataId == DataSourceKeys.DATASOURCE)
+			{
+				TreePath path = TreeUtil.getSelectedPathIfOne(tree);
+				if(path != null)
+				{
+					Object lastUserObject = TreeUtil.getLastUserObject(path);
+					if(lastUserObject instanceof DatabaseSourceNode)
+					{
+						return ((DatabaseSourceNode) lastUserObject).getValue();
+					}
+				}
+			}
+
+			return null;
+		});
 		return Couple.of(panel, myConfigurableWrapper);
 	}
 
@@ -153,12 +188,17 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 	@Override
 	protected void doOKAction()
 	{
-		for(EditableDataSource dataSource : myDataSources)
-		{
-			dataSource.commit();
-		}
+		myEditableDataSourceModel.commit();
 
 		super.doOKAction();
+	}
+
+	@Override
+	public void doCancelAction()
+	{
+		myEditableDataSourceModel.dispose();
+
+		super.doCancelAction();
 	}
 
 	@Nullable

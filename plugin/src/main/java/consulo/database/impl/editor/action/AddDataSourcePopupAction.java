@@ -5,8 +5,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import consulo.awt.TargetAWT;
+import consulo.database.datasource.EditableDataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.ui.annotation.RequiredUIAccess;
 
@@ -19,7 +21,7 @@ import javax.swing.*;
  */
 public class AddDataSourcePopupAction extends DumbAwareAction
 {
-	private static class StepImpl extends BaseListPopupStep<DataSourceProvider>
+	private class StepImpl extends BaseListPopupStep<DataSourceProvider>
 	{
 		private StepImpl()
 		{
@@ -38,11 +40,23 @@ public class AddDataSourcePopupAction extends DumbAwareAction
 		{
 			return TargetAWT.to(value.getIcon());
 		}
+
+		@Override
+		public PopupStep onChosen(DataSourceProvider selectedValue, boolean finalChoice)
+		{
+			return doFinalStep(() ->
+			{
+				myEditableDataSourceModel.newDataSource("New " + selectedValue.getName() + " Connection", selectedValue);
+			});
+		}
 	}
 
-	public AddDataSourcePopupAction()
+	private final EditableDataSourceModel myEditableDataSourceModel;
+
+	public AddDataSourcePopupAction(EditableDataSourceModel editableDataSourceModel)
 	{
 		super("Add Datasource", null, AllIcons.General.Add);
+		myEditableDataSourceModel = editableDataSourceModel;
 	}
 
 	@RequiredUIAccess

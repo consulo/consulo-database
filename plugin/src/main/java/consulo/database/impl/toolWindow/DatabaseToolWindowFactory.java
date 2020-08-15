@@ -24,7 +24,7 @@ public class DatabaseToolWindowFactory implements ToolWindowFactory
 	{
 		ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
-		toolWindowEx.setTitleActions(new AddDataSourceAction(), new RemoveDataSourceAction(), new EditDataSourceAction());
+		toolWindowEx.setTitleActions(new AddDataSourceAction(), new RemoveDataSourceAction(null), new EditDataSourceAction());
 
 		ContentManager contentManager = toolWindow.getContentManager();
 

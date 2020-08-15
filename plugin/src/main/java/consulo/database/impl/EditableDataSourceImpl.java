@@ -1,8 +1,11 @@
 package consulo.database.impl;
 
+import consulo.database.datasource.DataSourceModel;
 import consulo.database.datasource.EditableDataSource;
+import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author VISTALL
@@ -10,16 +13,24 @@ import javax.annotation.Nonnull;
  */
 public class EditableDataSourceImpl extends DataSourceImpl implements EditableDataSource
 {
-	private final DataSourceImpl myOriginal;
+	private DataSourceImpl myOriginal;
 
 	public EditableDataSourceImpl(DataSourceImpl original)
 	{
-		super(original.myDataSourceManager);
+		super(original.myModel);
 
 		myOriginal = original;
 
 		myName = original.getName();
 		myProvider = original.getProvider();
+	}
+
+	public EditableDataSourceImpl(DataSourceModel manager, String name, DataSourceProvider provider)
+	{
+		super(manager);
+
+		myName = name;
+		myProvider = provider;
 	}
 
 	@Override
@@ -28,18 +39,9 @@ public class EditableDataSourceImpl extends DataSourceImpl implements EditableDa
 		myName = name;
 	}
 
-	@Override
-	public void commit()
+	@Nullable
+	public DataSourceImpl getOriginal()
 	{
-		myOriginal.myName = myName;
-
-		myDataSourceManager.notifyChanged(myOriginal);
-	}
-
-	@Nonnull
-	@Override
-	public EditableDataSource wantEdit()
-	{
-		throw new UnsupportedOperationException("already editable");
+		return myOriginal;
 	}
 }

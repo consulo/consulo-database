@@ -1,7 +1,7 @@
 package consulo.database.impl;
 
 import consulo.database.datasource.DataSource;
-import consulo.database.datasource.EditableDataSource;
+import consulo.database.datasource.DataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
@@ -15,18 +15,24 @@ public class DataSourceImpl implements DataSource
 	protected String myName;
 	protected DataSourceProvider myProvider;
 
-	protected final DataSourceManagerImpl myDataSourceManager;
+	protected final DataSourceModel myModel;
 
-	public DataSourceImpl(String name, DataSourceProvider provider, DataSourceManagerImpl dataSourceManager)
+	public DataSourceImpl(String name, DataSourceProvider provider, DataSourceModel model)
 	{
-		this(dataSourceManager);
+		this(model);
 		myName = name;
 		myProvider = provider;
 	}
 
-	protected DataSourceImpl(DataSourceManagerImpl dataSourceManager)
+	protected DataSourceImpl(DataSourceModel model)
 	{
-		myDataSourceManager = dataSourceManager;
+		myModel = model;
+	}
+
+	public void copyFrom(DataSourceImpl dataSource)
+	{
+		myName = dataSource.getName();
+		myProvider = dataSource.getProvider();
 	}
 
 	@Nonnull
@@ -41,12 +47,5 @@ public class DataSourceImpl implements DataSource
 	public String getName()
 	{
 		return myName;
-	}
-
-	@Nonnull
-	@Override
-	public EditableDataSource wantEdit()
-	{
-		return new EditableDataSourceImpl(this);
 	}
 }

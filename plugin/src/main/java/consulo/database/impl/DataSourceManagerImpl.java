@@ -1,14 +1,20 @@
 package consulo.database.impl;
 
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
-import consulo.database.datasource.DataSource;
+import consulo.annotation.access.RequiredReadAction;
+import consulo.database.datasource.DataSourceEvent;
 import consulo.database.datasource.DataSourceManager;
-import consulo.database.datasource.provider.DataSourceProvider;
+import consulo.database.datasource.DataSourceModel;
+import consulo.database.datasource.EditableDataSourceModel;
+import org.jdom.Element;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,32 +22,68 @@ import java.util.List;
  * @since 2020-08-13
  */
 @Singleton
-public class DataSourceManagerImpl implements DataSourceManager
+@State(name = "DataSourceManagerImpl", storages = @Storage("datasource.xml"))
+public class DataSourceManagerImpl implements DataSourceManager, PersistentStateComponent<Element>
 {
 	private final Project myProject;
 
-	private List<DataSource> myDataSources = new ArrayList<>();
+	private DataSourceModelImpl<DataSourceImpl> myModel = new DataSourceModelImpl<>();
+
+	private EditableDataSourceModel myEditableDataSourceModel;
 
 	@Inject
 	public DataSourceManagerImpl(Project project)
 	{
 		myProject = project;
+	}
 
-		for(DataSourceProvider dataSourceProvider : DataSourceProvider.EP_NAME.getExtensionList())
+	public void notifyListeners(@Nonnull List<DataSourceEvent> events)
+	{
+		for(DataSourceEvent event : events)
 		{
-			myDataSources.add(new DataSourceImpl(dataSourceProvider.getName().get() + " Test", dataSourceProvider, this));
+			myProject.getMessageBus().syncPublisher(TOPIC).dataSourceEvent(event);
 		}
+	}
+
+	@Nullable
+	@Override
+	public Element getState()
+	{
+		Element state = new Element("state");
+		return state;
+	}
+
+	@Override
+	public void loadState(Element state)
+	{
+
+	}
+
+	@RequiredReadAction
+	@Nonnull
+	@Override
+	public DataSourceModel getModel()
+	{
+		myProject.getApplication().assertReadAccessAllowed();
+
+		return myModel;
 	}
 
 	@Nonnull
 	@Override
-	public List<DataSource> getDataSources()
+	public EditableDataSourceModel createEditableModel()
 	{
-		return myDataSources;
+		if(myEditableDataSourceModel != null)
+		{
+			throw new IllegalArgumentException("already created");
+		}
+
+		myEditableDataSourceModel = new EditableDataSourceModelImpl(this, myModel);
+		return myEditableDataSourceModel;
 	}
 
-	public void notifyChanged(@Nonnull DataSource dataSource)
+	protected void resetModel()
 	{
-		myProject.getMessageBus().syncPublisher(TOPIC).dataSourceChanged(dataSource);
+		myEditableDataSourceModel = null;
 	}
 }

@@ -1,14 +1,12 @@
 package consulo.database.datasource;
 
-import javax.annotation.Nonnull;
+import java.util.EventListener;
 
 /**
  * @author VISTALL
  * @since 2020-08-14
  */
-public interface DataSourceListener
+public interface DataSourceListener extends EventListener
 {
-	default void dataSourceChanged(@Nonnull DataSource dataSource)
-	{
-	}
+	void dataSourceEvent(DataSourceEvent event);
 }
