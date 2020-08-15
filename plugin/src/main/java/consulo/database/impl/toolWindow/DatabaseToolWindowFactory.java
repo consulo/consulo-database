@@ -19,6 +19,8 @@ import javax.annotation.Nonnull;
  */
 public class DatabaseToolWindowFactory implements ToolWindowFactory
 {
+	public static final String ID = "Database";
+
 	@Override
 	public void createToolWindowContent(@Nonnull Project project, @Nonnull ToolWindow toolWindow)
 	{
@@ -33,7 +35,7 @@ public class DatabaseToolWindowFactory implements ToolWindowFactory
 		DatabaseTreePanel panel = new DatabaseTreePanel(project);
 
 		Content content = factory.createContent(panel.getRootPanel(), null, false);
-		
+
 		content.setDisposer(panel);
 
 		contentManager.addContent(content);

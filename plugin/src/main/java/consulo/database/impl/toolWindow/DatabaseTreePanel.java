@@ -12,6 +12,7 @@ import consulo.database.datasource.DataSourceEvent;
 import consulo.database.datasource.DataSourceListener;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.tree.DataSourceKeys;
+import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.disposer.Disposable;
 
 import javax.annotation.Nonnull;
@@ -58,7 +59,10 @@ public class DatabaseTreePanel implements Disposable
 				if(path != null)
 				{
 					Object lastUserObject = TreeUtil.getLastUserObject(path);
-					System.out.println();
+					if(lastUserObject instanceof DatabaseSourceNode)
+					{
+						return ((DatabaseSourceNode) lastUserObject).getValue();
+					}
 				}
 			}
 			return null;
