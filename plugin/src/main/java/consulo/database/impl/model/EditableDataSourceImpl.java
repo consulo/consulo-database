@@ -28,7 +28,7 @@ public class EditableDataSourceImpl extends DataSourceImpl implements EditableDa
 		myProvider = original.getProvider();
 
 		myPropertiesHolder = new EditablePropertiesHolderImpl();
-		myPropertiesHolder.replaceAll(original.myPropertiesHolder);
+		myPropertiesHolder.copyFrom(original.myPropertiesHolder);
 	}
 
 	public EditableDataSourceImpl(DataSourceModel manager, String name, DataSourceProvider provider)

@@ -16,9 +16,10 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.intellij.util.ui.update.UiNotifyConnector;
-import consulo.database.datasource.*;
+import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.*;
 import consulo.database.datasource.ui.DataSourceKeys;
+import consulo.database.impl.action.CopyDataSourceAction;
 import consulo.database.impl.action.RemoveDataSourceAction;
 import consulo.database.impl.editor.action.AddDataSourcePopupAction;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
@@ -144,6 +145,7 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
 		builder.add(new AddDataSourcePopupAction(myEditableDataSourceModel));
 		builder.add(new RemoveDataSourceAction(myEditableDataSourceModel));
+		builder.add(new CopyDataSourceAction(myEditableDataSourceModel));
 
 		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
 		toolbar.setTargetComponent(tree);

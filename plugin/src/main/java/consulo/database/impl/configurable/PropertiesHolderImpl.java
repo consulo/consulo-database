@@ -30,7 +30,7 @@ public class PropertiesHolderImpl implements PropertiesHolder
 		return value;
 	}
 
-	public void replaceAll(PropertiesHolderImpl other)
+	public void copyFrom(PropertiesHolderImpl other)
 	{
 		myValues.clear();
 		myValues.putAll(other.myValues);

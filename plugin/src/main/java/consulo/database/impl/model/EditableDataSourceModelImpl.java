@@ -4,6 +4,7 @@ import com.intellij.util.EventDispatcher;
 import consulo.database.datasource.model.*;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.database.impl.DataSourceManagerImpl;
+import consulo.database.impl.configurable.PropertiesHolderImpl;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -58,6 +59,20 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 		myDispatcher.getMulticaster().dataSourceEvent(new DataSourceEvent(myManager, DataSourceEvent.Action.ADD, source));
 
 		return source;
+	}
+
+	@Override
+	public EditableDataSource newDatSourceCopy(@Nonnull String name, @Nonnull DataSource original)
+	{
+		EditableDataSourceImpl newDataSource = new EditableDataSourceImpl(this, name, original.getProvider());
+
+		newDataSource.myPropertiesHolder.copyFrom((PropertiesHolderImpl) original.getProperties());
+
+		myDataSources.add(newDataSource);
+
+		myDispatcher.getMulticaster().dataSourceEvent(new DataSourceEvent(myManager, DataSourceEvent.Action.ADD, newDataSource));
+
+		return newDataSource;
 	}
 
 	@Override

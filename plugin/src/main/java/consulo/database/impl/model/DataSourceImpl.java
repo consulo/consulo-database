@@ -41,7 +41,7 @@ public class DataSourceImpl implements DataSource
 	{
 		myName = dataSource.getName();
 		myProvider = dataSource.getProvider();
-		myPropertiesHolder.replaceAll(dataSource.myPropertiesHolder);
+		myPropertiesHolder.copyFrom(dataSource.myPropertiesHolder);
 	}
 
 	@Nonnull

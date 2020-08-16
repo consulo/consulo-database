@@ -19,6 +19,8 @@ public interface EditableDataSourceModel extends DataSourceModel
 
 	EditableDataSource newDataSource(@Nonnull String name, @Nonnull DataSourceProvider dataSourceProvider);
 
+	EditableDataSource newDatSourceCopy(@Nonnull String name, @Nonnull DataSource dataSource);
+
 	default void removeDataSource(@Nonnull String name)
 	{
 		DataSource dataSource = findDataSource(name);
