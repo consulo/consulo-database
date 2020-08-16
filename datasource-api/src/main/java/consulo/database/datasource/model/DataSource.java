@@ -1,5 +1,6 @@
 package consulo.database.datasource.model;
 
+import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
@@ -21,4 +22,7 @@ public interface DataSource
 	 */
 	@Nonnull
 	String getId();
+
+	@Nonnull
+	PropertiesHolder getProperties();
 }

@@ -1,4 +1,4 @@
-package consulo.database.datasource.provider.impl;
+package consulo.database.datasource.jdbc.provider.impl;
 
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.util.xmlb.XmlSerializerUtil;

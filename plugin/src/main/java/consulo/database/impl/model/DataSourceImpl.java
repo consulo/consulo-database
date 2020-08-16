@@ -1,8 +1,10 @@
 package consulo.database.impl.model;
 
+import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
+import consulo.database.impl.configurable.PropertiesHolderImpl;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -19,12 +21,15 @@ public class DataSourceImpl implements DataSource
 
 	protected final DataSourceModel myModel;
 
+	protected PropertiesHolderImpl myPropertiesHolder;
+
 	public DataSourceImpl(String id, String name, DataSourceProvider provider, DataSourceModel model)
 	{
 		this(model);
 		myId = id;
 		myName = name;
 		myProvider = provider;
+		myPropertiesHolder = new PropertiesHolderImpl();
 	}
 
 	protected DataSourceImpl(DataSourceModel model)
@@ -32,10 +37,11 @@ public class DataSourceImpl implements DataSource
 		myModel = model;
 	}
 
-	public void copyFrom(DataSourceImpl dataSource)
+	public void copyFrom(EditableDataSourceImpl dataSource)
 	{
 		myName = dataSource.getName();
 		myProvider = dataSource.getProvider();
+		myPropertiesHolder.replaceAll(dataSource.myPropertiesHolder);
 	}
 
 	@Nonnull
@@ -61,5 +67,12 @@ public class DataSourceImpl implements DataSource
 			myId = UUID.randomUUID().toString();
 		}
 		return myId;
+	}
+
+	@Nonnull
+	@Override
+	public PropertiesHolder getProperties()
+	{
+		return myPropertiesHolder;
 	}
 }

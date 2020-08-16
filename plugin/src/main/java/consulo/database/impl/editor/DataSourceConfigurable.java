@@ -1,8 +1,10 @@
 package consulo.database.impl.editor;
 
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.UnnamedConfigurable;
 import com.intellij.openapi.ui.NamedConfigurable;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.options.ConfigurableUIMigrationUtil;
 import consulo.ui.annotation.RequiredUIAccess;
 import org.jetbrains.annotations.Nls;
 
@@ -16,6 +18,8 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 {
 	private final EditableDataSource myDataSource;
 
+	private UnnamedConfigurable myInnerConfigurable;
+
 	public DataSourceConfigurable(EditableDataSource dataSource, Runnable treeUpdater)
 	{
 		super(true, treeUpdater);
@@ -26,14 +30,30 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 	@Override
 	public boolean isModified()
 	{
-		return false;
+		return myInnerConfigurable != null && myInnerConfigurable.isModified();
 	}
 
 	@RequiredUIAccess
 	@Override
 	public void apply() throws ConfigurationException
 	{
+		if(myInnerConfigurable != null)
+		{
+			myInnerConfigurable.apply();
+		}
+	}
 
+	@RequiredUIAccess
+	@Override
+	public void reset()
+	{
+		// need create ui
+		createComponent();
+		
+		if(myInnerConfigurable != null)
+		{
+			myInnerConfigurable.reset();
+		}
 	}
 
 	@Nls
@@ -62,8 +82,13 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 	}
 
 	@Override
+	@RequiredUIAccess
 	public JComponent createOptionsPanel()
 	{
-		return new JPanel();
+		if(myInnerConfigurable == null)
+		{
+			myInnerConfigurable = myDataSource.getProvider().createConfigurable(myDataSource);
+		}
+		return ConfigurableUIMigrationUtil.createComponent(myInnerConfigurable);
 	}
 }

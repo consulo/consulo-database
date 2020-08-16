@@ -4,6 +4,8 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Couple;
 import com.intellij.ui.components.panels.Wrapper;
@@ -13,6 +15,7 @@ import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.util.ui.tree.TreeUtil;
+import com.intellij.util.ui.update.UiNotifyConnector;
 import consulo.database.datasource.*;
 import consulo.database.datasource.model.*;
 import consulo.database.datasource.ui.DataSourceKeys;
@@ -39,15 +42,20 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 {
 	@Nonnull
 	private final Project myProject;
+	@Nullable
+	private final DataSource mySelectedDataSource;
 
 	private Wrapper myConfigurableWrapper;
 
+	private Configurable mySelectedConfigurable;
+
 	private EditableDataSourceModel myEditableDataSourceModel;
 
-	public DataSourcesDialog(@Nonnull Project project)
+	public DataSourcesDialog(@Nonnull Project project, @Nullable DataSource selectedDataSource)
 	{
 		super(project);
 		myProject = project;
+		mySelectedDataSource = selectedDataSource;
 
 		setTitle("Edit DataSources");
 
@@ -168,12 +176,35 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 
 			return null;
 		});
+
+		if(mySelectedDataSource != null)
+		{
+			DataSource dataSource = myEditableDataSourceModel.findDataSource(mySelectedDataSource.getName());
+
+			UiNotifyConnector.doWhenFirstShown(panel, () ->
+			{
+				selectConfigurable((EditableDataSource) dataSource, treeUpdater);
+			});
+		}
 		return Couple.of(panel, myConfigurableWrapper);
 	}
 
 	@RequiredUIAccess
 	private void selectConfigurable(@Nullable EditableDataSource dataSource, Runnable treeUpdater)
 	{
+		if(mySelectedConfigurable != null)
+		{
+			try
+			{
+				mySelectedConfigurable.apply();
+			}
+			catch(ConfigurationException ignored)
+			{
+			}
+
+			mySelectedConfigurable = null;
+		}
+
 		if(dataSource == null)
 		{
 			myConfigurableWrapper.setContent(null);
@@ -182,13 +213,28 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 		{
 			DataSourceConfigurable c = new DataSourceConfigurable(dataSource, treeUpdater);
 			c.reset();
+
+			mySelectedConfigurable = c;
+
 			myConfigurableWrapper.setContent(ConfigurableUIMigrationUtil.createComponent(c));
 		}
 	}
 
 	@Override
+	@RequiredUIAccess
 	protected void doOKAction()
 	{
+		if(mySelectedConfigurable != null)
+		{
+			try
+			{
+				mySelectedConfigurable.apply();
+			}
+			catch(ConfigurationException ignored)
+			{
+			}
+		}
+
 		myEditableDataSourceModel.commit();
 
 		super.doOKAction();

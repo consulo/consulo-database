@@ -4,7 +4,6 @@ import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author VISTALL
@@ -22,16 +21,13 @@ public interface EditableDataSourceModel extends DataSourceModel
 
 	default void removeDataSource(@Nonnull String name)
 	{
-		for(EditableDataSource source : getDataSources())
+		DataSource dataSource = findDataSource(name);
+		if(dataSource == null)
 		{
-			if(Objects.equals(source.getName(), name))
-			{
-				removeDataSource(source);
-				return;
-			}
+			throw new IllegalArgumentException("Didn't found datasource with name: " + name);
 		}
 
-		throw new UnsupportedOperationException("Didn't found datasource with name: " + name);
+		removeDataSource(dataSource);
 	}
 
 	void removeDataSource(@Nonnull DataSource dataSource);

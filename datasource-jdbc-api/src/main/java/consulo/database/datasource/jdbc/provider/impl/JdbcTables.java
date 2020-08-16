@@ -1,4 +1,4 @@
-package consulo.database.datasource.provider.impl;
+package consulo.database.datasource.jdbc.provider.impl;
 
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -12,7 +12,7 @@ import java.util.List;
  * @author VISTALL
  * @since 2020-08-15
  */
-public class JdbcResult implements PersistentStateComponent<JdbcResult>
+public class JdbcTables implements PersistentStateComponent<JdbcTables>
 {
 	private List<JdbcTable> myTables = new ArrayList<>();
 
@@ -24,13 +24,13 @@ public class JdbcResult implements PersistentStateComponent<JdbcResult>
 
 	@Nullable
 	@Override
-	public JdbcResult getState()
+	public JdbcTables getState()
 	{
 		return this;
 	}
 
 	@Override
-	public void loadState(JdbcResult state)
+	public void loadState(JdbcTables state)
 	{
 		XmlSerializerUtil.copyBean(state, this);
 	}

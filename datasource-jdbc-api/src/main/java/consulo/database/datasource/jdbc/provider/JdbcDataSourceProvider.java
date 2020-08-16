@@ -1,4 +1,6 @@
-package consulo.database.datasource.provider;
+package consulo.database.datasource.jdbc.provider;
+
+import consulo.database.datasource.provider.DataSourceProvider;
 
 /**
  * @author VISTALL

@@ -30,7 +30,7 @@ public class AddDataSourceAction extends DumbAwareAction
 			return;
 		}
 
-		DataSourcesDialog dialog = new DataSourcesDialog(project);
+		DataSourcesDialog dialog = new DataSourcesDialog(project, null);
 		dialog.showAsync();
 	}
 }

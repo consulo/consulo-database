@@ -1,6 +1,8 @@
 package consulo.database.datasource.provider;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.options.UnnamedConfigurable;
+import consulo.database.datasource.model.DataSource;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 
@@ -22,4 +24,7 @@ public interface DataSourceProvider
 
 	@Nonnull
 	Image getIcon();
+
+	@Nonnull
+	UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource);
 }
