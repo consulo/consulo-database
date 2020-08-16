@@ -5,6 +5,7 @@ import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.options.SimpleConfigurableByProperties;
 import consulo.ui.Component;
+import consulo.ui.IntBox;
 import consulo.ui.TextBox;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.layout.VerticalLayout;
@@ -41,6 +42,10 @@ public class JdbcConfigurable extends SimpleConfigurableByProperties
 		TextBox hostBox = TextBox.create();
 		builder.addLabeled("Host", hostBox);
 		propertyBuilder.add(hostBox, () -> properties.get(GenericPropertyKeys.HOST), it -> properties.set(GenericPropertyKeys.HOST, it));
+
+		IntBox portBox = IntBox.create();
+		builder.addLabeled("Port", portBox);
+		propertyBuilder.add(portBox, () -> properties.get(GenericPropertyKeys.PORT), it -> properties.set(GenericPropertyKeys.PORT, it));
 
 		TextBox loginBox = TextBox.create();
 		builder.addLabeled("Login", loginBox);

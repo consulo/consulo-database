@@ -213,7 +213,7 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 		}
 		else
 		{
-			DataSourceConfigurable c = new DataSourceConfigurable(dataSource, treeUpdater);
+			DataSourceConfigurable c = new DataSourceConfigurable(myProject, dataSource, treeUpdater);
 			c.reset();
 
 			mySelectedConfigurable = c;

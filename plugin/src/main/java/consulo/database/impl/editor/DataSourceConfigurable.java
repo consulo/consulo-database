@@ -2,13 +2,23 @@ package consulo.database.impl.editor;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.UnnamedConfigurable;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.NamedConfigurable;
+import com.intellij.openapi.util.AsyncResult;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.options.ConfigurableUIMigrationUtil;
 import consulo.ui.annotation.RequiredUIAccess;
 import org.jetbrains.annotations.Nls;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author VISTALL
@@ -16,13 +26,16 @@ import javax.swing.*;
  */
 public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource>
 {
+	private final Project myProject;
+
 	private final EditableDataSource myDataSource;
 
 	private UnnamedConfigurable myInnerConfigurable;
 
-	public DataSourceConfigurable(EditableDataSource dataSource, Runnable treeUpdater)
+	public DataSourceConfigurable(Project project, EditableDataSource dataSource, Runnable treeUpdater)
 	{
 		super(true, treeUpdater);
+		myProject = project;
 		myDataSource = dataSource;
 	}
 
@@ -49,7 +62,7 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 	{
 		// need create ui
 		createComponent();
-		
+
 		if(myInnerConfigurable != null)
 		{
 			myInnerConfigurable.reset();
@@ -89,6 +102,39 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		{
 			myInnerConfigurable = myDataSource.getProvider().createConfigurable(myDataSource);
 		}
-		return ConfigurableUIMigrationUtil.createComponent(myInnerConfigurable);
+
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(ConfigurableUIMigrationUtil.createComponent(myInnerConfigurable), BorderLayout.CENTER);
+
+		JButton testButton = new JButton("Test Connection");
+		testButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				DataSourceProvider dataSourceProvider = myDataSource.getProvider();
+
+				Task.Backgroundable.queue(myProject, "Testing connection", indicator ->
+				{
+					AsyncResult<Void> result = dataSourceProvider.testConnection(myDataSource);
+
+					result.doWhenDone(() -> {
+						SwingUtilities.invokeLater(() -> Messages.showInfoMessage(myProject, "Connection success", "DataSource"));
+					});
+
+					result.doWhenRejectedWithThrowable(throwable -> {
+						SwingUtilities.invokeLater(() -> Messages.showErrorDialog(myProject, "Connection failed: " + throwable.getMessage(), "DataSource"));
+					});
+
+					result.waitFor(-1);
+				});
+			}
+		});
+
+		JPanel buttonPanel = new BorderLayoutPanel().addToRight(testButton);
+		buttonPanel.setBorder(JBUI.Borders.empty(0, 10));
+		panel.add(buttonPanel, BorderLayout.SOUTH);
+
+		return panel;
 	}
 }

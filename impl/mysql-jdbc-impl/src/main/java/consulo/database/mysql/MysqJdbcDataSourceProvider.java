@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-13
  */
-public class MysqJdbcDataSourceProvider implements JdbcDataSourceProvider
+public class MysqJdbcDataSourceProvider extends JdbcDataSourceProvider
 {
 	@Nonnull
 	@Override
