@@ -1,19 +1,18 @@
 package consulo.database.datasource.configurable;
 
-import consulo.util.dataholder.Key;
-import consulo.util.dataholder.KeyWithDefaultValue;
-
 /**
  * @author VISTALL
  * @since 2020-08-16
  */
 public interface GenericPropertyKeys
 {
-	Key<String> HOST = KeyWithDefaultValue.create("host", "locahost");
+	GenericPropertyKey<String> HOST = GenericPropertyKey.create("host", String.class, "locahost");
 
-	Key<String> LOGIN = Key.create("login");
+	GenericPropertyKey<Integer> PORT = GenericPropertyKey.create("port", Integer.class, 0);
 
-	Key<String> PASSWORD = Key.create("password");
+	GenericPropertyKey<String> LOGIN = GenericPropertyKey.create("login", String.class);
 
-	Key<String> DATABASE_NAME = Key.create("database-name");
+	GenericPropertyKey<String> PASSWORD = GenericPropertyKey.create("password", String.class);
+
+	GenericPropertyKey<String> DATABASE_NAME = GenericPropertyKey.create("database-name", String.class);
 }

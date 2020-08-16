@@ -1,7 +1,5 @@
 package consulo.database.datasource.configurable;
 
-import consulo.util.dataholder.Key;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -11,5 +9,5 @@ import javax.annotation.Nullable;
  */
 public interface EditablePropertiesHolder extends PropertiesHolder
 {
-	<T> void set(@Nonnull Key<T> key, @Nullable T value);
+	<T> void set(@Nonnull GenericPropertyKey<T> key, @Nullable T value);
 }

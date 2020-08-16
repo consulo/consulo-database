@@ -1,7 +1,7 @@
 package consulo.database.impl.configurable;
 
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
-import consulo.util.dataholder.Key;
+import consulo.database.datasource.configurable.GenericPropertyKey;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,8 +12,13 @@ import javax.annotation.Nullable;
  */
 public class EditablePropertiesHolderImpl extends PropertiesHolderImpl implements EditablePropertiesHolder
 {
+	public EditablePropertiesHolderImpl(@Nonnull String name)
+	{
+		super(name);
+	}
+
 	@Override
-	public <T> void set(@Nonnull Key<T> key, @Nullable T value)
+	public <T> void set(@Nonnull GenericPropertyKey<T> key, @Nullable T value)
 	{
 		if(value == null)
 		{
@@ -21,7 +26,7 @@ public class EditablePropertiesHolderImpl extends PropertiesHolderImpl implement
 		}
 		else
 		{
-			myValues.put(key.toString(), value);
+			myValues.put(key.toString(), new UnstableValue(value));
 		}
 	}
 }

@@ -11,6 +11,7 @@ import consulo.database.datasource.model.DataSourceEvent;
 import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.model.EditableDataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
+import consulo.database.impl.configurable.PropertiesHolderImpl;
 import consulo.database.impl.model.DataSourceImpl;
 import consulo.database.impl.model.DataSourceModelImpl;
 import consulo.database.impl.model.EditableDataSourceModelImpl;
@@ -64,7 +65,9 @@ public class DataSourceManagerImpl implements DataSourceManager, PersistentState
 			dataSourceElement.setAttribute("name", source.getName());
 			dataSourceElement.setAttribute("provider", source.getProvider().getId());
 
-			// todo properties
+			PropertiesHolderImpl h = (PropertiesHolderImpl) source.getProperties();
+
+			dataSourceElement.addContent(h.toXmlState());
 
 			state.addContent(dataSourceElement);
 		}
@@ -89,6 +92,15 @@ public class DataSourceManagerImpl implements DataSourceManager, PersistentState
 			DataSourceProvider dataSourceProvider = findProvider(provider);
 
 			DataSourceImpl dataSource = new DataSourceImpl(id, name, dataSourceProvider, myModel);
+
+			Element propertiesElement = element.getChild(PropertiesHolderImpl.TAG_NAME);
+			if(propertiesElement != null)
+			{
+				PropertiesHolderImpl h = (PropertiesHolderImpl) dataSource.getProperties();
+
+				h.fromXmlState(propertiesElement);
+			}
+
 			dataSources.add(dataSource);
 		}
 

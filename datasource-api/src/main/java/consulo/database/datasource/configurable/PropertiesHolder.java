@@ -1,7 +1,5 @@
 package consulo.database.datasource.configurable;
 
-import consulo.util.dataholder.Key;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -10,5 +8,5 @@ import javax.annotation.Nonnull;
  */
 public interface PropertiesHolder
 {
-	<T> T get(@Nonnull Key<T> key);
+	<T> T get(@Nonnull GenericPropertyKey<T> key);
 }

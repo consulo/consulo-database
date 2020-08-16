@@ -1,8 +1,9 @@
 package consulo.database.impl.configurable;
 
+import com.intellij.util.ObjectUtil;
+import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.PropertiesHolder;
-import consulo.util.dataholder.Key;
-import consulo.util.dataholder.KeyWithDefaultValue;
+import org.jdom.Element;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,24 +16,118 @@ import java.util.Map;
  */
 public class PropertiesHolderImpl implements PropertiesHolder
 {
-	protected Map<String, Object> myValues = new HashMap<>();
+	public static final String TAG_NAME = "property-container";
+
+	protected static class UnstableValue
+	{
+		public Object value = ObjectUtil.NULL;
+
+		public String xmlValue;
+
+		public UnstableValue(Object value)
+		{
+			this.value = value;
+		}
+
+		@SuppressWarnings("unchecked")
+		public <T> T get(GenericPropertyKey<T> key)
+		{
+			if(value != ObjectUtil.NULL)
+			{
+				return (T) value;
+			}
+
+			if(xmlValue != null)
+			{
+				if(key.getTypeClass() == Integer.class)
+				{
+					T parsed = (T) Integer.valueOf(Integer.parseInt(xmlValue));
+					value = parsed;
+					xmlValue = null;
+					return parsed;
+				}
+
+				if(key.getTypeClass() == String.class)
+				{
+					value = xmlValue;
+					xmlValue = null;
+					return (T) value;
+				}
+
+				throw new UnsupportedOperationException("Key type " + key.getTypeClass() + " is not supported");
+			}
+
+			return key.getDefautValue();
+		}
+
+		public String getRawStringValue()
+		{
+			if(value != ObjectUtil.NULL)
+			{
+				return String.valueOf(value);
+			}
+
+			return xmlValue;
+		}
+	}
+
+	protected Map<String, UnstableValue> myValues = new HashMap<>();
+
+	private final String myName;
+
+	public PropertiesHolderImpl(@Nonnull String name)
+	{
+		myName = name;
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public <T> T get(@Nonnull Key<T> key)
+	public <T> T get(@Nonnull GenericPropertyKey<T> key)
 	{
-		T value = (T) myValues.get(key.toString());
-		if(value == null && key instanceof KeyWithDefaultValue)
+		UnstableValue value = myValues.get(key.toString());
+		if(value == null)
 		{
-			return ((KeyWithDefaultValue<T>) key).getDefaultValue();
+			return key.getDefautValue();
 		}
-		return value;
+		return value.get(key);
 	}
 
 	public void copyFrom(PropertiesHolderImpl other)
 	{
 		myValues.clear();
 		myValues.putAll(other.myValues);
+	}
+
+	@Nonnull
+	public Element toXmlState()
+	{
+		Element root = new Element(TAG_NAME);
+		root.setAttribute("name", myName);
+
+		for(Map.Entry<String, UnstableValue> entry : myValues.entrySet())
+		{
+			Element propertyElement = new Element("property");
+			propertyElement.setAttribute("name", entry.getKey());
+			propertyElement.setAttribute("value", String.valueOf(entry.getValue().getRawStringValue()));
+
+			root.addContent(propertyElement);
+		}
+
+		return root;
+	}
+
+	public void fromXmlState(@Nonnull Element element)
+	{
+		for(Element propertyElement : element.getChildren("property"))
+		{
+			String name = propertyElement.getAttributeValue("name");
+
+			String value = propertyElement.getAttributeValue("value");
+
+			UnstableValue unstableValue = new UnstableValue(ObjectUtil.NULL);
+			unstableValue.xmlValue = value;
+			myValues.put(name, unstableValue);
+		}
 	}
 }

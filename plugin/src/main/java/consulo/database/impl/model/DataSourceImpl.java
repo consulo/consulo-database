@@ -15,6 +15,8 @@ import java.util.UUID;
  */
 public class DataSourceImpl implements DataSource
 {
+	public static final String CONTAINER_NAME = "main";
+
 	protected String myId;
 	protected String myName;
 	protected DataSourceProvider myProvider;
@@ -29,7 +31,7 @@ public class DataSourceImpl implements DataSource
 		myId = id;
 		myName = name;
 		myProvider = provider;
-		myPropertiesHolder = new PropertiesHolderImpl();
+		myPropertiesHolder = new PropertiesHolderImpl(CONTAINER_NAME);
 	}
 
 	protected DataSourceImpl(DataSourceModel model)
