@@ -37,6 +37,7 @@ public class DataSourceImpl implements DataSource
 	protected DataSourceImpl(DataSourceModel model)
 	{
 		myModel = model;
+		myPropertiesHolder = new PropertiesHolderImpl(CONTAINER_NAME);
 	}
 
 	public void copyFrom(EditableDataSourceImpl dataSource)

@@ -2,7 +2,6 @@ package consulo.database.datasource.provider;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.options.UnnamedConfigurable;
-import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.DataSource;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
@@ -28,10 +27,4 @@ public interface DataSourceProvider
 
 	@Nonnull
 	UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource);
-
-	@Nonnull
-	default AsyncResult<Void> testConnection(@Nonnull DataSource dataSource)
-	{
-		return AsyncResult.resolved();
-	}
 }

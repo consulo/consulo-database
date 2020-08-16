@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   - Copyright 2013-2020 consulo.io
   -
@@ -36,20 +37,17 @@
 		</repository>
 	</repositories>
 
-	<groupId>consulo.plugin</groupId>
-	<artifactId>consulo.database.parent</artifactId>
-	<version>2-SNAPSHOT</version>
-	<packaging>pom</packaging>
 
-	<modules>
-		<module>datasource-api</module>
-		<module>datasource-jdbc-api</module>
-		<module>datasource-json-api</module>
-		<module>datasource-jdbc-rt</module>
-		<module>datasource-jdbc-rt-shared</module>
-		<module>impl/mysql-jdbc-impl</module>
-		<module>impl/mariadb-jdbc-impl</module>
-		<module>impl/mongo-impl</module>
-		<module>plugin</module>
-	</modules>
+	<groupId>consulo.plugin</groupId>
+	<artifactId>consulo.database-datasource.jdbc.rt.shared</artifactId>
+	<version>2-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.thrift</groupId>
+			<artifactId>libthrift</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+	</dependencies>
 </project>

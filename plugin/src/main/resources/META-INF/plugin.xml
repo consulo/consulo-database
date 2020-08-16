@@ -24,17 +24,23 @@
 
 	<extensionPoints>
 		<extensionPoint name="provider" interface="consulo.database.datasource.provider.DataSourceProvider"/>
+		<extensionPoint name="transport" interface="consulo.database.datasource.transport.DataSourceTransport"/>
 	</extensionPoints>
 
 	<extensions defaultExtensionNs="consulo.database">
 		<provider implementation="consulo.database.mysql.MysqJdbcDataSourceProvider"/>
+		<provider implementation="consulo.database.mariadb.MariadbJdbDataSourceProvider"/>
 		<provider implementation="consulo.database.mongo.MongoDbDataSourceProvider"/>
+
+		<transport implementation="consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport"/>
+		<transport implementation="consulo.database.datasource.transport.FakeDataSourceTransport" order="last"/>
 	</extensions>
 
 	<extensions defaultExtensionNs="com.intellij">
+		<applicationService serviceInterface="consulo.database.datasource.transport.DataSourceTransportManager" serviceImplementation="consulo.database.impl.transport.DataSourceTransportManagerImpl"/>
 		<projectService serviceInterface="consulo.database.datasource.DataSourceManager" serviceImplementation="consulo.database.impl.DataSourceManagerImpl"/>
 
-		<getDataRule implementation="consulo.database.impl.toolWindow.dataRules.DataSourceTreeRule" />
+		<getDataRule implementation="consulo.database.impl.toolWindow.dataRules.DataSourceTreeRule"/>
 
 		<toolWindow id="Database"
 					icon="/toolwindows/problems.png"
