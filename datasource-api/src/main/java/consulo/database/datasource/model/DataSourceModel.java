@@ -1,4 +1,4 @@
-package consulo.database.datasource;
+package consulo.database.datasource.model;
 
 import javax.annotation.Nonnull;
 import java.util.List;

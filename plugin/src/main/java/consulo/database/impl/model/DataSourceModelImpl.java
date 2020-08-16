@@ -1,10 +1,11 @@
-package consulo.database.impl;
+package consulo.database.impl.model;
 
-import consulo.database.datasource.DataSource;
-import consulo.database.datasource.DataSourceModel;
+import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.model.DataSourceModel;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,6 +20,12 @@ public class DataSourceModelImpl<T extends DataSource> implements DataSourceMode
 	@Override
 	public List<? extends DataSource> getDataSources()
 	{
-		return myDataSources;
+		return Collections.unmodifiableList(myDataSources);
+	}
+
+	public void replaceAll(@Nonnull List<T> newSources)
+	{
+		myDataSources.clear();
+		myDataSources.addAll(newSources);
 	}
 }

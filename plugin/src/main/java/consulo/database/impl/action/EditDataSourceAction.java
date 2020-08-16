@@ -3,7 +3,7 @@ package consulo.database.impl.action;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import consulo.database.datasource.tree.DataSourceKeys;
+import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;

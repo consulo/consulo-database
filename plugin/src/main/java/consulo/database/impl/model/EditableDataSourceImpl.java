@@ -1,7 +1,7 @@
-package consulo.database.impl;
+package consulo.database.impl.model;
 
-import consulo.database.datasource.DataSourceModel;
-import consulo.database.datasource.EditableDataSource;
+import consulo.database.datasource.model.DataSourceModel;
+import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
@@ -21,6 +21,7 @@ public class EditableDataSourceImpl extends DataSourceImpl implements EditableDa
 
 		myOriginal = original;
 
+		myId = original.getId();
 		myName = original.getName();
 		myProvider = original.getProvider();
 	}

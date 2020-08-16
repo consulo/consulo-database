@@ -7,7 +7,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
-import consulo.database.datasource.tree.DataSourceKeys;
+import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.database.impl.toolWindow.DatabaseToolWindowFactory;
 import consulo.util.dataholder.Key;
 

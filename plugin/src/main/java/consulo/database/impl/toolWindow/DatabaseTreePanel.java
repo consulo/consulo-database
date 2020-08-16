@@ -8,10 +8,10 @@ import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.tree.TreeUtil;
-import consulo.database.datasource.DataSourceEvent;
-import consulo.database.datasource.DataSourceListener;
+import consulo.database.datasource.model.DataSourceEvent;
+import consulo.database.datasource.model.DataSourceListener;
 import consulo.database.datasource.DataSourceManager;
-import consulo.database.datasource.tree.DataSourceKeys;
+import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.disposer.Disposable;
 

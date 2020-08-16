@@ -8,7 +8,7 @@ import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import consulo.awt.TargetAWT;
-import consulo.database.datasource.EditableDataSourceModel;
+import consulo.database.datasource.model.EditableDataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.ui.annotation.RequiredUIAccess;
 

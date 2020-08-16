@@ -4,6 +4,10 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.Topic;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.model.DataSourceListener;
+import consulo.database.datasource.model.DataSourceModel;
+import consulo.database.datasource.model.EditableDataSourceModel;
 
 import javax.annotation.Nonnull;
 import java.util.List;

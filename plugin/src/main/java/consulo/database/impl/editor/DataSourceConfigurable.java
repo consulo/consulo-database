@@ -2,7 +2,7 @@ package consulo.database.impl.editor;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.NamedConfigurable;
-import consulo.database.datasource.EditableDataSource;
+import consulo.database.datasource.model.EditableDataSource;
 import consulo.ui.annotation.RequiredUIAccess;
 import org.jetbrains.annotations.Nls;
 

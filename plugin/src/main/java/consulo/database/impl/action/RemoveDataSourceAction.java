@@ -4,10 +4,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import consulo.database.datasource.DataSource;
+import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.DataSourceManager;
-import consulo.database.datasource.EditableDataSourceModel;
-import consulo.database.datasource.tree.DataSourceKeys;
+import consulo.database.datasource.model.EditableDataSourceModel;
+import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;

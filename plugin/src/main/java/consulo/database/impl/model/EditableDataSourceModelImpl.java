@@ -1,12 +1,13 @@
-package consulo.database.impl;
+package consulo.database.impl.model;
 
 import com.intellij.util.EventDispatcher;
-import consulo.database.datasource.*;
+import consulo.database.datasource.model.*;
 import consulo.database.datasource.provider.DataSourceProvider;
-import consulo.disposer.Disposer;
+import consulo.database.impl.DataSourceManagerImpl;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 	@Override
 	public List<? extends EditableDataSource> getDataSources()
 	{
-		return myDataSources;
+		return Collections.unmodifiableList(myDataSources);
 	}
 
 	@Override
@@ -121,8 +122,6 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 	@Override
 	public void dispose()
 	{
-		Disposer.dispose(this);
-
 		myDataSources.clear();
 
 		myManager.resetModel();

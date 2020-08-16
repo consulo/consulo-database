@@ -1,4 +1,7 @@
-package consulo.database.datasource;
+package consulo.database.datasource.model;
+
+import consulo.database.datasource.DataSourceManager;
+import consulo.database.datasource.model.DataSource;
 
 import java.util.EventObject;
 

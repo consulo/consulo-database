@@ -6,7 +6,7 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
-import consulo.database.datasource.DataSource;
+import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;

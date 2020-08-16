@@ -1,10 +1,11 @@
-package consulo.database.impl;
+package consulo.database.impl.model;
 
-import consulo.database.datasource.DataSource;
-import consulo.database.datasource.DataSourceModel;
+import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * @author VISTALL
@@ -12,14 +13,16 @@ import javax.annotation.Nonnull;
  */
 public class DataSourceImpl implements DataSource
 {
+	protected String myId;
 	protected String myName;
 	protected DataSourceProvider myProvider;
 
 	protected final DataSourceModel myModel;
 
-	public DataSourceImpl(String name, DataSourceProvider provider, DataSourceModel model)
+	public DataSourceImpl(String id, String name, DataSourceProvider provider, DataSourceModel model)
 	{
 		this(model);
+		myId = id;
 		myName = name;
 		myProvider = provider;
 	}
@@ -47,5 +50,16 @@ public class DataSourceImpl implements DataSource
 	public String getName()
 	{
 		return myName;
+	}
+
+	@Nonnull
+	@Override
+	public String getId()
+	{
+		if(myId == null)
+		{
+			myId = UUID.randomUUID().toString();
+		}
+		return myId;
 	}
 }

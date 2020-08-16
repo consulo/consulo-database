@@ -3,7 +3,7 @@ package consulo.database.impl.editor;
 import com.intellij.ide.projectView.TreeStructureProvider;
 import com.intellij.ide.util.treeView.AbstractTreeStructureBase;
 import com.intellij.openapi.project.Project;
-import consulo.database.datasource.DataSourceModel;
+import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.impl.editor.node.DataSourceEditorRootNode;
 
 import javax.annotation.Nonnull;

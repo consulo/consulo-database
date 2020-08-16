@@ -6,8 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.containers.MultiMap;
 import consulo.annotation.access.RequiredReadAction;
-import consulo.database.datasource.DataSource;
-import consulo.database.datasource.DataSourceModel;
+import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;

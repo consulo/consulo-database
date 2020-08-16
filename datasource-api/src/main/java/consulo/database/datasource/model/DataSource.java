@@ -1,4 +1,4 @@
-package consulo.database.datasource;
+package consulo.database.datasource.model;
 
 import consulo.database.datasource.provider.DataSourceProvider;
 
@@ -15,4 +15,10 @@ public interface DataSource
 
 	@Nonnull
 	String getName();
+
+	/**
+	 * @return unique uuid for datasource. this id never change
+	 */
+	@Nonnull
+	String getId();
 }
