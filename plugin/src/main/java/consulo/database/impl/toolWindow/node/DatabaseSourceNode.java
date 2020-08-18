@@ -7,10 +7,13 @@ import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.database.datasource.ui.DataSourceTreeNodeProvider;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author VISTALL
@@ -42,6 +45,11 @@ public class DatabaseSourceNode extends AbstractTreeNode<DataSource>
 		{
 			return Collections.emptyList();
 		}
-		return Collections.singletonList(new DatabaseTablesNode(myProject, value));
+		List<AbstractTreeNode<?>> result = new ArrayList<>();
+		for(DataSourceTreeNodeProvider provider : DataSourceTreeNodeProvider.EP_NAME.getExtensionList())
+		{
+			provider.fillTreeNodes(myProject, value, result::add);
+		}
+		return result;
 	}
 }

@@ -12,25 +12,25 @@ import java.util.List;
  * @author VISTALL
  * @since 2020-08-15
  */
-public class JdbcTables implements PersistentStateComponent<JdbcTables>
+public class JdbcTablesState implements PersistentStateComponent<JdbcTablesState>
 {
-	private List<JdbcTable> myTables = new ArrayList<>();
+	private List<JdbcTableState> myTables = new ArrayList<>();
 
 	@Nonnull
-	public List<JdbcTable> getTables()
+	public List<JdbcTableState> getTables()
 	{
 		return myTables;
 	}
 
 	@Nullable
 	@Override
-	public JdbcTables getState()
+	public JdbcTablesState getState()
 	{
 		return this;
 	}
 
 	@Override
-	public void loadState(JdbcTables state)
+	public void loadState(JdbcTablesState state)
 	{
 		XmlSerializerUtil.copyBean(state, this);
 	}

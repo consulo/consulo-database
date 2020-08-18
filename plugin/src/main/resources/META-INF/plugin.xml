@@ -25,6 +25,8 @@
 	<extensionPoints>
 		<extensionPoint name="provider" interface="consulo.database.datasource.provider.DataSourceProvider"/>
 		<extensionPoint name="transport" interface="consulo.database.datasource.transport.DataSourceTransport"/>
+
+		<extensionPoint name="treeNodeProvider" interface="consulo.database.datasource.ui.DataSourceTreeNodeProvider"/>
 	</extensionPoints>
 
 	<extensions defaultExtensionNs="consulo.database">
@@ -34,10 +36,12 @@
 
 		<transport implementation="consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport"/>
 		<transport implementation="consulo.database.datasource.transport.FakeDataSourceTransport" order="last"/>
+
+		<treeNodeProvider implementation="consulo.database.datasource.jdbc.ui.JdbcDataSourceTreeNodeProvider"/>
 	</extensions>
 
 	<extensions defaultExtensionNs="com.intellij">
-		<applicationService serviceInterface="consulo.database.datasource.transport.DataSourceTransportManager" serviceImplementation="consulo.database.impl.transport.DataSourceTransportManagerImpl"/>
+		<projectService serviceInterface="consulo.database.datasource.transport.DataSourceTransportManager" serviceImplementation="consulo.database.impl.transport.DataSourceTransportManagerImpl"/>
 		<projectService serviceInterface="consulo.database.datasource.DataSourceManager" serviceImplementation="consulo.database.impl.DataSourceManagerImpl"/>
 
 		<getDataRule implementation="consulo.database.impl.toolWindow.dataRules.DataSourceTreeRule"/>

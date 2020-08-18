@@ -4,22 +4,24 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author VISTALL
  * @since 2020-08-15
  */
-public class JdbcTable implements PersistentStateComponent<JdbcTable>
+public class JdbcTableColumState implements PersistentStateComponent<JdbcTableColumState>
 {
 	private String myName;
+	private String myType;
 
-	private List<JdbcTableColum> myColumns = new ArrayList<>();
+	private JdbcTableColumState()
+	{
+	}
 
-	public void setName(String name)
+	public JdbcTableColumState(String name, String type)
 	{
 		myName = name;
+		myType = type;
 	}
 
 	public String getName()
@@ -27,20 +29,30 @@ public class JdbcTable implements PersistentStateComponent<JdbcTable>
 		return myName;
 	}
 
-	public List<JdbcTableColum> getColumns()
+	public void setType(String type)
 	{
-		return myColumns;
+		myType = type;
+	}
+
+	public String getType()
+	{
+		return myType;
+	}
+
+	public void setName(String name)
+	{
+		myName = name;
 	}
 
 	@Nullable
 	@Override
-	public JdbcTable getState()
+	public JdbcTableColumState getState()
 	{
 		return this;
 	}
 
 	@Override
-	public void loadState(JdbcTable state)
+	public void loadState(JdbcTableColumState state)
 	{
 		XmlSerializerUtil.copyBean(state, this);
 	}

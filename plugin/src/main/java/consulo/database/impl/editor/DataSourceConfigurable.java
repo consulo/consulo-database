@@ -112,9 +112,9 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-				DataSourceTransportManager dataSourceTransportManager = DataSourceTransportManager.getInstance();
+				DataSourceTransportManager dataSourceTransportManager = DataSourceTransportManager.getInstance(myProject);
 
-				AsyncResult<Void> result = dataSourceTransportManager.testConnection(myProject, myDataSource);
+				AsyncResult<Void> result = dataSourceTransportManager.testConnection(myDataSource);
 
 				result.doWhenDone(() -> {
 					SwingUtilities.invokeLater(() -> Messages.showInfoMessage(myProject, "Connection success", "DataSource"));

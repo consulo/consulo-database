@@ -1,8 +1,11 @@
 package consulo.database.datasource.transport;
 
+import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
+import com.intellij.util.messages.Topic;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
@@ -13,12 +16,19 @@ import javax.annotation.Nonnull;
  */
 public interface DataSourceTransportManager
 {
+	Topic<DataSourceTransportListener> TOPIC = Topic.create("DataSourceTransportListener", DataSourceTransportListener.class);
+
 	@Nonnull
-	static DataSourceTransportManager getInstance()
+	static DataSourceTransportManager getInstance(@Nonnull Project project)
 	{
-		return ServiceManager.getService(DataSourceTransportManager.class);
+		return ServiceManager.getService(project, DataSourceTransportManager.class);
 	}
 
 	@Nonnull
-	AsyncResult<Void> testConnection(@Nonnull Project project, @Nonnull DataSource dataSource);
+	AsyncResult<Void> testConnection(@Nonnull DataSource dataSource);
+
+	@RequiredReadAction
+	void refreshAll();
+
+	<T extends PersistentStateComponent<?>> T getDataState(@Nonnull DataSource dataSource);
 }

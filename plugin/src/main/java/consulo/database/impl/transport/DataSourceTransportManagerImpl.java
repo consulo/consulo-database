@@ -1,27 +1,116 @@
 package consulo.database.impl.transport;
 
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
+import consulo.annotation.access.RequiredReadAction;
+import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.model.DataSourceEvent;
+import consulo.database.datasource.model.DataSourceListener;
 import consulo.database.datasource.transport.DataSourceTransport;
+import consulo.database.datasource.transport.DataSourceTransportListener;
 import consulo.database.datasource.transport.DataSourceTransportManager;
+import org.jdom.Element;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author VISTALL
  * @since 2020-08-16
  */
 @Singleton
-public class DataSourceTransportManagerImpl implements DataSourceTransportManager
+@State(name = "DataSourceManagerImpl", storages = @Storage("datasource-cache.xml"))
+public class DataSourceTransportManagerImpl implements DataSourceTransportManager, PersistentStateComponent<Element>
 {
+	private final Project myProject;
+
+	private final DataSourceManager myDataSourceManager;
+
+	private final Map<String, Object> myStates = new ConcurrentHashMap<>();
+
+	@Inject
+	public DataSourceTransportManagerImpl(Project project, DataSourceManager dataSourceManager)
+	{
+		myProject = project;
+		myDataSourceManager = dataSourceManager;
+
+		myProject.getMessageBus().connect().subscribe(DataSourceManager.TOPIC, new DataSourceListener()
+		{
+			@Override
+			public void dataSourceEvent(DataSourceEvent event)
+			{
+				if(event.getAction() == DataSourceEvent.Action.REMOVE)
+				{
+					myStates.remove(event.getDataSource().getId());
+				}
+			}
+		});
+	}
+
 	@Nonnull
 	@Override
-	public AsyncResult<Void> testConnection(@Nonnull Project project, @Nonnull DataSource dataSource)
+	public AsyncResult<Void> testConnection(@Nonnull DataSource dataSource)
+	{
+		DataSourceTransport dataSourceTransport = findTransport(dataSource);
+
+		AsyncResult<Void> result = AsyncResult.undefined();
+
+		final DataSourceTransport finalDataSourceTransport = dataSourceTransport;
+		new Task.ConditionalModal(myProject, "Testing connection", true, PerformInBackgroundOption.DEAF)
+		{
+			@Override
+			public void run(@Nonnull ProgressIndicator indicator)
+			{
+				finalDataSourceTransport.testConnection(indicator, myProject, dataSource, result);
+
+				result.waitFor(-1);
+			}
+		}.queue();
+		return result;
+	}
+
+	@RequiredReadAction
+	@Override
+	@SuppressWarnings("unchecked")
+	public void refreshAll()
+	{
+		List<? extends DataSource> dataSources = myDataSourceManager.getDataSources();
+
+		DataSourceTransportListener publisher = myProject.getMessageBus().syncPublisher(TOPIC);
+
+		Task.Backgroundable.queue(myProject, "Refreshing data sources...", true, indicator ->
+		{
+			for(DataSource dataSource : dataSources)
+			{
+				DataSourceTransport transport = findTransport(dataSource);
+
+				AsyncResult<PersistentStateComponent<?>> result = AsyncResult.undefined();
+
+				transport.loadInitialData(indicator, myProject, dataSource, result);
+
+				result.doWhenDone(state -> {
+					myStates.put(dataSource.getId(), state);
+
+					publisher.dataUpdated(dataSource, state);
+				});
+			}
+		});
+	}
+
+	@Nonnull
+	private DataSourceTransport findTransport(DataSource dataSource)
 	{
 		DataSourceTransport dataSourceTransport = null;
 		for(DataSourceTransport transport : DataSourceTransport.EP_NAME.getExtensionList())
@@ -38,19 +127,27 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 			throw new UnsupportedOperationException("No fake transport. Broken distribution");
 		}
 
-		AsyncResult<Void> result = AsyncResult.undefined();
+		return dataSourceTransport;
+	}
 
-		final DataSourceTransport finalDataSourceTransport = dataSourceTransport;
-		new Task.ConditionalModal(project, "Testing connection", true, PerformInBackgroundOption.DEAF)
-		{
-			@Override
-			public void run(@Nonnull ProgressIndicator indicator)
-			{
-				finalDataSourceTransport.testConnection(indicator, project, dataSource, result);
+	@Override
+	public <T extends PersistentStateComponent<?>> T getDataState(@Nonnull DataSource dataSource)
+	{
+		Object o = myStates.get(dataSource.getId());
 
-				result.waitFor(-1);
-			}
-		}.queue();
-		return result;
+		return (T) o;
+	}
+
+	@Nullable
+	@Override
+	public Element getState()
+	{
+		return new Element("state");
+	}
+
+	@Override
+	public void loadState(Element state)
+	{
+
 	}
 }

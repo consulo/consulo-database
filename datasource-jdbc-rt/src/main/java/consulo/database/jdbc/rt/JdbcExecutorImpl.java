@@ -2,12 +2,17 @@ package consulo.database.jdbc.rt;
 
 import consulo.database.jdbc.rt.shared.FailError;
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
+import consulo.database.jdbc.rt.shared.JdbcTable;
 import org.apache.thrift.TException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -18,25 +23,29 @@ import java.util.Properties;
 public class JdbcExecutorImpl implements JdbcExecutor.Iface
 {
 	@Override
-	public boolean testConnection(String url, Map<String, String> from) throws TException
+	public boolean testConnection(String url, Map<String, String> params) throws TException
 	{
-		Properties properties = new Properties();
-		properties.putAll(from);
+		return call(connection -> connection.isValid(5000), url, params);
+	}
 
-		try
+	@Override
+	public List<JdbcTable> listTables(String url, Map<String, String> params) throws FailError, TException
+	{
+		return call(conn ->
 		{
-			Connection connection = DriverManager.getConnection(url, properties);
+			List<JdbcTable> list = new ArrayList<>();
 
-			connection.isValid(5000);
+			DatabaseMetaData md = conn.getMetaData();
+			ResultSet rs = md.getTables(null, null, "%", null);
+			while(rs.next())
+			{
+				String tableName = rs.getString(3);
 
-			return true;
-		}
-		catch(Throwable e)
-		{
-			e.printStackTrace();
+				list.add(new JdbcTable(tableName, new ArrayList<>()));
+			}
 
-			throw new FailError(e.getMessage(), getStackTrace(e));
-		}
+			return list;
+		}, url, params);
 	}
 
 	private String getStackTrace(Throwable t)
@@ -47,5 +56,24 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 			t.printStackTrace(printWriter);
 		}
 		return writer.getBuffer().toString();
+	}
+
+	protected <T> T call(ThwroableFunction<T, Connection> callable, String url, Map<String, String> params) throws FailError
+	{
+		Properties properties = new Properties();
+		properties.putAll(params);
+
+		try
+		{
+			Connection connection = DriverManager.getConnection(url, properties);
+
+			return callable.call(connection);
+		}
+		catch(Throwable e)
+		{
+			e.printStackTrace();
+
+			throw new FailError(e.getMessage(), getStackTrace(e));
+		}
 	}
 }
