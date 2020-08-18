@@ -1,6 +1,8 @@
 package consulo.database.mariadb;
 
 import com.intellij.openapi.options.UnnamedConfigurable;
+import consulo.database.datasource.configurable.EditablePropertiesHolder;
+import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.configurable.JdbcConfigurable;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
@@ -43,6 +45,14 @@ public class MariadbJdbDataSourceProvider extends JdbcDataSourceProvider
 	public UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource)
 	{
 		return new JdbcConfigurable((EditableDataSource) dataSource);
+	}
+
+	@Override
+	public void fillDefaultProperties(@Nonnull EditablePropertiesHolder propertiesHolder)
+	{
+		propertiesHolder.set(GenericPropertyKeys.PORT, 3306);
+		propertiesHolder.set(GenericPropertyKeys.LOGIN, "root");
+		propertiesHolder.set(GenericPropertyKeys.PASSWORD, "root");
 	}
 
 	@Override

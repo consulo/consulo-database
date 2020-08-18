@@ -6,7 +6,7 @@ package consulo.database.datasource.configurable;
  */
 public interface GenericPropertyKeys
 {
-	GenericPropertyKey<String> HOST = GenericPropertyKey.create("host", String.class, "locahost");
+	GenericPropertyKey<String> HOST = GenericPropertyKey.create("host", String.class, "localhost");
 
 	GenericPropertyKey<Integer> PORT = GenericPropertyKey.create("port", Integer.class, 0);
 

@@ -42,7 +42,7 @@ public class CopyDataSourceAction extends DumbAwareAction
 			return;
 		}
 
-		myEditableDataSourceModel.newDatSourceCopy(source.getName() + " Copy", source);
+		myEditableDataSourceModel.newDataSourceCopy(source.getName() + " Copy", source);
 	}
 
 	@RequiredUIAccess

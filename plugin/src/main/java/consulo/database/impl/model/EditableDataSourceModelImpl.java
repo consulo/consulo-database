@@ -54,6 +54,8 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 	{
 		EditableDataSourceImpl source = new EditableDataSourceImpl(this, name, dataSourceProvider);
 
+		dataSourceProvider.fillDefaultProperties(source.getProperties());
+
 		myDataSources.add(source);
 
 		myDispatcher.getMulticaster().dataSourceEvent(new DataSourceEvent(myManager, DataSourceEvent.Action.ADD, source));
@@ -62,7 +64,7 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 	}
 
 	@Override
-	public EditableDataSource newDatSourceCopy(@Nonnull String name, @Nonnull DataSource original)
+	public EditableDataSource newDataSourceCopy(@Nonnull String name, @Nonnull DataSource original)
 	{
 		EditableDataSourceImpl newDataSource = new EditableDataSourceImpl(this, name, original.getProvider());
 
