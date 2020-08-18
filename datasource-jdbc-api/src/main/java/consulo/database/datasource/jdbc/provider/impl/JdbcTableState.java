@@ -27,6 +27,11 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 		return myName;
 	}
 
+	public void addColumn(JdbcTableColumState columState)
+	{
+		myColumns.add(columState);
+	}
+
 	public List<JdbcTableColumState> getColumns()
 	{
 		return myColumns;

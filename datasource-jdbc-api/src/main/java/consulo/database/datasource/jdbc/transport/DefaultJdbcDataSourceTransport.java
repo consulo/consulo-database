@@ -5,9 +5,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.JdbcState;
+import consulo.database.datasource.jdbc.provider.impl.JdbcTableColumState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
+import consulo.database.jdbc.rt.shared.JdbcColum;
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
 import consulo.database.jdbc.rt.shared.JdbcTable;
 
@@ -64,6 +66,10 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 				JdbcTableState tableState = new JdbcTableState();
 				tableState.setName(jdbcTable.getName());
 
+				for(JdbcColum colum : jdbcTable.getColums())
+				{
+					tableState.addColumn(new JdbcTableColumState(colum.getName(), colum.getType()));
+				}
 				state.addTable(tableState);
 			}
 

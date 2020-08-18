@@ -1,6 +1,7 @@
 package consulo.database.jdbc.rt;
 
 import consulo.database.jdbc.rt.shared.FailError;
+import consulo.database.jdbc.rt.shared.JdbcColum;
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
 import consulo.database.jdbc.rt.shared.JdbcTable;
 import org.apache.thrift.TException;
@@ -41,7 +42,17 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 			{
 				String tableName = rs.getString(3);
 
-				list.add(new JdbcTable(tableName, new ArrayList<>()));
+				List<JdbcColum> columList = new ArrayList<>();
+
+				ResultSet columns = md.getColumns(null, null, tableName, null);
+				while(columns.next())
+				{
+					String colName = columns.getString(4);
+					String colType = columns.getString(6);
+
+					columList.add(new JdbcColum(colName, colType));
+				}
+				list.add(new JdbcTable(tableName, columList));
 			}
 
 			return list;
