@@ -9,6 +9,7 @@ import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 
 /**
  * @author VISTALL
@@ -42,5 +43,11 @@ public class MariadbJdbDataSourceProvider extends JdbcDataSourceProvider
 	public UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource)
 	{
 		return new JdbcConfigurable((EditableDataSource) dataSource);
+	}
+
+	@Override
+	public void fillDrivers(Map<String, String> map)
+	{
+		map.put("mariadb-java-client-2.6.2.jar", "https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.6.2/mariadb-java-client-2.6.2.jar");
 	}
 }

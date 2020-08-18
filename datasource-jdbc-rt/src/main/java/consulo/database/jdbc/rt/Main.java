@@ -1,8 +1,12 @@
 package consulo.database.jdbc.rt;
 
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
-import org.apache.thrift.server.TThreadedSelectorServer;
-import org.apache.thrift.transport.TNonblockingServerSocket;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.server.ServerContext;
+import org.apache.thrift.server.TServerEventHandler;
+import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TTransport;
 
 import java.net.InetSocketAddress;
 
@@ -16,13 +20,36 @@ public class Main
 	{
 		JdbcExecutor.Processor<JdbcExecutorImpl> p = new JdbcExecutor.Processor<>(new JdbcExecutorImpl());
 
-		TNonblockingServerSocket transport = new TNonblockingServerSocket(new InetSocketAddress("localhost", 6645));
+		TServerSocket transport = new TServerSocket(new InetSocketAddress("localhost", 6645));
 
-		TThreadedSelectorServer.Args serverArgs = new TThreadedSelectorServer.Args(transport);
-
+		TSimpleServer.Args serverArgs = new TSimpleServer.Args(transport);
 		serverArgs = serverArgs.processor(p);
 
-		TThreadedSelectorServer server = new TThreadedSelectorServer(serverArgs);
+		TSimpleServer server = new TSimpleServer(serverArgs);
+		server.setServerEventHandler(new TServerEventHandler()
+		{
+			@Override
+			public void preServe()
+			{
+				System.out.println("[binded]");
+			}
+
+			@Override
+			public ServerContext createContext(TProtocol tProtocol, TProtocol tProtocol1)
+			{
+				return null;
+			}
+
+			@Override
+			public void deleteContext(ServerContext serverContext, TProtocol tProtocol, TProtocol tProtocol1)
+			{
+			}
+
+			@Override
+			public void processContext(ServerContext serverContext, TTransport tTransport, TTransport tTransport1)
+			{
+			}
+		});
 
 		server.serve();
 	}

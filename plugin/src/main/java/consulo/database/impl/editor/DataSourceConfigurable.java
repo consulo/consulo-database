@@ -2,6 +2,7 @@ package consulo.database.impl.editor;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.UnnamedConfigurable;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.NamedConfigurable;
@@ -120,6 +121,11 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 				});
 
 				result.doWhenRejectedWithThrowable(throwable -> {
+					if(throwable instanceof ProcessCanceledException)
+					{
+						// canceled no need info
+						return;
+					}
 					SwingUtilities.invokeLater(() -> Messages.showErrorDialog(myProject, "Connection failed: " + throwable.getMessage(), "DataSource"));
 				});
 			}

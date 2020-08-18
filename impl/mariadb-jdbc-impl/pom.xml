@@ -67,11 +67,5 @@
 			<artifactId>consulo.database-datasource.jdbc.api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-			<artifactId>mariadb-java-client</artifactId>
-			<version>2.6.2</version>
-		</dependency>
 	</dependencies>
 </project>

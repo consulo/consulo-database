@@ -25,13 +25,13 @@ public class JdbcExecutor {
 
   public interface Iface {
 
-    public boolean testConnection() throws org.apache.thrift.TException;
+    public boolean testConnection(String url, Map<String,String> properties) throws FailError, org.apache.thrift.TException;
 
   }
 
   public interface AsyncIface {
 
-    public void testConnection(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void testConnection(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -55,24 +55,29 @@ public class JdbcExecutor {
       super(iprot, oprot);
     }
 
-    public boolean testConnection() throws org.apache.thrift.TException
+    public boolean testConnection(String url, Map<String,String> properties) throws FailError, org.apache.thrift.TException
     {
-      send_testConnection();
+      send_testConnection(url, properties);
       return recv_testConnection();
     }
 
-    public void send_testConnection() throws org.apache.thrift.TException
+    public void send_testConnection(String url, Map<String,String> properties) throws org.apache.thrift.TException
     {
       testConnection_args args = new testConnection_args();
+      args.setUrl(url);
+      args.setProperties(properties);
       sendBase("testConnection", args);
     }
 
-    public boolean recv_testConnection() throws org.apache.thrift.TException
+    public boolean recv_testConnection() throws FailError, org.apache.thrift.TException
     {
       testConnection_result result = new testConnection_result();
       receiveBase(result, "testConnection");
       if (result.isSetSuccess()) {
         return result.success;
+      }
+      if (result.fr != null) {
+        throw result.fr;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "testConnection failed: unknown result");
     }
@@ -95,26 +100,32 @@ public class JdbcExecutor {
       super(protocolFactory, clientManager, transport);
     }
 
-    public void testConnection(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void testConnection(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      testConnection_call method_call = new testConnection_call(resultHandler, this, ___protocolFactory, ___transport);
+      testConnection_call method_call = new testConnection_call(url, properties, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
     public static class testConnection_call extends org.apache.thrift.async.TAsyncMethodCall {
-      public testConnection_call(org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private String url;
+      private Map<String,String> properties;
+      public testConnection_call(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
+        this.url = url;
+        this.properties = properties;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("testConnection", org.apache.thrift.protocol.TMessageType.CALL, 0));
         testConnection_args args = new testConnection_args();
+        args.setUrl(url);
+        args.setProperties(properties);
         args.write(prot);
         prot.writeMessageEnd();
       }
 
-      public boolean getResult() throws org.apache.thrift.TException {
+      public boolean getResult() throws FailError, org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
@@ -156,8 +167,12 @@ public class JdbcExecutor {
 
       public testConnection_result getResult(I iface, testConnection_args args) throws org.apache.thrift.TException {
         testConnection_result result = new testConnection_result();
-        result.success = iface.testConnection();
-        result.setSuccessIsSet(true);
+        try {
+          result.success = iface.testConnection(args.url, args.properties);
+          result.setSuccessIsSet(true);
+        } catch (FailError fr) {
+          result.fr = fr;
+        }
         return result;
       }
     }
@@ -207,6 +222,12 @@ public class JdbcExecutor {
             byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
             org.apache.thrift.TBase msg;
             testConnection_result result = new testConnection_result();
+            if (e instanceof FailError) {
+                        result.fr = (FailError) e;
+                        result.setFrIsSet(true);
+                        msg = result;
+            }
+             else 
             {
               msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
               msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
@@ -227,7 +248,7 @@ public class JdbcExecutor {
       }
 
       public void start(I iface, testConnection_args args, org.apache.thrift.async.AsyncMethodCallback<Boolean> resultHandler) throws TException {
-        iface.testConnection(resultHandler);
+        iface.testConnection(args.url, args.properties,resultHandler);
       }
     }
 
@@ -236,6 +257,8 @@ public class JdbcExecutor {
   public static class testConnection_args implements org.apache.thrift.TBase<testConnection_args, testConnection_args._Fields>, java.io.Serializable, Cloneable, Comparable<testConnection_args>   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("testConnection_args");
 
+    private static final org.apache.thrift.protocol.TField URL_FIELD_DESC = new org.apache.thrift.protocol.TField("url", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField PROPERTIES_FIELD_DESC = new org.apache.thrift.protocol.TField("properties", org.apache.thrift.protocol.TType.MAP, (short)2);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -243,10 +266,13 @@ public class JdbcExecutor {
       schemes.put(TupleScheme.class, new testConnection_argsTupleSchemeFactory());
     }
 
+    public String url; // required
+    public Map<String,String> properties; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-;
+      URL((short)1, "url"),
+      PROPERTIES((short)2, "properties");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -261,6 +287,10 @@ public class JdbcExecutor {
        */
       public static _Fields findByThriftId(int fieldId) {
         switch(fieldId) {
+          case 1: // URL
+            return URL;
+          case 2: // PROPERTIES
+            return PROPERTIES;
           default:
             return null;
         }
@@ -299,9 +329,17 @@ public class JdbcExecutor {
         return _fieldName;
       }
     }
+
+    // isset id assignments
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.URL, new org.apache.thrift.meta_data.FieldMetaData("url", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.PROPERTIES, new org.apache.thrift.meta_data.FieldMetaData("properties", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.MapMetaData(org.apache.thrift.protocol.TType.MAP, 
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING), 
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(testConnection_args.class, metaDataMap);
     }
@@ -309,10 +347,26 @@ public class JdbcExecutor {
     public testConnection_args() {
     }
 
+    public testConnection_args(
+      String url,
+      Map<String,String> properties)
+    {
+      this();
+      this.url = url;
+      this.properties = properties;
+    }
+
     /**
      * Performs a deep copy on <i>other</i>.
      */
     public testConnection_args(testConnection_args other) {
+      if (other.isSetUrl()) {
+        this.url = other.url;
+      }
+      if (other.isSetProperties()) {
+        Map<String,String> __this__properties = new HashMap<String,String>(other.properties);
+        this.properties = __this__properties;
+      }
     }
 
     public testConnection_args deepCopy() {
@@ -321,15 +375,98 @@ public class JdbcExecutor {
 
     @Override
     public void clear() {
+      this.url = null;
+      this.properties = null;
+    }
+
+    public String getUrl() {
+      return this.url;
+    }
+
+    public testConnection_args setUrl(String url) {
+      this.url = url;
+      return this;
+    }
+
+    public void unsetUrl() {
+      this.url = null;
+    }
+
+    /** Returns true if field url is set (has been assigned a value) and false otherwise */
+    public boolean isSetUrl() {
+      return this.url != null;
+    }
+
+    public void setUrlIsSet(boolean value) {
+      if (!value) {
+        this.url = null;
+      }
+    }
+
+    public int getPropertiesSize() {
+      return (this.properties == null) ? 0 : this.properties.size();
+    }
+
+    public void putToProperties(String key, String val) {
+      if (this.properties == null) {
+        this.properties = new HashMap<String,String>();
+      }
+      this.properties.put(key, val);
+    }
+
+    public Map<String,String> getProperties() {
+      return this.properties;
+    }
+
+    public testConnection_args setProperties(Map<String,String> properties) {
+      this.properties = properties;
+      return this;
+    }
+
+    public void unsetProperties() {
+      this.properties = null;
+    }
+
+    /** Returns true if field properties is set (has been assigned a value) and false otherwise */
+    public boolean isSetProperties() {
+      return this.properties != null;
+    }
+
+    public void setPropertiesIsSet(boolean value) {
+      if (!value) {
+        this.properties = null;
+      }
     }
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
+      case URL:
+        if (value == null) {
+          unsetUrl();
+        } else {
+          setUrl((String)value);
+        }
+        break;
+
+      case PROPERTIES:
+        if (value == null) {
+          unsetProperties();
+        } else {
+          setProperties((Map<String,String>)value);
+        }
+        break;
+
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
+      case URL:
+        return getUrl();
+
+      case PROPERTIES:
+        return getProperties();
+
       }
       throw new IllegalStateException();
     }
@@ -341,6 +478,10 @@ public class JdbcExecutor {
       }
 
       switch (field) {
+      case URL:
+        return isSetUrl();
+      case PROPERTIES:
+        return isSetProperties();
       }
       throw new IllegalStateException();
     }
@@ -358,12 +499,40 @@ public class JdbcExecutor {
       if (that == null)
         return false;
 
+      boolean this_present_url = true && this.isSetUrl();
+      boolean that_present_url = true && that.isSetUrl();
+      if (this_present_url || that_present_url) {
+        if (!(this_present_url && that_present_url))
+          return false;
+        if (!this.url.equals(that.url))
+          return false;
+      }
+
+      boolean this_present_properties = true && this.isSetProperties();
+      boolean that_present_properties = true && that.isSetProperties();
+      if (this_present_properties || that_present_properties) {
+        if (!(this_present_properties && that_present_properties))
+          return false;
+        if (!this.properties.equals(that.properties))
+          return false;
+      }
+
       return true;
     }
 
     @Override
     public int hashCode() {
       List<Object> list = new ArrayList<Object>();
+
+      boolean present_url = true && (isSetUrl());
+      list.add(present_url);
+      if (present_url)
+        list.add(url);
+
+      boolean present_properties = true && (isSetProperties());
+      list.add(present_properties);
+      if (present_properties)
+        list.add(properties);
 
       return list.hashCode();
     }
@@ -376,6 +545,26 @@ public class JdbcExecutor {
 
       int lastComparison = 0;
 
+      lastComparison = Boolean.valueOf(isSetUrl()).compareTo(other.isSetUrl());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUrl()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.url, other.url);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetProperties()).compareTo(other.isSetProperties());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetProperties()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.properties, other.properties);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -396,6 +585,21 @@ public class JdbcExecutor {
       StringBuilder sb = new StringBuilder("testConnection_args(");
       boolean first = true;
 
+      sb.append("url:");
+      if (this.url == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.url);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("properties:");
+      if (this.properties == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.properties);
+      }
+      first = false;
       sb.append(")");
       return sb.toString();
     }
@@ -439,6 +643,34 @@ public class JdbcExecutor {
             break;
           }
           switch (schemeField.id) {
+            case 1: // URL
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.url = iprot.readString();
+                struct.setUrlIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // PROPERTIES
+              if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
+                {
+                  org.apache.thrift.protocol.TMap _map0 = iprot.readMapBegin();
+                  struct.properties = new HashMap<String,String>(2*_map0.size);
+                  String _key1;
+                  String _val2;
+                  for (int _i3 = 0; _i3 < _map0.size; ++_i3)
+                  {
+                    _key1 = iprot.readString();
+                    _val2 = iprot.readString();
+                    struct.properties.put(_key1, _val2);
+                  }
+                  iprot.readMapEnd();
+                }
+                struct.setPropertiesIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -454,6 +686,24 @@ public class JdbcExecutor {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.url != null) {
+          oprot.writeFieldBegin(URL_FIELD_DESC);
+          oprot.writeString(struct.url);
+          oprot.writeFieldEnd();
+        }
+        if (struct.properties != null) {
+          oprot.writeFieldBegin(PROPERTIES_FIELD_DESC);
+          {
+            oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.properties.size()));
+            for (Map.Entry<String, String> _iter4 : struct.properties.entrySet())
+            {
+              oprot.writeString(_iter4.getKey());
+              oprot.writeString(_iter4.getValue());
+            }
+            oprot.writeMapEnd();
+          }
+          oprot.writeFieldEnd();
+        }
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -471,11 +721,52 @@ public class JdbcExecutor {
       @Override
       public void write(org.apache.thrift.protocol.TProtocol prot, testConnection_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetUrl()) {
+          optionals.set(0);
+        }
+        if (struct.isSetProperties()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetUrl()) {
+          oprot.writeString(struct.url);
+        }
+        if (struct.isSetProperties()) {
+          {
+            oprot.writeI32(struct.properties.size());
+            for (Map.Entry<String, String> _iter5 : struct.properties.entrySet())
+            {
+              oprot.writeString(_iter5.getKey());
+              oprot.writeString(_iter5.getValue());
+            }
+          }
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, testConnection_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.url = iprot.readString();
+          struct.setUrlIsSet(true);
+        }
+        if (incoming.get(1)) {
+          {
+            org.apache.thrift.protocol.TMap _map6 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+            struct.properties = new HashMap<String,String>(2*_map6.size);
+            String _key7;
+            String _val8;
+            for (int _i9 = 0; _i9 < _map6.size; ++_i9)
+            {
+              _key7 = iprot.readString();
+              _val8 = iprot.readString();
+              struct.properties.put(_key7, _val8);
+            }
+          }
+          struct.setPropertiesIsSet(true);
+        }
       }
     }
 
@@ -485,6 +776,7 @@ public class JdbcExecutor {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("testConnection_result");
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.BOOL, (short)0);
+    private static final org.apache.thrift.protocol.TField FR_FIELD_DESC = new org.apache.thrift.protocol.TField("fr", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -493,10 +785,12 @@ public class JdbcExecutor {
     }
 
     public boolean success; // required
+    public FailError fr; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      SUCCESS((short)0, "success");
+      SUCCESS((short)0, "success"),
+      FR((short)1, "fr");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -513,6 +807,8 @@ public class JdbcExecutor {
         switch(fieldId) {
           case 0: // SUCCESS
             return SUCCESS;
+          case 1: // FR
+            return FR;
           default:
             return null;
         }
@@ -560,6 +856,8 @@ public class JdbcExecutor {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+      tmpMap.put(_Fields.FR, new org.apache.thrift.meta_data.FieldMetaData("fr", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(testConnection_result.class, metaDataMap);
     }
@@ -568,11 +866,13 @@ public class JdbcExecutor {
     }
 
     public testConnection_result(
-      boolean success)
+      boolean success,
+      FailError fr)
     {
       this();
       this.success = success;
       setSuccessIsSet(true);
+      this.fr = fr;
     }
 
     /**
@@ -581,6 +881,9 @@ public class JdbcExecutor {
     public testConnection_result(testConnection_result other) {
       __isset_bitfield = other.__isset_bitfield;
       this.success = other.success;
+      if (other.isSetFr()) {
+        this.fr = new FailError(other.fr);
+      }
     }
 
     public testConnection_result deepCopy() {
@@ -591,6 +894,7 @@ public class JdbcExecutor {
     public void clear() {
       setSuccessIsSet(false);
       this.success = false;
+      this.fr = null;
     }
 
     public boolean isSuccess() {
@@ -616,6 +920,30 @@ public class JdbcExecutor {
       __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __SUCCESS_ISSET_ID, value);
     }
 
+    public FailError getFr() {
+      return this.fr;
+    }
+
+    public testConnection_result setFr(FailError fr) {
+      this.fr = fr;
+      return this;
+    }
+
+    public void unsetFr() {
+      this.fr = null;
+    }
+
+    /** Returns true if field fr is set (has been assigned a value) and false otherwise */
+    public boolean isSetFr() {
+      return this.fr != null;
+    }
+
+    public void setFrIsSet(boolean value) {
+      if (!value) {
+        this.fr = null;
+      }
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case SUCCESS:
@@ -626,6 +954,14 @@ public class JdbcExecutor {
         }
         break;
 
+      case FR:
+        if (value == null) {
+          unsetFr();
+        } else {
+          setFr((FailError)value);
+        }
+        break;
+
       }
     }
 
@@ -633,6 +969,9 @@ public class JdbcExecutor {
       switch (field) {
       case SUCCESS:
         return isSuccess();
+
+      case FR:
+        return getFr();
 
       }
       throw new IllegalStateException();
@@ -647,6 +986,8 @@ public class JdbcExecutor {
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
+      case FR:
+        return isSetFr();
       }
       throw new IllegalStateException();
     }
@@ -673,6 +1014,15 @@ public class JdbcExecutor {
           return false;
       }
 
+      boolean this_present_fr = true && this.isSetFr();
+      boolean that_present_fr = true && that.isSetFr();
+      if (this_present_fr || that_present_fr) {
+        if (!(this_present_fr && that_present_fr))
+          return false;
+        if (!this.fr.equals(that.fr))
+          return false;
+      }
+
       return true;
     }
 
@@ -684,6 +1034,11 @@ public class JdbcExecutor {
       list.add(present_success);
       if (present_success)
         list.add(success);
+
+      boolean present_fr = true && (isSetFr());
+      list.add(present_fr);
+      if (present_fr)
+        list.add(fr);
 
       return list.hashCode();
     }
@@ -702,6 +1057,16 @@ public class JdbcExecutor {
       }
       if (isSetSuccess()) {
         lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, other.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetFr()).compareTo(other.isSetFr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetFr()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.fr, other.fr);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -728,6 +1093,14 @@ public class JdbcExecutor {
 
       sb.append("success:");
       sb.append(this.success);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("fr:");
+      if (this.fr == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.fr);
+      }
       first = false;
       sb.append(")");
       return sb.toString();
@@ -782,6 +1155,15 @@ public class JdbcExecutor {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 1: // FR
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.fr = new FailError();
+                struct.fr.read(iprot);
+                struct.setFrIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -800,6 +1182,11 @@ public class JdbcExecutor {
         if (struct.isSetSuccess()) {
           oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
           oprot.writeBool(struct.success);
+          oprot.writeFieldEnd();
+        }
+        if (struct.fr != null) {
+          oprot.writeFieldBegin(FR_FIELD_DESC);
+          struct.fr.write(oprot);
           oprot.writeFieldEnd();
         }
         oprot.writeFieldStop();
@@ -823,19 +1210,30 @@ public class JdbcExecutor {
         if (struct.isSetSuccess()) {
           optionals.set(0);
         }
-        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetFr()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
         if (struct.isSetSuccess()) {
           oprot.writeBool(struct.success);
+        }
+        if (struct.isSetFr()) {
+          struct.fr.write(oprot);
         }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, testConnection_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(1);
+        BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
           struct.success = iprot.readBool();
           struct.setSuccessIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.fr = new FailError();
+          struct.fr.read(iprot);
+          struct.setFrIsSet(true);
         }
       }
     }

@@ -1,6 +1,7 @@
 package consulo.database.datasource.transport;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.DataSource;
@@ -17,5 +18,5 @@ public interface DataSourceTransport
 
 	boolean accept(@Nonnull DataSource dataSource);
 
-	void testConnection(@Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<Void> result);
+	void testConnection(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<Void> result);
 }

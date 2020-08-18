@@ -10,6 +10,7 @@ import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 
 /**
  * @author VISTALL
@@ -43,5 +44,11 @@ public class MysqJdbcDataSourceProvider extends JdbcDataSourceProvider
 	public UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource)
 	{
 		return new JdbcConfigurable((EditableDataSource) dataSource);
+	}
+
+	@Override
+	public void fillDrivers(Map<String, String> map)
+	{
+		map.put("mysql-connector-java-8.0.21.jar", "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar");
 	}
 }

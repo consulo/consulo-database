@@ -54,6 +54,12 @@
 					<packaging>
 						<skip>${dev.mode}</skip>
 						<version>${build.number}</version>
+						<copies>
+							<copy>
+								<artifact>${project.groupId}:consulo.database-datasource.jdbc.rt:${project.version}</artifact>
+								<path>rt/consulo.database-datasource.jdbc.rt.jar</path>
+							</copy>
+						</copies>
 					</packaging>
 				</configuration>
 				<executions>
@@ -104,11 +110,17 @@
 			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-			<artifactId>mariadb-java-client</artifactId>
-			<version>2.6.2</version>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>consulo.database-datasource.jdbc.rt</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>consulo.database-datasource.jdbc.rt.shared</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

@@ -1,5 +1,7 @@
 package consulo.database.impl.transport;
 
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
@@ -39,13 +41,16 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 		AsyncResult<Void> result = AsyncResult.undefined();
 
 		final DataSourceTransport finalDataSourceTransport = dataSourceTransport;
-		Task.Backgroundable.queue(project, "Testing connection", indicator ->
+		new Task.ConditionalModal(project, "Testing connection", true, PerformInBackgroundOption.DEAF)
 		{
-			finalDataSourceTransport.testConnection(project, dataSource, result);
+			@Override
+			public void run(@Nonnull ProgressIndicator indicator)
+			{
+				finalDataSourceTransport.testConnection(indicator, project, dataSource, result);
 
-			result.waitFor(-1);
-		});
-
+				result.waitFor(-1);
+			}
+		}.queue();
 		return result;
 	}
 }

@@ -1,5 +1,6 @@
 package consulo.database.datasource.transport;
 
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.DataSource;
@@ -19,7 +20,7 @@ public class FakeDataSourceTransport implements DataSourceTransport
 	}
 
 	@Override
-	public void testConnection(@Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<Void> result)
+	public void testConnection(ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<Void> result)
 	{
 		result.setDone();
 	}

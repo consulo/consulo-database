@@ -5,6 +5,7 @@ import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 
 /**
  * @author VISTALL
@@ -33,4 +34,6 @@ public abstract class JdbcDataSourceProvider implements DataSourceProvider
 
 		return builder.toString();
 	}
+
+	public abstract void fillDrivers(Map<String, String> map);
 }
