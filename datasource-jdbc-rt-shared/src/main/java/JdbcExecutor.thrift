@@ -23,8 +23,12 @@ struct JdbcColum
 
 service JdbcExecutor
 {
-	bool testConnection(1: string url, 2: map<string, string> properties) throws (1: FailError fr);
+	void connect(1: string url, 2: map<string, string> properties) throws (1: FailError fr);
 
-	list<JdbcTable> listTables(1: string url, 2: map<string, string> properties) throws (1: FailError fr);
+	bool testConnection() throws (1: FailError fr);
+
+	list<string> listDatabases() throws (1: FailError fr);
+
+	list<JdbcTable> listTables(1: string databaseName) throws (1: FailError fr);
 }
 

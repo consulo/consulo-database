@@ -4,9 +4,9 @@ import com.intellij.execution.configurations.SimpleJavaParameters;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.util.AsyncResult;
 import com.intellij.util.PathUtil;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.containers.ContainerUtil;
@@ -17,10 +17,10 @@ import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
-import consulo.logging.Logger;
 import consulo.platform.Platform;
 import consulo.util.dataholder.Key;
 import consulo.util.lang.ref.SimpleReference;
+import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.transport.TSocket;
@@ -35,43 +35,41 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author VISTALL
  * @since 2020-08-18
  */
-public class JdbcSession<T>
+public class JdbcSession implements AutoCloseable
 {
-	private static final Logger LOG = Logger.getInstance(JdbcSession.class);
-
-	private final JdbcExecutorAction<T> myAction;
-
-	public JdbcSession(JdbcExecutorAction<T> action)
+	private enum SessionState
 	{
-		myAction = action;
+		UNDEFINED,
+		WAIT_CLIENT,
+		CANCELED,
+		ERROR
 	}
 
-	@Nonnull
-	public AsyncResult<T> run(@Nonnull ProgressIndicator indicator, @Nonnull DataSource dataSource)
-	{
-		AsyncResult<T> result = AsyncResult.undefined();
+	private ProcessHandler myProcessHandler;
 
+	private Future<?> myWatcherTask = CompletableFuture.completedFuture(null);
+
+	private JdbcExecutor.Client myClient;
+
+	private final TSocket mySocket;
+
+	private SessionState myState = SessionState.UNDEFINED;
+
+	private final CountDownLatch myCountDownLatch = new CountDownLatch(1);
+
+	public JdbcSession(@Nonnull ProgressIndicator indicator, @Nonnull DataSource dataSource) throws Exception
+	{
 		JdbcDataSourceProvider provider = (JdbcDataSourceProvider) dataSource.getProvider();
 
-		Path driverPath;
-
-		try
-		{
-			driverPath = prepareJdbcDriver(indicator, provider);
-		}
-		catch(IOException e)
-		{
-			result.rejectWithThrowable(e);
-			return result;
-		}
+		Path driverPath = prepareJdbcDriver(indicator, provider);
 
 		String jdbcUrl = provider.buildJdbcUrl(dataSource);
 
@@ -82,93 +80,117 @@ public class JdbcSession<T>
 		properties.put("user", login);
 		properties.put("password", password);
 
-		SimpleReference<OSProcessHandler> processRef = SimpleReference.create();
-
 		SimpleReference<Integer> exitCodeRef = SimpleReference.create();
 
-		SimpleReference<Future<?>> watcherRef = SimpleReference.create(CompletableFuture.completedFuture(null));
+		Platform platform = Platform.current();
 
+		String java_home = platform.os().getEnvironmentVariable("JAVA_HOME");
+
+		SimpleJavaParameters simpleJavaParameters = new SimpleJavaParameters();
+		simpleJavaParameters.getClassPath().add(new File(PluginManager.getPluginPath(DefaultJdbcDataSourceTransport.class), "rt/consulo.database-datasource.jdbc.rt.jar"));
+		simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(JdbcExecutor.class));
+		simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(TServer.class));
+		simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(org.slf4j.Logger.class));
+		simpleJavaParameters.getClassPath().add(driverPath.toFile());
+		simpleJavaParameters.setMainClass("consulo.database.jdbc.rt.Main");
+		simpleJavaParameters.setJdk(new FakeSdk(java_home));
+
+		OSProcessHandler processHandler = simpleJavaParameters.createOSProcessHandler();
+		myProcessHandler = processHandler;
+
+		processHandler.addProcessListener(new ProcessAdapter()
+		{
+			@Override
+			public void onTextAvailable(ProcessEvent event, Key outputType)
+			{
+				if(event.getText().trim().equals("[binded]"))
+				{
+					changeState(SessionState.WAIT_CLIENT);
+				}
+			}
+
+			@Override
+			public void processTerminated(ProcessEvent event)
+			{
+				exitCodeRef.setIfNull(event.getExitCode());
+
+				changeState(SessionState.ERROR);
+			}
+		});
+
+		myWatcherTask = AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() ->
+		{
+			// process terminated
+			if(exitCodeRef.get() != null)
+			{
+				myWatcherTask.cancel(false);
+				return;
+			}
+
+			if(indicator.isCanceled())
+			{
+				// force set canceled
+				myState = SessionState.CANCELED;
+
+				ProcessHandler handler = myProcessHandler;
+				if(handler != null)
+				{
+					// reset ref - no need kill process twice
+					myProcessHandler = null;
+					handler.destroyProcess();
+				}
+			}
+
+		}, 500, 500, TimeUnit.MILLISECONDS);
+
+		processHandler.startNotify();
+
+		myCountDownLatch.await();
+
+		if(myState == SessionState.CANCELED)
+		{
+			throw new ProcessCanceledException();
+		}
+
+		if(myState != SessionState.WAIT_CLIENT)
+		{
+			throw new Exception("Connection error");
+		}
+
+		mySocket = new TSocket("localhost", 6645);
+
+		mySocket.open();
+
+		myClient = new JdbcExecutor.Client(new TBinaryProtocol(mySocket));
+
+		myClient.connect(jdbcUrl, properties);
+	}
+
+	private void changeState(SessionState state)
+	{
+		if(myState == SessionState.UNDEFINED)
+		{
+			myState = state;
+			myCountDownLatch.countDown();
+		}
+	}
+
+	public <T> T execute(@Nonnull JdbcExecutorAction<T> action) throws TException
+	{
+		assert myClient != null;
 		try
 		{
-			Platform platform = Platform.current();
-
-			String java_home = platform.os().getEnvironmentVariable("JAVA_HOME");
-
-			SimpleJavaParameters simpleJavaParameters = new SimpleJavaParameters();
-			simpleJavaParameters.getClassPath().add(new File(PluginManager.getPluginPath(DefaultJdbcDataSourceTransport.class), "rt/consulo.database-datasource.jdbc.rt.jar"));
-			simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(JdbcExecutor.class));
-			simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(TServer.class));
-			simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(org.slf4j.Logger.class));
-			simpleJavaParameters.getClassPath().add(driverPath.toFile());
-			simpleJavaParameters.setMainClass("consulo.database.jdbc.rt.Main");
-			simpleJavaParameters.setJdk(new FakeSdk(java_home));
-
-			OSProcessHandler processHandler = simpleJavaParameters.createOSProcessHandler();
-			processRef.set(processHandler);
-
-			processHandler.addProcessListener(new ProcessAdapter()
-			{
-				@Override
-				public void onTextAvailable(ProcessEvent event, Key outputType)
-				{
-					if(event.getText().trim().equals("[binded]"))
-					{
-						scheduleConnectAsync(result, jdbcUrl, properties, processRef);
-					}
-				}
-
-				@Override
-				public void processTerminated(ProcessEvent event)
-				{
-					exitCodeRef.setIfNull(event.getExitCode());
-
-
-					if(event.getExitCode() != 0)
-					{
-						result.rejectWithThrowable(new ProcessCanceledException());
-					}
-					else
-					{
-						result.setDone(null);
-					}
-				}
-			});
-
-			ScheduledFuture<?> future = AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() ->
-			{
-				// process terminated
-				if(exitCodeRef.get() != null)
-				{
-					watcherRef.get().cancel(false);
-					return;
-				}
-
-				if(indicator.isCanceled())
-				{
-					OSProcessHandler handler = processRef.get();
-					if(handler != null)
-					{
-						// reset ref - no need kill process twice
-						processRef.set(null);
-						handler.destroyProcess();
-					}
-					return;
-				}
-
-			}, 1, 1, TimeUnit.SECONDS);
-
-			watcherRef.set(future);
-
-			processHandler.startNotify();
+			return action.run(myClient);
 		}
-		catch(Throwable e)
+		catch(TException e)
 		{
-			LOG.warn(e);
+			if(myState == SessionState.CANCELED)
+			{
+				throw new ProcessCanceledException();
+			}
 
-			result.rejectWithThrowable(e);
+			throw e;
 		}
-
-		return result;
 	}
 
 	@Nonnull
@@ -194,36 +216,20 @@ public class JdbcSession<T>
 		return driverPath;
 	}
 
-	protected void scheduleConnectAsync(AsyncResult<T> result, String jdbcUrl, Map<String, String> properties, SimpleReference<OSProcessHandler> processHandler)
+	@Override
+	public void close() throws Exception
 	{
-		AppExecutorUtil.getAppExecutorService().execute(() -> scheduleConnect(result, jdbcUrl, properties, processHandler));
-	}
-
-	protected void scheduleConnect(AsyncResult<T> result, String jdbcUrl, Map<String, String> properties, SimpleReference<OSProcessHandler> processHandler)
-	{
-		try
+		if(mySocket != null)
 		{
-			TSocket socket = new TSocket("localhost", 6645);
-			
-			socket.open();
-
-			JdbcExecutor.Client client = new JdbcExecutor.Client(new TBinaryProtocol(socket));
-
-			result.setDone(myAction.run(client, jdbcUrl, properties));
-
-			socket.close();
-		}
-		catch(Throwable e)
-		{
-			LOG.warn(e);
-
-			result.rejectWithThrowable(e);
+			mySocket.close();
 		}
 
-		OSProcessHandler handler = processHandler.get();
-		if(handler != null)
+		if(myProcessHandler != null)
 		{
-			handler.destroyProcess();
+			myProcessHandler.destroyProcess();
+			myProcessHandler = null;
 		}
+
+		myWatcherTask.cancel(false);
 	}
 }

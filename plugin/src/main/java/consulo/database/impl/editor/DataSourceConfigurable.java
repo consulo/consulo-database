@@ -17,8 +17,6 @@ import org.jetbrains.annotations.Nls;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * @author VISTALL
@@ -107,28 +105,33 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		panel.add(ConfigurableUIMigrationUtil.createComponent(myInnerConfigurable), BorderLayout.CENTER);
 
 		JButton testButton = new JButton("Test Connection");
-		testButton.addActionListener(new ActionListener()
+		testButton.addActionListener(e ->
 		{
-			@Override
-			public void actionPerformed(ActionEvent actionEvent)
+			try
 			{
-				DataSourceTransportManager dataSourceTransportManager = DataSourceTransportManager.getInstance(myProject);
-
-				AsyncResult<Void> result = dataSourceTransportManager.testConnection(myDataSource);
-
-				result.doWhenDone(() -> {
-					SwingUtilities.invokeLater(() -> Messages.showInfoMessage(myProject, "Connection success", "DataSource"));
-				});
-
-				result.doWhenRejectedWithThrowable(throwable -> {
-					if(throwable instanceof ProcessCanceledException)
-					{
-						// canceled no need info
-						return;
-					}
-					SwingUtilities.invokeLater(() -> Messages.showErrorDialog(myProject, "Connection failed: " + throwable.getMessage(), "DataSource"));
-				});
+				apply();
 			}
+			catch(ConfigurationException ignored)
+			{
+				return;
+			}
+
+			DataSourceTransportManager dataSourceTransportManager = DataSourceTransportManager.getInstance(myProject);
+
+			AsyncResult<Void> result = dataSourceTransportManager.testConnection(myDataSource);
+
+			result.doWhenDone(() -> {
+				SwingUtilities.invokeLater(() -> Messages.showInfoMessage(myProject, "Connection success", "DataSource"));
+			});
+
+			result.doWhenRejectedWithThrowable(throwable -> {
+				if(throwable instanceof ProcessCanceledException)
+				{
+					// canceled no need info
+					return;
+				}
+				SwingUtilities.invokeLater(() -> Messages.showErrorDialog(myProject, "Connection failed: " + throwable.getMessage(), "DataSource"));
+			});
 		});
 
 		JPanel buttonPanel = new BorderLayoutPanel().addToRight(testButton);

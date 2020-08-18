@@ -1,5 +1,6 @@
 package consulo.database.impl.toolWindow.node;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
@@ -54,6 +55,6 @@ public class DatabaseProviderNode extends AbstractTreeNode<DataSourceProvider>
 	{
 		DataSourceProvider value = getValue();
 		presentation.addText(value.getName().getValue(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
-		presentation.setIcon(value.getIcon());
+		presentation.setIcon(AllIcons.Nodes.Folder);
 	}
 }

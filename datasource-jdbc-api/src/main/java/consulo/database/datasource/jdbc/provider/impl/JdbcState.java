@@ -5,8 +5,8 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author VISTALL
@@ -14,17 +14,17 @@ import java.util.List;
  */
 public class JdbcState implements PersistentStateComponent<JdbcState>
 {
-	private List<JdbcTableState> myTables = new ArrayList<>();
+	private Map<String, JdbcDatabaseState> myDatabases = new TreeMap<>();
 
 	@Nonnull
-	public List<JdbcTableState> getTables()
+	public Map<String, JdbcDatabaseState> getDatabases()
 	{
-		return myTables;
+		return myDatabases;
 	}
 
-	public void addTable(@Nonnull JdbcTableState state)
+	public void addDatabase(@Nonnull String dbName, @Nonnull JdbcDatabaseState databaseState)
 	{
-		myTables.add(state);
+		myDatabases.put(dbName, databaseState);
 	}
 
 	@Nullable

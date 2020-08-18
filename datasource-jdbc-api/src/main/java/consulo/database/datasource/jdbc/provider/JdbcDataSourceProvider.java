@@ -3,6 +3,7 @@ package consulo.database.datasource.jdbc.provider;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.provider.DataSourceProvider;
+import consulo.util.lang.StringUtil;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -29,8 +30,11 @@ public abstract class JdbcDataSourceProvider implements DataSourceProvider
 		builder.append(port);
 
 		String databaseName = dataSource.getProperties().get(GenericPropertyKeys.DATABASE_NAME);
-		builder.append("/");
-		builder.append(databaseName);
+		if(!StringUtil.isEmpty(databaseName))
+		{
+			builder.append("/");
+			builder.append(databaseName);
+		}
 
 		return builder.toString();
 	}

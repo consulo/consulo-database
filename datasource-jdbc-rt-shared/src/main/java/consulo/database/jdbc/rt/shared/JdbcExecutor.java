@@ -6,36 +6,56 @@
  */
 package consulo.database.jdbc.rt.shared;
 
-import org.apache.thrift.EncodingUtils;
-import org.apache.thrift.TException;
-import org.apache.thrift.async.AsyncMethodCallback;
-import org.apache.thrift.protocol.TTupleProtocol;
 import org.apache.thrift.scheme.IScheme;
 import org.apache.thrift.scheme.SchemeFactory;
 import org.apache.thrift.scheme.StandardScheme;
+
 import org.apache.thrift.scheme.TupleScheme;
-import org.apache.thrift.server.AbstractNonblockingServer.AsyncFrameBuffer;
+import org.apache.thrift.protocol.TTupleProtocol;
+import org.apache.thrift.protocol.TProtocolException;
+import org.apache.thrift.EncodingUtils;
+import org.apache.thrift.TException;
+import org.apache.thrift.async.AsyncMethodCallback;
+import org.apache.thrift.server.AbstractNonblockingServer.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.EnumSet;
+import java.util.Collections;
+import java.util.BitSet;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 @SuppressWarnings({"cast", "rawtypes", "serial", "unchecked"})
 public class JdbcExecutor {
 
   public interface Iface {
 
-    public boolean testConnection(String url, Map<String,String> properties) throws FailError, org.apache.thrift.TException;
+    public void connect(String url, Map<String,String> properties) throws FailError, org.apache.thrift.TException;
 
-    public List<JdbcTable> listTables(String url, Map<String,String> properties) throws FailError, org.apache.thrift.TException;
+    public boolean testConnection() throws FailError, org.apache.thrift.TException;
+
+    public List<String> listDatabases() throws FailError, org.apache.thrift.TException;
+
+    public List<JdbcTable> listTables(String databaseName) throws FailError, org.apache.thrift.TException;
 
   }
 
   public interface AsyncIface {
 
-    public void testConnection(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void connect(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void listTables(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void testConnection(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+
+    public void listDatabases(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+
+    public void listTables(String databaseName, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -59,17 +79,39 @@ public class JdbcExecutor {
       super(iprot, oprot);
     }
 
-    public boolean testConnection(String url, Map<String,String> properties) throws FailError, org.apache.thrift.TException
+    public void connect(String url, Map<String,String> properties) throws FailError, org.apache.thrift.TException
     {
-      send_testConnection(url, properties);
+      send_connect(url, properties);
+      recv_connect();
+    }
+
+    public void send_connect(String url, Map<String,String> properties) throws org.apache.thrift.TException
+    {
+      connect_args args = new connect_args();
+      args.setUrl(url);
+      args.setProperties(properties);
+      sendBase("connect", args);
+    }
+
+    public void recv_connect() throws FailError, org.apache.thrift.TException
+    {
+      connect_result result = new connect_result();
+      receiveBase(result, "connect");
+      if (result.fr != null) {
+        throw result.fr;
+      }
+      return;
+    }
+
+    public boolean testConnection() throws FailError, org.apache.thrift.TException
+    {
+      send_testConnection();
       return recv_testConnection();
     }
 
-    public void send_testConnection(String url, Map<String,String> properties) throws org.apache.thrift.TException
+    public void send_testConnection() throws org.apache.thrift.TException
     {
       testConnection_args args = new testConnection_args();
-      args.setUrl(url);
-      args.setProperties(properties);
       sendBase("testConnection", args);
     }
 
@@ -86,17 +128,41 @@ public class JdbcExecutor {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "testConnection failed: unknown result");
     }
 
-    public List<JdbcTable> listTables(String url, Map<String,String> properties) throws FailError, org.apache.thrift.TException
+    public List<String> listDatabases() throws FailError, org.apache.thrift.TException
     {
-      send_listTables(url, properties);
+      send_listDatabases();
+      return recv_listDatabases();
+    }
+
+    public void send_listDatabases() throws org.apache.thrift.TException
+    {
+      listDatabases_args args = new listDatabases_args();
+      sendBase("listDatabases", args);
+    }
+
+    public List<String> recv_listDatabases() throws FailError, org.apache.thrift.TException
+    {
+      listDatabases_result result = new listDatabases_result();
+      receiveBase(result, "listDatabases");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      if (result.fr != null) {
+        throw result.fr;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "listDatabases failed: unknown result");
+    }
+
+    public List<JdbcTable> listTables(String databaseName) throws FailError, org.apache.thrift.TException
+    {
+      send_listTables(databaseName);
       return recv_listTables();
     }
 
-    public void send_listTables(String url, Map<String,String> properties) throws org.apache.thrift.TException
+    public void send_listTables(String databaseName) throws org.apache.thrift.TException
     {
       listTables_args args = new listTables_args();
-      args.setUrl(url);
-      args.setProperties(properties);
+      args.setDatabaseName(databaseName);
       sendBase("listTables", args);
     }
 
@@ -131,27 +197,56 @@ public class JdbcExecutor {
       super(protocolFactory, clientManager, transport);
     }
 
-    public void testConnection(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void connect(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      testConnection_call method_call = new testConnection_call(url, properties, resultHandler, this, ___protocolFactory, ___transport);
+      connect_call method_call = new connect_call(url, properties, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
-    public static class testConnection_call extends org.apache.thrift.async.TAsyncMethodCall {
+    public static class connect_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String url;
       private Map<String,String> properties;
-      public testConnection_call(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public connect_call(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.url = url;
         this.properties = properties;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
-        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("testConnection", org.apache.thrift.protocol.TMessageType.CALL, 0));
-        testConnection_args args = new testConnection_args();
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("connect", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        connect_args args = new connect_args();
         args.setUrl(url);
         args.setProperties(properties);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws FailError, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_connect();
+      }
+    }
+
+    public void testConnection(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      testConnection_call method_call = new testConnection_call(resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class testConnection_call extends org.apache.thrift.async.TAsyncMethodCall {
+      public testConnection_call(org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("testConnection", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        testConnection_args args = new testConnection_args();
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -166,27 +261,53 @@ public class JdbcExecutor {
       }
     }
 
-    public void listTables(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void listDatabases(org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      listTables_call method_call = new listTables_call(url, properties, resultHandler, this, ___protocolFactory, ___transport);
+      listDatabases_call method_call = new listDatabases_call(resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class listDatabases_call extends org.apache.thrift.async.TAsyncMethodCall {
+      public listDatabases_call(org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("listDatabases", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        listDatabases_args args = new listDatabases_args();
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<String> getResult() throws FailError, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_listDatabases();
+      }
+    }
+
+    public void listTables(String databaseName, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      listTables_call method_call = new listTables_call(databaseName, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
     public static class listTables_call extends org.apache.thrift.async.TAsyncMethodCall {
-      private String url;
-      private Map<String,String> properties;
-      public listTables_call(String url, Map<String,String> properties, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private String databaseName;
+      public listTables_call(String databaseName, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
-        this.url = url;
-        this.properties = properties;
+        this.databaseName = databaseName;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("listTables", org.apache.thrift.protocol.TMessageType.CALL, 0));
         listTables_args args = new listTables_args();
-        args.setUrl(url);
-        args.setProperties(properties);
+        args.setDatabaseName(databaseName);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -214,9 +335,35 @@ public class JdbcExecutor {
     }
 
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
+      processMap.put("connect", new connect());
       processMap.put("testConnection", new testConnection());
+      processMap.put("listDatabases", new listDatabases());
       processMap.put("listTables", new listTables());
       return processMap;
+    }
+
+    public static class connect<I extends Iface> extends org.apache.thrift.ProcessFunction<I, connect_args> {
+      public connect() {
+        super("connect");
+      }
+
+      public connect_args getEmptyArgsInstance() {
+        return new connect_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public connect_result getResult(I iface, connect_args args) throws org.apache.thrift.TException {
+        connect_result result = new connect_result();
+        try {
+          iface.connect(args.url, args.properties);
+        } catch (FailError fr) {
+          result.fr = fr;
+        }
+        return result;
+      }
     }
 
     public static class testConnection<I extends Iface> extends org.apache.thrift.ProcessFunction<I, testConnection_args> {
@@ -235,8 +382,32 @@ public class JdbcExecutor {
       public testConnection_result getResult(I iface, testConnection_args args) throws org.apache.thrift.TException {
         testConnection_result result = new testConnection_result();
         try {
-          result.success = iface.testConnection(args.url, args.properties);
+          result.success = iface.testConnection();
           result.setSuccessIsSet(true);
+        } catch (FailError fr) {
+          result.fr = fr;
+        }
+        return result;
+      }
+    }
+
+    public static class listDatabases<I extends Iface> extends org.apache.thrift.ProcessFunction<I, listDatabases_args> {
+      public listDatabases() {
+        super("listDatabases");
+      }
+
+      public listDatabases_args getEmptyArgsInstance() {
+        return new listDatabases_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public listDatabases_result getResult(I iface, listDatabases_args args) throws org.apache.thrift.TException {
+        listDatabases_result result = new listDatabases_result();
+        try {
+          result.success = iface.listDatabases();
         } catch (FailError fr) {
           result.fr = fr;
         }
@@ -260,7 +431,7 @@ public class JdbcExecutor {
       public listTables_result getResult(I iface, listTables_args args) throws org.apache.thrift.TException {
         listTables_result result = new listTables_result();
         try {
-          result.success = iface.listTables(args.url, args.properties);
+          result.success = iface.listTables(args.databaseName);
         } catch (FailError fr) {
           result.fr = fr;
         }
@@ -281,9 +452,67 @@ public class JdbcExecutor {
     }
 
     private static <I extends AsyncIface> Map<String,  org.apache.thrift.AsyncProcessFunction<I, ? extends  org.apache.thrift.TBase,?>> getProcessMap(Map<String,  org.apache.thrift.AsyncProcessFunction<I, ? extends  org.apache.thrift.TBase, ?>> processMap) {
+      processMap.put("connect", new connect());
       processMap.put("testConnection", new testConnection());
+      processMap.put("listDatabases", new listDatabases());
       processMap.put("listTables", new listTables());
       return processMap;
+    }
+
+    public static class connect<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, connect_args, Void> {
+      public connect() {
+        super("connect");
+      }
+
+      public connect_args getEmptyArgsInstance() {
+        return new connect_args();
+      }
+
+      public AsyncMethodCallback<Void> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
+        final org.apache.thrift.AsyncProcessFunction fcall = this;
+        return new AsyncMethodCallback<Void>() { 
+          public void onComplete(Void o) {
+            connect_result result = new connect_result();
+            try {
+              fcall.sendResponse(fb,result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
+              return;
+            } catch (Exception e) {
+              LOGGER.error("Exception writing to internal frame buffer", e);
+            }
+            fb.close();
+          }
+          public void onError(Exception e) {
+            byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
+            org.apache.thrift.TBase msg;
+            connect_result result = new connect_result();
+            if (e instanceof FailError) {
+                        result.fr = (FailError) e;
+                        result.setFrIsSet(true);
+                        msg = result;
+            }
+             else 
+            {
+              msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
+              msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
+            }
+            try {
+              fcall.sendResponse(fb,msg,msgType,seqid);
+              return;
+            } catch (Exception ex) {
+              LOGGER.error("Exception writing to internal frame buffer", ex);
+            }
+            fb.close();
+          }
+        };
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public void start(I iface, connect_args args, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws TException {
+        iface.connect(args.url, args.properties,resultHandler);
+      }
     }
 
     public static class testConnection<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, testConnection_args, Boolean> {
@@ -340,7 +569,64 @@ public class JdbcExecutor {
       }
 
       public void start(I iface, testConnection_args args, org.apache.thrift.async.AsyncMethodCallback<Boolean> resultHandler) throws TException {
-        iface.testConnection(args.url, args.properties,resultHandler);
+        iface.testConnection(resultHandler);
+      }
+    }
+
+    public static class listDatabases<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, listDatabases_args, List<String>> {
+      public listDatabases() {
+        super("listDatabases");
+      }
+
+      public listDatabases_args getEmptyArgsInstance() {
+        return new listDatabases_args();
+      }
+
+      public AsyncMethodCallback<List<String>> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
+        final org.apache.thrift.AsyncProcessFunction fcall = this;
+        return new AsyncMethodCallback<List<String>>() { 
+          public void onComplete(List<String> o) {
+            listDatabases_result result = new listDatabases_result();
+            result.success = o;
+            try {
+              fcall.sendResponse(fb,result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
+              return;
+            } catch (Exception e) {
+              LOGGER.error("Exception writing to internal frame buffer", e);
+            }
+            fb.close();
+          }
+          public void onError(Exception e) {
+            byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
+            org.apache.thrift.TBase msg;
+            listDatabases_result result = new listDatabases_result();
+            if (e instanceof FailError) {
+                        result.fr = (FailError) e;
+                        result.setFrIsSet(true);
+                        msg = result;
+            }
+             else 
+            {
+              msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
+              msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
+            }
+            try {
+              fcall.sendResponse(fb,msg,msgType,seqid);
+              return;
+            } catch (Exception ex) {
+              LOGGER.error("Exception writing to internal frame buffer", ex);
+            }
+            fb.close();
+          }
+        };
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public void start(I iface, listDatabases_args args, org.apache.thrift.async.AsyncMethodCallback<List<String>> resultHandler) throws TException {
+        iface.listDatabases(resultHandler);
       }
     }
 
@@ -397,22 +683,22 @@ public class JdbcExecutor {
       }
 
       public void start(I iface, listTables_args args, org.apache.thrift.async.AsyncMethodCallback<List<JdbcTable>> resultHandler) throws TException {
-        iface.listTables(args.url, args.properties,resultHandler);
+        iface.listTables(args.databaseName,resultHandler);
       }
     }
 
   }
 
-  public static class testConnection_args implements org.apache.thrift.TBase<testConnection_args, testConnection_args._Fields>, java.io.Serializable, Cloneable, Comparable<testConnection_args>   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("testConnection_args");
+  public static class connect_args implements org.apache.thrift.TBase<connect_args, connect_args._Fields>, java.io.Serializable, Cloneable, Comparable<connect_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("connect_args");
 
     private static final org.apache.thrift.protocol.TField URL_FIELD_DESC = new org.apache.thrift.protocol.TField("url", org.apache.thrift.protocol.TType.STRING, (short)1);
     private static final org.apache.thrift.protocol.TField PROPERTIES_FIELD_DESC = new org.apache.thrift.protocol.TField("properties", org.apache.thrift.protocol.TType.MAP, (short)2);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new testConnection_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new testConnection_argsTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new connect_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new connect_argsTupleSchemeFactory());
     }
 
     public String url; // required
@@ -490,13 +776,13 @@ public class JdbcExecutor {
               new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING), 
               new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(testConnection_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(connect_args.class, metaDataMap);
     }
 
-    public testConnection_args() {
+    public connect_args() {
     }
 
-    public testConnection_args(
+    public connect_args(
       String url,
       Map<String,String> properties)
     {
@@ -508,7 +794,7 @@ public class JdbcExecutor {
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public testConnection_args(testConnection_args other) {
+    public connect_args(connect_args other) {
       if (other.isSetUrl()) {
         this.url = other.url;
       }
@@ -518,8 +804,8 @@ public class JdbcExecutor {
       }
     }
 
-    public testConnection_args deepCopy() {
-      return new testConnection_args(this);
+    public connect_args deepCopy() {
+      return new connect_args(this);
     }
 
     @Override
@@ -532,7 +818,7 @@ public class JdbcExecutor {
       return this.url;
     }
 
-    public testConnection_args setUrl(String url) {
+    public connect_args setUrl(String url) {
       this.url = url;
       return this;
     }
@@ -567,7 +853,7 @@ public class JdbcExecutor {
       return this.properties;
     }
 
-    public testConnection_args setProperties(Map<String,String> properties) {
+    public connect_args setProperties(Map<String,String> properties) {
       this.properties = properties;
       return this;
     }
@@ -639,12 +925,12 @@ public class JdbcExecutor {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof testConnection_args)
-        return this.equals((testConnection_args)that);
+      if (that instanceof connect_args)
+        return this.equals((connect_args)that);
       return false;
     }
 
-    public boolean equals(testConnection_args that) {
+    public boolean equals(connect_args that) {
       if (that == null)
         return false;
 
@@ -687,7 +973,7 @@ public class JdbcExecutor {
     }
 
     @Override
-    public int compareTo(testConnection_args other) {
+    public int compareTo(connect_args other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
@@ -731,7 +1017,7 @@ public class JdbcExecutor {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("testConnection_args(");
+      StringBuilder sb = new StringBuilder("connect_args(");
       boolean first = true;
 
       sb.append("url:");
@@ -774,15 +1060,15 @@ public class JdbcExecutor {
       }
     }
 
-    private static class testConnection_argsStandardSchemeFactory implements SchemeFactory {
-      public testConnection_argsStandardScheme getScheme() {
-        return new testConnection_argsStandardScheme();
+    private static class connect_argsStandardSchemeFactory implements SchemeFactory {
+      public connect_argsStandardScheme getScheme() {
+        return new connect_argsStandardScheme();
       }
     }
 
-    private static class testConnection_argsStandardScheme extends StandardScheme<testConnection_args> {
+    private static class connect_argsStandardScheme extends StandardScheme<connect_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, testConnection_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, connect_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -831,7 +1117,7 @@ public class JdbcExecutor {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, testConnection_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, connect_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -859,16 +1145,16 @@ public class JdbcExecutor {
 
     }
 
-    private static class testConnection_argsTupleSchemeFactory implements SchemeFactory {
-      public testConnection_argsTupleScheme getScheme() {
-        return new testConnection_argsTupleScheme();
+    private static class connect_argsTupleSchemeFactory implements SchemeFactory {
+      public connect_argsTupleScheme getScheme() {
+        return new connect_argsTupleScheme();
       }
     }
 
-    private static class testConnection_argsTupleScheme extends TupleScheme<testConnection_args> {
+    private static class connect_argsTupleScheme extends TupleScheme<connect_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, testConnection_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, connect_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetUrl()) {
@@ -894,7 +1180,7 @@ public class JdbcExecutor {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, testConnection_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, connect_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
@@ -916,6 +1202,617 @@ public class JdbcExecutor {
           }
           struct.setPropertiesIsSet(true);
         }
+      }
+    }
+
+  }
+
+  public static class connect_result implements org.apache.thrift.TBase<connect_result, connect_result._Fields>, java.io.Serializable, Cloneable, Comparable<connect_result>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("connect_result");
+
+    private static final org.apache.thrift.protocol.TField FR_FIELD_DESC = new org.apache.thrift.protocol.TField("fr", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new connect_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new connect_resultTupleSchemeFactory());
+    }
+
+    public FailError fr; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      FR((short)1, "fr");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // FR
+            return FR;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.FR, new org.apache.thrift.meta_data.FieldMetaData("fr", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(connect_result.class, metaDataMap);
+    }
+
+    public connect_result() {
+    }
+
+    public connect_result(
+      FailError fr)
+    {
+      this();
+      this.fr = fr;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public connect_result(connect_result other) {
+      if (other.isSetFr()) {
+        this.fr = new FailError(other.fr);
+      }
+    }
+
+    public connect_result deepCopy() {
+      return new connect_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.fr = null;
+    }
+
+    public FailError getFr() {
+      return this.fr;
+    }
+
+    public connect_result setFr(FailError fr) {
+      this.fr = fr;
+      return this;
+    }
+
+    public void unsetFr() {
+      this.fr = null;
+    }
+
+    /** Returns true if field fr is set (has been assigned a value) and false otherwise */
+    public boolean isSetFr() {
+      return this.fr != null;
+    }
+
+    public void setFrIsSet(boolean value) {
+      if (!value) {
+        this.fr = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case FR:
+        if (value == null) {
+          unsetFr();
+        } else {
+          setFr((FailError)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case FR:
+        return getFr();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case FR:
+        return isSetFr();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof connect_result)
+        return this.equals((connect_result)that);
+      return false;
+    }
+
+    public boolean equals(connect_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_fr = true && this.isSetFr();
+      boolean that_present_fr = true && that.isSetFr();
+      if (this_present_fr || that_present_fr) {
+        if (!(this_present_fr && that_present_fr))
+          return false;
+        if (!this.fr.equals(that.fr))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      List<Object> list = new ArrayList<Object>();
+
+      boolean present_fr = true && (isSetFr());
+      list.add(present_fr);
+      if (present_fr)
+        list.add(fr);
+
+      return list.hashCode();
+    }
+
+    @Override
+    public int compareTo(connect_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      lastComparison = Boolean.valueOf(isSetFr()).compareTo(other.isSetFr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetFr()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.fr, other.fr);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("connect_result(");
+      boolean first = true;
+
+      sb.append("fr:");
+      if (this.fr == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.fr);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class connect_resultStandardSchemeFactory implements SchemeFactory {
+      public connect_resultStandardScheme getScheme() {
+        return new connect_resultStandardScheme();
+      }
+    }
+
+    private static class connect_resultStandardScheme extends StandardScheme<connect_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, connect_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // FR
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.fr = new FailError();
+                struct.fr.read(iprot);
+                struct.setFrIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, connect_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.fr != null) {
+          oprot.writeFieldBegin(FR_FIELD_DESC);
+          struct.fr.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class connect_resultTupleSchemeFactory implements SchemeFactory {
+      public connect_resultTupleScheme getScheme() {
+        return new connect_resultTupleScheme();
+      }
+    }
+
+    private static class connect_resultTupleScheme extends TupleScheme<connect_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, connect_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetFr()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetFr()) {
+          struct.fr.write(oprot);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, connect_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.fr = new FailError();
+          struct.fr.read(iprot);
+          struct.setFrIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class testConnection_args implements org.apache.thrift.TBase<testConnection_args, testConnection_args._Fields>, java.io.Serializable, Cloneable, Comparable<testConnection_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("testConnection_args");
+
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new testConnection_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new testConnection_argsTupleSchemeFactory());
+    }
+
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+;
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(testConnection_args.class, metaDataMap);
+    }
+
+    public testConnection_args() {
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public testConnection_args(testConnection_args other) {
+    }
+
+    public testConnection_args deepCopy() {
+      return new testConnection_args(this);
+    }
+
+    @Override
+    public void clear() {
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof testConnection_args)
+        return this.equals((testConnection_args)that);
+      return false;
+    }
+
+    public boolean equals(testConnection_args that) {
+      if (that == null)
+        return false;
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      List<Object> list = new ArrayList<Object>();
+
+      return list.hashCode();
+    }
+
+    @Override
+    public int compareTo(testConnection_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("testConnection_args(");
+      boolean first = true;
+
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class testConnection_argsStandardSchemeFactory implements SchemeFactory {
+      public testConnection_argsStandardScheme getScheme() {
+        return new testConnection_argsStandardScheme();
+      }
+    }
+
+    private static class testConnection_argsStandardScheme extends StandardScheme<testConnection_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, testConnection_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, testConnection_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class testConnection_argsTupleSchemeFactory implements SchemeFactory {
+      public testConnection_argsTupleScheme getScheme() {
+        return new testConnection_argsTupleScheme();
+      }
+    }
+
+    private static class testConnection_argsTupleScheme extends TupleScheme<testConnection_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, testConnection_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, testConnection_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
       }
     }
 
@@ -1389,25 +2286,20 @@ public class JdbcExecutor {
 
   }
 
-  public static class listTables_args implements org.apache.thrift.TBase<listTables_args, listTables_args._Fields>, java.io.Serializable, Cloneable, Comparable<listTables_args>   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("listTables_args");
+  public static class listDatabases_args implements org.apache.thrift.TBase<listDatabases_args, listDatabases_args._Fields>, java.io.Serializable, Cloneable, Comparable<listDatabases_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("listDatabases_args");
 
-    private static final org.apache.thrift.protocol.TField URL_FIELD_DESC = new org.apache.thrift.protocol.TField("url", org.apache.thrift.protocol.TType.STRING, (short)1);
-    private static final org.apache.thrift.protocol.TField PROPERTIES_FIELD_DESC = new org.apache.thrift.protocol.TField("properties", org.apache.thrift.protocol.TType.MAP, (short)2);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new listTables_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new listTables_argsTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new listDatabases_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new listDatabases_argsTupleSchemeFactory());
     }
 
-    public String url; // required
-    public Map<String,String> properties; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      URL((short)1, "url"),
-      PROPERTIES((short)2, "properties");
+;
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -1422,10 +2314,263 @@ public class JdbcExecutor {
        */
       public static _Fields findByThriftId(int fieldId) {
         switch(fieldId) {
-          case 1: // URL
-            return URL;
-          case 2: // PROPERTIES
-            return PROPERTIES;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(listDatabases_args.class, metaDataMap);
+    }
+
+    public listDatabases_args() {
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public listDatabases_args(listDatabases_args other) {
+    }
+
+    public listDatabases_args deepCopy() {
+      return new listDatabases_args(this);
+    }
+
+    @Override
+    public void clear() {
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof listDatabases_args)
+        return this.equals((listDatabases_args)that);
+      return false;
+    }
+
+    public boolean equals(listDatabases_args that) {
+      if (that == null)
+        return false;
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      List<Object> list = new ArrayList<Object>();
+
+      return list.hashCode();
+    }
+
+    @Override
+    public int compareTo(listDatabases_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("listDatabases_args(");
+      boolean first = true;
+
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class listDatabases_argsStandardSchemeFactory implements SchemeFactory {
+      public listDatabases_argsStandardScheme getScheme() {
+        return new listDatabases_argsStandardScheme();
+      }
+    }
+
+    private static class listDatabases_argsStandardScheme extends StandardScheme<listDatabases_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, listDatabases_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, listDatabases_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class listDatabases_argsTupleSchemeFactory implements SchemeFactory {
+      public listDatabases_argsTupleScheme getScheme() {
+        return new listDatabases_argsTupleScheme();
+      }
+    }
+
+    private static class listDatabases_argsTupleScheme extends TupleScheme<listDatabases_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, listDatabases_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, listDatabases_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+      }
+    }
+
+  }
+
+  public static class listDatabases_result implements org.apache.thrift.TBase<listDatabases_result, listDatabases_result._Fields>, java.io.Serializable, Cloneable, Comparable<listDatabases_result>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("listDatabases_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.LIST, (short)0);
+    private static final org.apache.thrift.protocol.TField FR_FIELD_DESC = new org.apache.thrift.protocol.TField("fr", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new listDatabases_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new listDatabases_resultTupleSchemeFactory());
+    }
+
+    public List<String> success; // required
+    public FailError fr; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      FR((short)1, "fr");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // FR
+            return FR;
           default:
             return null;
         }
@@ -1469,125 +2614,128 @@ public class JdbcExecutor {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.URL, new org.apache.thrift.meta_data.FieldMetaData("url", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-      tmpMap.put(_Fields.PROPERTIES, new org.apache.thrift.meta_data.FieldMetaData("properties", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.MapMetaData(org.apache.thrift.protocol.TType.MAP, 
-              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING), 
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
               new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+      tmpMap.put(_Fields.FR, new org.apache.thrift.meta_data.FieldMetaData("fr", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(listTables_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(listDatabases_result.class, metaDataMap);
     }
 
-    public listTables_args() {
+    public listDatabases_result() {
     }
 
-    public listTables_args(
-      String url,
-      Map<String,String> properties)
+    public listDatabases_result(
+      List<String> success,
+      FailError fr)
     {
       this();
-      this.url = url;
-      this.properties = properties;
+      this.success = success;
+      this.fr = fr;
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public listTables_args(listTables_args other) {
-      if (other.isSetUrl()) {
-        this.url = other.url;
+    public listDatabases_result(listDatabases_result other) {
+      if (other.isSetSuccess()) {
+        List<String> __this__success = new ArrayList<String>(other.success);
+        this.success = __this__success;
       }
-      if (other.isSetProperties()) {
-        Map<String,String> __this__properties = new HashMap<String,String>(other.properties);
-        this.properties = __this__properties;
+      if (other.isSetFr()) {
+        this.fr = new FailError(other.fr);
       }
     }
 
-    public listTables_args deepCopy() {
-      return new listTables_args(this);
+    public listDatabases_result deepCopy() {
+      return new listDatabases_result(this);
     }
 
     @Override
     public void clear() {
-      this.url = null;
-      this.properties = null;
+      this.success = null;
+      this.fr = null;
     }
 
-    public String getUrl() {
-      return this.url;
+    public int getSuccessSize() {
+      return (this.success == null) ? 0 : this.success.size();
     }
 
-    public listTables_args setUrl(String url) {
-      this.url = url;
+    public java.util.Iterator<String> getSuccessIterator() {
+      return (this.success == null) ? null : this.success.iterator();
+    }
+
+    public void addToSuccess(String elem) {
+      if (this.success == null) {
+        this.success = new ArrayList<String>();
+      }
+      this.success.add(elem);
+    }
+
+    public List<String> getSuccess() {
+      return this.success;
+    }
+
+    public listDatabases_result setSuccess(List<String> success) {
+      this.success = success;
       return this;
     }
 
-    public void unsetUrl() {
-      this.url = null;
+    public void unsetSuccess() {
+      this.success = null;
     }
 
-    /** Returns true if field url is set (has been assigned a value) and false otherwise */
-    public boolean isSetUrl() {
-      return this.url != null;
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
     }
 
-    public void setUrlIsSet(boolean value) {
+    public void setSuccessIsSet(boolean value) {
       if (!value) {
-        this.url = null;
+        this.success = null;
       }
     }
 
-    public int getPropertiesSize() {
-      return (this.properties == null) ? 0 : this.properties.size();
+    public FailError getFr() {
+      return this.fr;
     }
 
-    public void putToProperties(String key, String val) {
-      if (this.properties == null) {
-        this.properties = new HashMap<String,String>();
-      }
-      this.properties.put(key, val);
-    }
-
-    public Map<String,String> getProperties() {
-      return this.properties;
-    }
-
-    public listTables_args setProperties(Map<String,String> properties) {
-      this.properties = properties;
+    public listDatabases_result setFr(FailError fr) {
+      this.fr = fr;
       return this;
     }
 
-    public void unsetProperties() {
-      this.properties = null;
+    public void unsetFr() {
+      this.fr = null;
     }
 
-    /** Returns true if field properties is set (has been assigned a value) and false otherwise */
-    public boolean isSetProperties() {
-      return this.properties != null;
+    /** Returns true if field fr is set (has been assigned a value) and false otherwise */
+    public boolean isSetFr() {
+      return this.fr != null;
     }
 
-    public void setPropertiesIsSet(boolean value) {
+    public void setFrIsSet(boolean value) {
       if (!value) {
-        this.properties = null;
+        this.fr = null;
       }
     }
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case URL:
+      case SUCCESS:
         if (value == null) {
-          unsetUrl();
+          unsetSuccess();
         } else {
-          setUrl((String)value);
+          setSuccess((List<String>)value);
         }
         break;
 
-      case PROPERTIES:
+      case FR:
         if (value == null) {
-          unsetProperties();
+          unsetFr();
         } else {
-          setProperties((Map<String,String>)value);
+          setFr((FailError)value);
         }
         break;
 
@@ -1596,11 +2744,11 @@ public class JdbcExecutor {
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case URL:
-        return getUrl();
+      case SUCCESS:
+        return getSuccess();
 
-      case PROPERTIES:
-        return getProperties();
+      case FR:
+        return getFr();
 
       }
       throw new IllegalStateException();
@@ -1613,10 +2761,460 @@ public class JdbcExecutor {
       }
 
       switch (field) {
-      case URL:
-        return isSetUrl();
-      case PROPERTIES:
-        return isSetProperties();
+      case SUCCESS:
+        return isSetSuccess();
+      case FR:
+        return isSetFr();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof listDatabases_result)
+        return this.equals((listDatabases_result)that);
+      return false;
+    }
+
+    public boolean equals(listDatabases_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_fr = true && this.isSetFr();
+      boolean that_present_fr = true && that.isSetFr();
+      if (this_present_fr || that_present_fr) {
+        if (!(this_present_fr && that_present_fr))
+          return false;
+        if (!this.fr.equals(that.fr))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      List<Object> list = new ArrayList<Object>();
+
+      boolean present_success = true && (isSetSuccess());
+      list.add(present_success);
+      if (present_success)
+        list.add(success);
+
+      boolean present_fr = true && (isSetFr());
+      list.add(present_fr);
+      if (present_fr)
+        list.add(fr);
+
+      return list.hashCode();
+    }
+
+    @Override
+    public int compareTo(listDatabases_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(other.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, other.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetFr()).compareTo(other.isSetFr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetFr()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.fr, other.fr);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("listDatabases_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("fr:");
+      if (this.fr == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.fr);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class listDatabases_resultStandardSchemeFactory implements SchemeFactory {
+      public listDatabases_resultStandardScheme getScheme() {
+        return new listDatabases_resultStandardScheme();
+      }
+    }
+
+    private static class listDatabases_resultStandardScheme extends StandardScheme<listDatabases_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, listDatabases_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+                {
+                  org.apache.thrift.protocol.TList _list18 = iprot.readListBegin();
+                  struct.success = new ArrayList<String>(_list18.size);
+                  String _elem19;
+                  for (int _i20 = 0; _i20 < _list18.size; ++_i20)
+                  {
+                    _elem19 = iprot.readString();
+                    struct.success.add(_elem19);
+                  }
+                  iprot.readListEnd();
+                }
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 1: // FR
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.fr = new FailError();
+                struct.fr.read(iprot);
+                struct.setFrIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, listDatabases_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.success.size()));
+            for (String _iter21 : struct.success)
+            {
+              oprot.writeString(_iter21);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+        if (struct.fr != null) {
+          oprot.writeFieldBegin(FR_FIELD_DESC);
+          struct.fr.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class listDatabases_resultTupleSchemeFactory implements SchemeFactory {
+      public listDatabases_resultTupleScheme getScheme() {
+        return new listDatabases_resultTupleScheme();
+      }
+    }
+
+    private static class listDatabases_resultTupleScheme extends TupleScheme<listDatabases_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, listDatabases_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        if (struct.isSetFr()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetSuccess()) {
+          {
+            oprot.writeI32(struct.success.size());
+            for (String _iter22 : struct.success)
+            {
+              oprot.writeString(_iter22);
+            }
+          }
+        }
+        if (struct.isSetFr()) {
+          struct.fr.write(oprot);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, listDatabases_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          {
+            org.apache.thrift.protocol.TList _list23 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+            struct.success = new ArrayList<String>(_list23.size);
+            String _elem24;
+            for (int _i25 = 0; _i25 < _list23.size; ++_i25)
+            {
+              _elem24 = iprot.readString();
+              struct.success.add(_elem24);
+            }
+          }
+          struct.setSuccessIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.fr = new FailError();
+          struct.fr.read(iprot);
+          struct.setFrIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class listTables_args implements org.apache.thrift.TBase<listTables_args, listTables_args._Fields>, java.io.Serializable, Cloneable, Comparable<listTables_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("listTables_args");
+
+    private static final org.apache.thrift.protocol.TField DATABASE_NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("databaseName", org.apache.thrift.protocol.TType.STRING, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new listTables_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new listTables_argsTupleSchemeFactory());
+    }
+
+    public String databaseName; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      DATABASE_NAME((short)1, "databaseName");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // DATABASE_NAME
+            return DATABASE_NAME;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.DATABASE_NAME, new org.apache.thrift.meta_data.FieldMetaData("databaseName", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(listTables_args.class, metaDataMap);
+    }
+
+    public listTables_args() {
+    }
+
+    public listTables_args(
+      String databaseName)
+    {
+      this();
+      this.databaseName = databaseName;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public listTables_args(listTables_args other) {
+      if (other.isSetDatabaseName()) {
+        this.databaseName = other.databaseName;
+      }
+    }
+
+    public listTables_args deepCopy() {
+      return new listTables_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.databaseName = null;
+    }
+
+    public String getDatabaseName() {
+      return this.databaseName;
+    }
+
+    public listTables_args setDatabaseName(String databaseName) {
+      this.databaseName = databaseName;
+      return this;
+    }
+
+    public void unsetDatabaseName() {
+      this.databaseName = null;
+    }
+
+    /** Returns true if field databaseName is set (has been assigned a value) and false otherwise */
+    public boolean isSetDatabaseName() {
+      return this.databaseName != null;
+    }
+
+    public void setDatabaseNameIsSet(boolean value) {
+      if (!value) {
+        this.databaseName = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case DATABASE_NAME:
+        if (value == null) {
+          unsetDatabaseName();
+        } else {
+          setDatabaseName((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case DATABASE_NAME:
+        return getDatabaseName();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case DATABASE_NAME:
+        return isSetDatabaseName();
       }
       throw new IllegalStateException();
     }
@@ -1634,21 +3232,12 @@ public class JdbcExecutor {
       if (that == null)
         return false;
 
-      boolean this_present_url = true && this.isSetUrl();
-      boolean that_present_url = true && that.isSetUrl();
-      if (this_present_url || that_present_url) {
-        if (!(this_present_url && that_present_url))
+      boolean this_present_databaseName = true && this.isSetDatabaseName();
+      boolean that_present_databaseName = true && that.isSetDatabaseName();
+      if (this_present_databaseName || that_present_databaseName) {
+        if (!(this_present_databaseName && that_present_databaseName))
           return false;
-        if (!this.url.equals(that.url))
-          return false;
-      }
-
-      boolean this_present_properties = true && this.isSetProperties();
-      boolean that_present_properties = true && that.isSetProperties();
-      if (this_present_properties || that_present_properties) {
-        if (!(this_present_properties && that_present_properties))
-          return false;
-        if (!this.properties.equals(that.properties))
+        if (!this.databaseName.equals(that.databaseName))
           return false;
       }
 
@@ -1659,15 +3248,10 @@ public class JdbcExecutor {
     public int hashCode() {
       List<Object> list = new ArrayList<Object>();
 
-      boolean present_url = true && (isSetUrl());
-      list.add(present_url);
-      if (present_url)
-        list.add(url);
-
-      boolean present_properties = true && (isSetProperties());
-      list.add(present_properties);
-      if (present_properties)
-        list.add(properties);
+      boolean present_databaseName = true && (isSetDatabaseName());
+      list.add(present_databaseName);
+      if (present_databaseName)
+        list.add(databaseName);
 
       return list.hashCode();
     }
@@ -1680,22 +3264,12 @@ public class JdbcExecutor {
 
       int lastComparison = 0;
 
-      lastComparison = Boolean.valueOf(isSetUrl()).compareTo(other.isSetUrl());
+      lastComparison = Boolean.valueOf(isSetDatabaseName()).compareTo(other.isSetDatabaseName());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      if (isSetUrl()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.url, other.url);
-        if (lastComparison != 0) {
-          return lastComparison;
-        }
-      }
-      lastComparison = Boolean.valueOf(isSetProperties()).compareTo(other.isSetProperties());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      if (isSetProperties()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.properties, other.properties);
+      if (isSetDatabaseName()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.databaseName, other.databaseName);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -1720,19 +3294,11 @@ public class JdbcExecutor {
       StringBuilder sb = new StringBuilder("listTables_args(");
       boolean first = true;
 
-      sb.append("url:");
-      if (this.url == null) {
+      sb.append("databaseName:");
+      if (this.databaseName == null) {
         sb.append("null");
       } else {
-        sb.append(this.url);
-      }
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("properties:");
-      if (this.properties == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.properties);
+        sb.append(this.databaseName);
       }
       first = false;
       sb.append(")");
@@ -1778,30 +3344,10 @@ public class JdbcExecutor {
             break;
           }
           switch (schemeField.id) {
-            case 1: // URL
+            case 1: // DATABASE_NAME
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
-                struct.url = iprot.readString();
-                struct.setUrlIsSet(true);
-              } else { 
-                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-              }
-              break;
-            case 2: // PROPERTIES
-              if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
-                {
-                  org.apache.thrift.protocol.TMap _map18 = iprot.readMapBegin();
-                  struct.properties = new HashMap<String,String>(2*_map18.size);
-                  String _key19;
-                  String _val20;
-                  for (int _i21 = 0; _i21 < _map18.size; ++_i21)
-                  {
-                    _key19 = iprot.readString();
-                    _val20 = iprot.readString();
-                    struct.properties.put(_key19, _val20);
-                  }
-                  iprot.readMapEnd();
-                }
-                struct.setPropertiesIsSet(true);
+                struct.databaseName = iprot.readString();
+                struct.setDatabaseNameIsSet(true);
               } else { 
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
@@ -1821,22 +3367,9 @@ public class JdbcExecutor {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
-        if (struct.url != null) {
-          oprot.writeFieldBegin(URL_FIELD_DESC);
-          oprot.writeString(struct.url);
-          oprot.writeFieldEnd();
-        }
-        if (struct.properties != null) {
-          oprot.writeFieldBegin(PROPERTIES_FIELD_DESC);
-          {
-            oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.properties.size()));
-            for (Map.Entry<String, String> _iter22 : struct.properties.entrySet())
-            {
-              oprot.writeString(_iter22.getKey());
-              oprot.writeString(_iter22.getValue());
-            }
-            oprot.writeMapEnd();
-          }
+        if (struct.databaseName != null) {
+          oprot.writeFieldBegin(DATABASE_NAME_FIELD_DESC);
+          oprot.writeString(struct.databaseName);
           oprot.writeFieldEnd();
         }
         oprot.writeFieldStop();
@@ -1857,50 +3390,22 @@ public class JdbcExecutor {
       public void write(org.apache.thrift.protocol.TProtocol prot, listTables_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
-        if (struct.isSetUrl()) {
+        if (struct.isSetDatabaseName()) {
           optionals.set(0);
         }
-        if (struct.isSetProperties()) {
-          optionals.set(1);
-        }
-        oprot.writeBitSet(optionals, 2);
-        if (struct.isSetUrl()) {
-          oprot.writeString(struct.url);
-        }
-        if (struct.isSetProperties()) {
-          {
-            oprot.writeI32(struct.properties.size());
-            for (Map.Entry<String, String> _iter23 : struct.properties.entrySet())
-            {
-              oprot.writeString(_iter23.getKey());
-              oprot.writeString(_iter23.getValue());
-            }
-          }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetDatabaseName()) {
+          oprot.writeString(struct.databaseName);
         }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, listTables_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(2);
+        BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.url = iprot.readString();
-          struct.setUrlIsSet(true);
-        }
-        if (incoming.get(1)) {
-          {
-            org.apache.thrift.protocol.TMap _map24 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-            struct.properties = new HashMap<String,String>(2*_map24.size);
-            String _key25;
-            String _val26;
-            for (int _i27 = 0; _i27 < _map24.size; ++_i27)
-            {
-              _key25 = iprot.readString();
-              _val26 = iprot.readString();
-              struct.properties.put(_key25, _val26);
-            }
-          }
-          struct.setPropertiesIsSet(true);
+          struct.databaseName = iprot.readString();
+          struct.setDatabaseNameIsSet(true);
         }
       }
     }
@@ -2305,14 +3810,14 @@ public class JdbcExecutor {
             case 0: // SUCCESS
               if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
                 {
-                  org.apache.thrift.protocol.TList _list28 = iprot.readListBegin();
-                  struct.success = new ArrayList<JdbcTable>(_list28.size);
-                  JdbcTable _elem29;
-                  for (int _i30 = 0; _i30 < _list28.size; ++_i30)
+                  org.apache.thrift.protocol.TList _list26 = iprot.readListBegin();
+                  struct.success = new ArrayList<JdbcTable>(_list26.size);
+                  JdbcTable _elem27;
+                  for (int _i28 = 0; _i28 < _list26.size; ++_i28)
                   {
-                    _elem29 = new JdbcTable();
-                    _elem29.read(iprot);
-                    struct.success.add(_elem29);
+                    _elem27 = new JdbcTable();
+                    _elem27.read(iprot);
+                    struct.success.add(_elem27);
                   }
                   iprot.readListEnd();
                 }
@@ -2349,9 +3854,9 @@ public class JdbcExecutor {
           oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.success.size()));
-            for (JdbcTable _iter31 : struct.success)
+            for (JdbcTable _iter29 : struct.success)
             {
-              _iter31.write(oprot);
+              _iter29.write(oprot);
             }
             oprot.writeListEnd();
           }
@@ -2390,9 +3895,9 @@ public class JdbcExecutor {
         if (struct.isSetSuccess()) {
           {
             oprot.writeI32(struct.success.size());
-            for (JdbcTable _iter32 : struct.success)
+            for (JdbcTable _iter30 : struct.success)
             {
-              _iter32.write(oprot);
+              _iter30.write(oprot);
             }
           }
         }
@@ -2407,14 +3912,14 @@ public class JdbcExecutor {
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
           {
-            org.apache.thrift.protocol.TList _list33 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-            struct.success = new ArrayList<JdbcTable>(_list33.size);
-            JdbcTable _elem34;
-            for (int _i35 = 0; _i35 < _list33.size; ++_i35)
+            org.apache.thrift.protocol.TList _list31 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+            struct.success = new ArrayList<JdbcTable>(_list31.size);
+            JdbcTable _elem32;
+            for (int _i33 = 0; _i33 < _list31.size; ++_i33)
             {
-              _elem34 = new JdbcTable();
-              _elem34.read(iprot);
-              struct.success.add(_elem34);
+              _elem32 = new JdbcTable();
+              _elem32.read(iprot);
+              struct.success.add(_elem32);
             }
           }
           struct.setSuccessIsSet(true);

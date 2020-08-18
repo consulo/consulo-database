@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2020-08-16
  */
 @Singleton
-@State(name = "DataSourceManagerImpl", storages = @Storage("datasource-cache.xml"))
+@State(name = "DataSourceTransportManagerImpl", storages = @Storage("datasource-cache.xml"))
 public class DataSourceTransportManagerImpl implements DataSourceTransportManager, PersistentStateComponent<Element>
 {
 	private final Project myProject;

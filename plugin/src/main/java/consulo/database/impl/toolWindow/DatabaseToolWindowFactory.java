@@ -1,6 +1,7 @@
 package consulo.database.impl.toolWindow;
 
 import com.intellij.openapi.actionSystem.AnSeparator;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
@@ -19,7 +20,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-06-01
  */
-public class DatabaseToolWindowFactory implements ToolWindowFactory
+public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware
 {
 	public static final String ID = "Database";
 

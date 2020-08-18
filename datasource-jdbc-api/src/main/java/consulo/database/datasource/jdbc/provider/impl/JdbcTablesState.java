@@ -22,6 +22,11 @@ public class JdbcTablesState implements PersistentStateComponent<JdbcTablesState
 		return myTables;
 	}
 
+	public void addTable(JdbcTableState state)
+	{
+		myTables.add(state);
+	}
+
 	@Nullable
 	@Override
 	public JdbcTablesState getState()

@@ -8,10 +8,7 @@ import org.apache.thrift.TException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,17 +20,60 @@ import java.util.Properties;
  */
 public class JdbcExecutorImpl implements JdbcExecutor.Iface
 {
+	private Connection myConnection;
+
 	@Override
-	public boolean testConnection(String url, Map<String, String> params) throws TException
+	public void connect(String url, Map<String, String> params) throws FailError, TException
 	{
-		return call(connection -> connection.isValid(5000), url, params);
+		Properties properties = new Properties();
+		properties.putAll(params);
+
+		try
+		{
+			myConnection = DriverManager.getConnection(url, properties);
+		}
+		catch(Throwable e)
+		{
+			e.printStackTrace();
+
+			throw new FailError(e.getMessage(), getStackTrace(e));
+		}
 	}
 
 	@Override
-	public List<JdbcTable> listTables(String url, Map<String, String> params) throws FailError, TException
+	public boolean testConnection() throws FailError, TException
+	{
+		return call(param ->
+		{
+			param.isValid(10_000);
+			return true;
+		});
+	}
+
+	@Override
+	public List<String> listDatabases() throws FailError, TException
 	{
 		return call(conn ->
 		{
+			List<String> databases = new ArrayList<>();
+
+			DatabaseMetaData metaData = conn.getMetaData();
+			ResultSet tables = metaData.getCatalogs();
+			while(tables.next())
+			{
+				databases.add(tables.getString("TABLE_CAT"));
+			}
+			return databases;
+		});
+	}
+
+	@Override
+	public List<JdbcTable> listTables(String databaseName) throws FailError, TException
+	{
+		return call(conn ->
+		{
+			conn.setCatalog(databaseName);
+
 			List<JdbcTable> list = new ArrayList<>();
 
 			DatabaseMetaData md = conn.getMetaData();
@@ -56,7 +96,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 			}
 
 			return list;
-		}, url, params);
+		});
 	}
 
 	private String getStackTrace(Throwable t)
@@ -69,16 +109,16 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 		return writer.getBuffer().toString();
 	}
 
-	protected <T> T call(ThwroableFunction<T, Connection> callable, String url, Map<String, String> params) throws FailError
+	protected <T> T call(ThwroableFunction<T, Connection> callable) throws FailError
 	{
-		Properties properties = new Properties();
-		properties.putAll(params);
-
 		try
 		{
-			Connection connection = DriverManager.getConnection(url, properties);
+			if(myConnection == null)
+			{
+				throw new SQLException("Not connected");
+			}
 
-			return callable.call(connection);
+			return callable.call(myConnection);
 		}
 		catch(Throwable e)
 		{
