@@ -40,7 +40,7 @@ public class JdbcDataSourceTreeNodeProvider implements DataSourceTreeNodeProvide
 
 			for(JdbcDatabaseState databaseState : state.getDatabases().values())
 			{
-				consumer.accept(new DatabaseJdbcDatabaseNode(project, databaseState));
+				consumer.accept(new DatabaseJdbcDatabaseNode(project, dataSource, databaseState));
 			}
 		}
 	}

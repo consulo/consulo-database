@@ -7,10 +7,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
+import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author VISTALL
@@ -18,9 +19,12 @@ import java.util.Collections;
  */
 public class DatabaseJdbcDatabaseNode extends AbstractTreeNode<JdbcDatabaseState>
 {
-	public DatabaseJdbcDatabaseNode(Project project, JdbcDatabaseState state)
+	private final DataSource myDataSource;
+
+	public DatabaseJdbcDatabaseNode(Project project, DataSource dataSource, JdbcDatabaseState state)
 	{
 		super(project, state);
+		myDataSource = dataSource;
 	}
 
 	@RequiredReadAction
@@ -28,7 +32,7 @@ public class DatabaseJdbcDatabaseNode extends AbstractTreeNode<JdbcDatabaseState
 	@Override
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		return Collections.singletonList(new DatabaseJdbcTablesNode(myProject, getValue()));
+		return Arrays.asList(new DatabaseJdbcIndexesNode(myProject, myDataSource), new DatabaseJdbcTablesNode(myProject, getValue()));
 	}
 
 	@Override

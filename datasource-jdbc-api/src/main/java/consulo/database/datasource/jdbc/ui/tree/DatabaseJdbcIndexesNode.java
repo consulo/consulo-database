@@ -9,21 +9,18 @@ import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author VISTALL
- * @since 2020-08-18
+ * @since 2020-08-19
  */
-public class DatabaseKnownJdbcDatabaseNode extends AbstractTreeNode<String>
+public class DatabaseJdbcIndexesNode extends AbstractTreeNode<DataSource>
 {
-	private final DataSource myDataSource;
-
-	public DatabaseKnownJdbcDatabaseNode(Project project, DataSource dataSource, String databaseName)
+	public DatabaseJdbcIndexesNode(Project project, @Nonnull DataSource value)
 	{
-		super(project, databaseName);
-		myDataSource = dataSource;
+		super(project, value);
 	}
 
 	@RequiredReadAction
@@ -31,13 +28,13 @@ public class DatabaseKnownJdbcDatabaseNode extends AbstractTreeNode<String>
 	@Override
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		return Arrays.asList(new DatabaseJdbcIndexesNode(myProject, myDataSource), new DatabaseKnownJdbcTablesNode(myProject, myDataSource, getValue()));
+		return Collections.emptyList();
 	}
 
 	@Override
 	protected void update(PresentationData presentationData)
 	{
-		presentationData.setIcon(AllIcons.Nodes.DataSchema);
-		presentationData.addText(getValue(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+		presentationData.setIcon(AllIcons.Nodes.C_protected);
+		presentationData.addText("Indexes", SimpleTextAttributes.REGULAR_ATTRIBUTES);
 	}
 }
