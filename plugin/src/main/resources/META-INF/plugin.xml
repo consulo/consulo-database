@@ -48,7 +48,7 @@
 		<getDataRule implementation="consulo.database.impl.toolWindow.dataRules.DataSourceTreeRule"/>
 
 		<toolWindow id="Database"
-					icon="/toolwindows/problems.png"
+					icon="/icons/toolWindowDatabase.svg"
 					dispayName="consulo.database.DatabaseLocalize@toolwindow.title"
 					anchor="right"
 					factoryClass="consulo.database.impl.toolWindow.DatabaseToolWindowFactory"/>
