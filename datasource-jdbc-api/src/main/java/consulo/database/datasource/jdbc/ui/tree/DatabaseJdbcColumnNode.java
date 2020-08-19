@@ -6,19 +6,19 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
-import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
+import consulo.database.datasource.jdbc.provider.impl.JdbcTableColumState;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author VISTALL
- * @since 2020-08-18
+ * @since 2020-08-19
  */
-public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
+public class DatabaseJdbcColumnNode extends AbstractTreeNode<JdbcTableColumState>
 {
-	public DatabaseJdbcTableNode(Project project, @Nonnull JdbcTableState value)
+	public DatabaseJdbcColumnNode(Project project, @Nonnull JdbcTableColumState value)
 	{
 		super(project, value);
 	}
@@ -28,13 +28,20 @@ public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
 	@Override
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		return Arrays.asList(new DatabaseJdbcColumnsNode(myProject, getValue()));
+		return Collections.emptyList();
 	}
 
 	@Override
 	protected void update(PresentationData presentationData)
 	{
-		presentationData.setIcon(AllIcons.Nodes.DataTables);
+		presentationData.setIcon(AllIcons.Nodes.DataColumn);
 		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+		presentationData.addText(" : " + getValue().getType(), SimpleTextAttributes.GRAY_ATTRIBUTES);
+	}
+
+	@Override
+	public boolean isAlwaysLeaf()
+	{
+		return true;
 	}
 }

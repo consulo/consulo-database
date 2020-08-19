@@ -6,19 +6,21 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.database.datasource.jdbc.provider.impl.JdbcTableColumState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author VISTALL
- * @since 2020-08-18
+ * @since 2020-08-19
  */
-public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
+public class DatabaseJdbcColumnsNode extends AbstractTreeNode<JdbcTableState>
 {
-	public DatabaseJdbcTableNode(Project project, @Nonnull JdbcTableState value)
+	public DatabaseJdbcColumnsNode(Project project, @Nonnull JdbcTableState value)
 	{
 		super(project, value);
 	}
@@ -28,13 +30,18 @@ public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
 	@Override
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		return Arrays.asList(new DatabaseJdbcColumnsNode(myProject, getValue()));
+		List<AbstractTreeNode> columns = new ArrayList<>();
+		for(JdbcTableColumState state : getValue().getColumns())
+		{
+			columns.add(new DatabaseJdbcColumnNode(myProject, state));
+		}
+		return columns;
 	}
 
 	@Override
 	protected void update(PresentationData presentationData)
 	{
-		presentationData.setIcon(AllIcons.Nodes.DataTables);
-		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+		presentationData.setIcon(AllIcons.Nodes.Folder);
+		presentationData.addText("Columns", SimpleTextAttributes.REGULAR_ATTRIBUTES);
 	}
 }
