@@ -149,21 +149,34 @@ public class JdbcSession implements AutoCloseable
 
 		if(myState == SessionState.CANCELED)
 		{
+			closeImpl();
+
 			throw new ProcessCanceledException();
 		}
 
 		if(myState != SessionState.WAIT_CLIENT)
 		{
+			closeImpl();
+
 			throw new Exception("Connection error");
 		}
 
-		mySocket = new TSocket("localhost", 6645);
+		try
+		{
+			mySocket = new TSocket("localhost", 6645);
 
-		mySocket.open();
+			mySocket.open();
 
-		myClient = new JdbcExecutor.Client(new TBinaryProtocol(mySocket));
+			myClient = new JdbcExecutor.Client(new TBinaryProtocol(mySocket));
 
-		myClient.connect(jdbcUrl, properties);
+			myClient.connect(jdbcUrl, properties);
+		}
+		catch(Exception e)
+		{
+			closeImpl();
+
+			throw e;
+		}
 	}
 
 	private void changeState(SessionState state)
@@ -186,8 +199,12 @@ public class JdbcSession implements AutoCloseable
 		{
 			if(myState == SessionState.CANCELED)
 			{
+				closeImpl();
+
 				throw new ProcessCanceledException();
 			}
+
+			closeImpl();
 
 			throw e;
 		}
@@ -219,9 +236,20 @@ public class JdbcSession implements AutoCloseable
 	@Override
 	public void close() throws Exception
 	{
-		if(mySocket != null)
+		closeImpl();
+	}
+
+	private void closeImpl()
+	{
+		try
 		{
-			mySocket.close();
+			if(mySocket != null)
+			{
+				mySocket.close();
+			}
+		}
+		catch(Exception ignored)
+		{
 		}
 
 		if(myProcessHandler != null)
