@@ -38,6 +38,11 @@ public class JdbcState implements PersistentStateComponent<JdbcState>
 		return myDatabases;
 	}
 
+	public void setDatabases(Map<String, JdbcDatabaseState> databases)
+	{
+		myDatabases = databases;
+	}
+
 	public void addDatabase(@Nonnull String dbName, @Nonnull JdbcDatabaseState databaseState)
 	{
 		myDatabases.put(dbName, databaseState);

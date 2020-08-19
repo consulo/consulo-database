@@ -68,4 +68,11 @@ public class DatabaseSourceNode extends AbstractTreeNode<DataSource>
 		}
 		return result;
 	}
+
+	@Nonnull
+	@Override
+	public String toString()
+	{
+		return getValue().getId().toString();
+	}
 }

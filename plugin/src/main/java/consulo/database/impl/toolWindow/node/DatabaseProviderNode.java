@@ -73,4 +73,11 @@ public class DatabaseProviderNode extends AbstractTreeNode<DataSourceProvider>
 		presentation.addText(value.getName().getValue(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
 		presentation.setIcon(AllIcons.Nodes.Folder);
 	}
+
+	@Nonnull
+	@Override
+	public String toString()
+	{
+		return getValue().getId();
+	}
 }

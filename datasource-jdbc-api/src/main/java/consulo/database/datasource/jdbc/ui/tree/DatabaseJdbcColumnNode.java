@@ -60,4 +60,10 @@ public class DatabaseJdbcColumnNode extends AbstractTreeNode<JdbcTableColumState
 	{
 		return true;
 	}
+
+	@Override
+	public String toString()
+	{
+		return getValue().getName();
+	}
 }

@@ -19,6 +19,7 @@ package consulo.database.impl.transport;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -48,14 +49,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2020-08-16
  */
 @Singleton
-@State(name = "DataSourceTransportManagerImpl", storages = @Storage("datasource-cache.xml"))
+@State(name = "DataSourceTransportManagerImpl", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
 public class DataSourceTransportManagerImpl implements DataSourceTransportManager, PersistentStateComponent<Element>
 {
 	private final Project myProject;
 
 	private final DataSourceManager myDataSourceManager;
 
-	private final Map<UUID, Object> myStates = new ConcurrentHashMap<>();
+	private final Map<UUID, DataSourceState> myStates = new ConcurrentHashMap<>();
 
 	@Inject
 	public DataSourceTransportManagerImpl(Project project, DataSourceManager dataSourceManager)
@@ -118,7 +119,7 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 				transport.loadInitialData(indicator, myProject, dataSource, result);
 
 				result.doWhenDone(state -> {
-					myStates.put(dataSource.getId(), state);
+					myStates.put(dataSource.getId(), new DataSourceState(null, state));
 
 					publisher.dataUpdated(dataSource, state);
 				});
@@ -150,21 +151,60 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 	@Override
 	public <T extends PersistentStateComponent<?>> T getDataState(@Nonnull DataSource dataSource)
 	{
-		Object o = myStates.get(dataSource.getId());
+		DataSourceState dataSourceState = myStates.get(dataSource.getId());
+		if(dataSourceState == null)
+		{
+			return null;
+		}
 
-		return (T) o;
+		DataSourceTransport transport = findTransport(dataSource);
+
+		return dataSourceState.getObjectState(dataSource, transport);
 	}
 
 	@Nullable
 	@Override
 	public Element getState()
 	{
-		return new Element("state");
+		Element rootElement = new Element("state");
+		for(Map.Entry<UUID, DataSourceState> entry : myStates.entrySet())
+		{
+			Element stateElement = new Element("datasource");
+			rootElement.addContent(stateElement);
+
+			stateElement.setAttribute("id", entry.getKey().toString());
+
+			Element dataSourceState = new Element("data-state");
+			dataSourceState.addContent(entry.getValue().toXmlState());
+
+			stateElement.addContent(dataSourceState);
+		}
+		return rootElement;
 	}
 
 	@Override
 	public void loadState(Element state)
 	{
+		for(Element element : state.getChildren())
+		{
+			String id = element.getAttributeValue("id");
+			if(id == null)
+			{
+				continue;
+			}
 
+			UUID uuid = UUID.fromString(id);
+
+			Element stateElement = element.getChild("data-state");
+
+			if(stateElement.getContentSize() == 0)
+			{
+				continue;
+			}
+		
+			Element firstChild = stateElement.getChildren().get(0);
+
+			myStates.put(uuid, new DataSourceState(firstChild, null));
+		}
 	}
 }

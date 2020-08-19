@@ -38,6 +38,11 @@ public class JdbcTablesState implements PersistentStateComponent<JdbcTablesState
 		return myTables;
 	}
 
+	public void setTables(List<JdbcTableState> tables)
+	{
+		myTables = tables;
+	}
+
 	public void addTable(JdbcTableState state)
 	{
 		myTables.add(state);

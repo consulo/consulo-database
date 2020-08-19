@@ -53,4 +53,10 @@ public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
 		presentationData.setIcon(AllIcons.Nodes.DataTables);
 		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 	}
+
+	@Override
+	public String toString()
+	{
+		return getValue().getName();
+	}
 }

@@ -19,7 +19,6 @@ package consulo.database.impl.toolWindow.node;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ObjectUtil;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.DataSourceManager;
 
@@ -34,7 +33,7 @@ public class DatabaseRootNode extends AbstractTreeNode<Object>
 {
 	public DatabaseRootNode(Project project)
 	{
-		super(project, ObjectUtil.NULL);
+		super(project, "root");
 	}
 
 	@RequiredReadAction

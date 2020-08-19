@@ -94,4 +94,10 @@ public class DataSourceImpl implements DataSource
 	{
 		return myPropertiesHolder;
 	}
+
+	@Override
+	public String toString()
+	{
+		return myId.toString();
+	}
 }

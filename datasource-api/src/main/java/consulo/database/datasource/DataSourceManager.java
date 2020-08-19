@@ -26,7 +26,9 @@ import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.model.EditableDataSourceModel;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author VISTALL
@@ -47,6 +49,13 @@ public interface DataSourceManager
 	default List<? extends DataSource> getDataSources()
 	{
 		 return getModel().getDataSources();
+	}
+
+	@Nullable
+	@RequiredReadAction
+	default DataSource findDataSource(@Nonnull UUID uuid)
+	{
+		return getModel().findDataSource(uuid);
 	}
 
 	/**

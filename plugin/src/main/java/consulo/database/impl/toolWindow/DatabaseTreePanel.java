@@ -17,6 +17,7 @@
 package consulo.database.impl.toolWindow;
 
 import com.intellij.ide.DataManager;
+import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.tree.AsyncTreeModel;
@@ -31,11 +32,14 @@ import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.transport.DataSourceTransportListener;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.datasource.ui.DataSourceKeys;
+import consulo.database.impl.DataSourceWorkspaceManager;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.disposer.Disposable;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 
@@ -50,10 +54,25 @@ public class DatabaseTreePanel implements Disposable
 	public DatabaseTreePanel(@Nonnull Project project)
 	{
 		myRootPanel = new JPanel(new BorderLayout());
+		DataSourceWorkspaceManager workspaceManager = DataSourceWorkspaceManager.getInstance(project);
 
 		DatabaseTreeStructure structure = new DatabaseTreeStructure(project);
 		StructureTreeModel<DatabaseTreeStructure> treeModel = new StructureTreeModel<>(structure, this);
 		Tree tree = new Tree(new AsyncTreeModel(treeModel, this));
+		tree.addTreeExpansionListener(new TreeExpansionListener()
+		{
+			@Override
+			public void treeExpanded(TreeExpansionEvent treeExpansionEvent)
+			{
+				workspaceManager.setTreeState(TreeState.createOn(tree));
+			}
+
+			@Override
+			public void treeCollapsed(TreeExpansionEvent treeExpansionEvent)
+			{
+				workspaceManager.setTreeState(TreeState.createOn(tree));
+			}
+		});
 		tree.setRootVisible(false);
 
 		MessageBusConnection connection = project.getMessageBus().connect(this);
@@ -96,7 +115,15 @@ public class DatabaseTreePanel implements Disposable
 			return null;
 		});
 
-		TreeUtil.expand(tree, 2);
+		TreeState treeState = workspaceManager.getTreeState();
+		if(treeState != null)
+		{
+			treeState.applyTo(tree);
+		}
+		else
+		{
+			TreeUtil.expand(tree, 2);
+		}
 
 		myRootPanel.add(ScrollPaneFactory.createScrollPane(tree, true));
 	}
