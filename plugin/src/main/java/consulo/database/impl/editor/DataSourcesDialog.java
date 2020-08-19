@@ -181,7 +181,7 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 
 		if(mySelectedDataSource != null)
 		{
-			DataSource dataSource = myEditableDataSourceModel.findDataSource(mySelectedDataSource.getName());
+			DataSource dataSource = myEditableDataSourceModel.findDataSource(mySelectedDataSource.getId());
 
 			UiNotifyConnector.doWhenFirstShown(panel, () ->
 			{

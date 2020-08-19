@@ -4,6 +4,7 @@ import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.provider.DataSourceProvider;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * @author VISTALL
@@ -21,7 +22,7 @@ public interface DataSource
 	 * @return unique uuid for datasource. this id never change
 	 */
 	@Nonnull
-	String getId();
+	UUID getId();
 
 	@Nonnull
 	PropertiesHolder getProperties();

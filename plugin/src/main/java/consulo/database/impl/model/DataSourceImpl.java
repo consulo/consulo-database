@@ -17,7 +17,7 @@ public class DataSourceImpl implements DataSource
 {
 	public static final String CONTAINER_NAME = "main";
 
-	protected String myId;
+	protected UUID myId;
 	protected String myName;
 	protected DataSourceProvider myProvider;
 
@@ -25,7 +25,7 @@ public class DataSourceImpl implements DataSource
 
 	protected PropertiesHolderImpl myPropertiesHolder;
 
-	public DataSourceImpl(String id, String name, DataSourceProvider provider, DataSourceModel model)
+	public DataSourceImpl(UUID id, String name, DataSourceProvider provider, DataSourceModel model)
 	{
 		this(model);
 		myId = id;
@@ -63,11 +63,11 @@ public class DataSourceImpl implements DataSource
 
 	@Nonnull
 	@Override
-	public String getId()
+	public UUID getId()
 	{
 		if(myId == null)
 		{
-			myId = UUID.randomUUID().toString();
+			myId = UUID.randomUUID();
 		}
 		return myId;
 	}

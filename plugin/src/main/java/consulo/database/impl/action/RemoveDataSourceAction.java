@@ -47,13 +47,13 @@ public class RemoveDataSourceAction extends DumbAwareAction
 		if(myModel == null)
 		{
 			EditableDataSourceModel model = DataSourceManager.getInstance(project).createEditableModel();
-			model.removeDataSource(source.getName());
+			model.removeDataSource(source.getId());
 			model.commit();
 		}
 		else
 		{
 			// do not commit if we have editable model
-			myModel.removeDataSource(source.getName());
+			myModel.removeDataSource(source.getId());
 		}
 	}
 

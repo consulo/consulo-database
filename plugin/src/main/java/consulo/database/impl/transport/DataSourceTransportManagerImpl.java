@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -38,7 +39,7 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 
 	private final DataSourceManager myDataSourceManager;
 
-	private final Map<String, Object> myStates = new ConcurrentHashMap<>();
+	private final Map<UUID, Object> myStates = new ConcurrentHashMap<>();
 
 	@Inject
 	public DataSourceTransportManagerImpl(Project project, DataSourceManager dataSourceManager)

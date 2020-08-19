@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author VISTALL
@@ -61,7 +62,7 @@ public class DataSourceManagerImpl implements DataSourceManager, PersistentState
 		for(DataSource source : myModel.getDataSources())
 		{
 			Element dataSourceElement = new Element("datasource");
-			dataSourceElement.setAttribute("id", source.getId());
+			dataSourceElement.setAttribute("id", source.getId().toString());
 			dataSourceElement.setAttribute("name", source.getName());
 			dataSourceElement.setAttribute("provider", source.getProvider().getId());
 
@@ -91,7 +92,7 @@ public class DataSourceManagerImpl implements DataSourceManager, PersistentState
 
 			DataSourceProvider dataSourceProvider = findProvider(provider);
 
-			DataSourceImpl dataSource = new DataSourceImpl(id, name, dataSourceProvider, myModel);
+			DataSourceImpl dataSource = new DataSourceImpl(UUID.fromString(id), name, dataSourceProvider, myModel);
 
 			Element propertiesElement = element.getChild(PropertiesHolderImpl.TAG_NAME);
 			if(propertiesElement != null)
