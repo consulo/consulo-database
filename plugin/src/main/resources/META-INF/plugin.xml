@@ -44,7 +44,12 @@
 	<extensions defaultExtensionNs="com.intellij">
 		<projectService serviceInterface="consulo.database.datasource.transport.DataSourceTransportManager" serviceImplementation="consulo.database.impl.transport.DataSourceTransportManagerImpl"/>
 		<projectService serviceInterface="consulo.database.datasource.DataSourceManager" serviceImplementation="consulo.database.impl.DataSourceManagerImpl"/>
+		<projectService serviceInterface="consulo.database.datasource.editor.DataSourceEditorManager" serviceImplementation="consulo.database.impl.editor.DataSourceEditorManagerImpl"/>
 		<projectService serviceImplementation="consulo.database.impl.DataSourceWorkspaceManager"/>
+
+		<fileEditorProvider implementation="consulo.database.impl.editor.DataSourceFileEditorProvider"/>
+
+		<virtualFileSystem implementation="consulo.database.impl.editor.DataSourceVirtualFileSystem"/>
 
 		<getDataRule implementation="consulo.database.impl.toolWindow.dataRules.DataSourceTreeRule"/>
 

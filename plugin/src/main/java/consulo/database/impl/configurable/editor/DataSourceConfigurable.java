@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package consulo.database.impl.editor;
+package consulo.database.impl.configurable.editor;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.UnnamedConfigurable;

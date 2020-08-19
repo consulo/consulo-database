@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package consulo.database.impl.editor;
+package consulo.database.impl.configurable.editor;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -37,7 +37,7 @@ import consulo.database.datasource.model.*;
 import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.database.impl.action.CopyDataSourceAction;
 import consulo.database.impl.action.RemoveDataSourceAction;
-import consulo.database.impl.editor.action.AddDataSourcePopupAction;
+import consulo.database.impl.configurable.editor.action.AddDataSourcePopupAction;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.options.ConfigurableUIMigrationUtil;
 import consulo.ui.SwingUIDecorator;

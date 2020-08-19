@@ -25,6 +25,7 @@ import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTablesState;
+import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -38,9 +39,12 @@ import java.util.List;
  */
 public class DatabaseJdbcTablesNode extends AbstractTreeNode<JdbcDatabaseState>
 {
-	public DatabaseJdbcTablesNode(Project project, JdbcDatabaseState jdbcDatabaseState)
+	private final DataSource myDataSource;
+
+	public DatabaseJdbcTablesNode(Project project, DataSource dataSource, JdbcDatabaseState jdbcDatabaseState)
 	{
 		super(project, jdbcDatabaseState);
+		myDataSource = dataSource;
 	}
 
 	@RequiredReadAction
@@ -60,7 +64,7 @@ public class DatabaseJdbcTablesNode extends AbstractTreeNode<JdbcDatabaseState>
 
 		for(JdbcTableState table : tables)
 		{
-			nodes.add(new DatabaseJdbcTableNode(myProject, table));
+			nodes.add(new DatabaseJdbcTableNode(myProject, myDataSource, table));
 		}
 		return nodes;
 	}

@@ -14,57 +14,43 @@
  * limitations under the License.
  */
 
-package consulo.database.impl.editor;
+package consulo.database.impl.configurable.editor.node;
 
-import com.intellij.ide.projectView.TreeStructureProvider;
-import com.intellij.ide.util.treeView.AbstractTreeStructureBase;
+import com.intellij.ide.projectView.PresentationData;
+import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.ObjectUtil;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.model.DataSourceModel;
-import consulo.database.impl.editor.node.DataSourceEditorRootNode;
+import consulo.database.impl.toolWindow.node.DatabaseProviderNode;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author VISTALL
  * @since 2020-08-13
  */
-public class DataSourceTreeStructure extends AbstractTreeStructureBase
+public class DataSourceEditorRootNode extends AbstractTreeNode<Object>
 {
 	private final DataSourceModel myDataSourceModel;
-	private final DataSourceEditorRootNode myRoot;
 
-	public DataSourceTreeStructure(Project project, DataSourceModel dataSourceModel)
+	public DataSourceEditorRootNode(Project project, DataSourceModel dataSourceModel)
 	{
-		super(project);
+		super(project, ObjectUtil.NULL);
 		myDataSourceModel = dataSourceModel;
-		myRoot = new DataSourceEditorRootNode(myProject, dataSourceModel);
 	}
 
-	@Nullable
-	@Override
-	public List<TreeStructureProvider> getProviders()
-	{
-		return null;
-	}
-
+	@RequiredReadAction
 	@Nonnull
 	@Override
-	public Object getRootElement()
+	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		return myRoot;
+		return DatabaseProviderNode.split(getProject(), myDataSourceModel);
 	}
 
 	@Override
-	public void commit()
+	protected void update(PresentationData presentation)
 	{
-
-	}
-
-	@Override
-	public boolean hasSomethingToCommit()
-	{
-		return false;
 	}
 }

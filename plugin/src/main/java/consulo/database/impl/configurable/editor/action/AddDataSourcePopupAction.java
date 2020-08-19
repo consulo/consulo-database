@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package consulo.database.impl.editor.action;
+package consulo.database.impl.configurable.editor.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;

@@ -17,24 +17,29 @@
 package consulo.database.impl.toolWindow;
 
 import com.intellij.ide.DataManager;
+import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.DoubleClickListener;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.tree.AsyncTreeModel;
 import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.tree.TreeUtil;
+import consulo.database.datasource.DataSourceManager;
+import consulo.database.datasource.editor.DataSourceEditorManager;
+import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcTableNode;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.DataSourceEvent;
 import consulo.database.datasource.model.DataSourceListener;
-import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.transport.DataSourceTransportListener;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.database.impl.DataSourceWorkspaceManager;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.disposer.Disposable;
+import consulo.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -42,6 +47,7 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 
 /**
  * @author VISTALL
@@ -49,6 +55,8 @@ import java.awt.*;
  */
 public class DatabaseTreePanel implements Disposable
 {
+	private static final Logger LOG = Logger.getInstance(DatabaseTreePanel.class);
+
 	private JPanel myRootPanel;
 
 	public DatabaseTreePanel(@Nonnull Project project)
@@ -58,7 +66,26 @@ public class DatabaseTreePanel implements Disposable
 
 		DatabaseTreeStructure structure = new DatabaseTreeStructure(project);
 		StructureTreeModel<DatabaseTreeStructure> treeModel = new StructureTreeModel<>(structure, this);
-		Tree tree = new Tree(new AsyncTreeModel(treeModel, this));
+		Tree tree = new Tree(new AsyncTreeModel(treeModel, this))
+		{
+			@Override
+			public final int getToggleClickCount()
+			{
+				int count = super.getToggleClickCount();
+				TreePath path = getSelectionPath();
+				if(path != null)
+				{
+					NodeDescriptor descriptor = TreeUtil.getLastUserObject(NodeDescriptor.class, path);
+					if(descriptor != null && !descriptor.expandOnDoubleClick())
+					{
+						LOG.debug("getToggleClickCount: -1 for ", descriptor.getClass().getName());
+						return -1;
+					}
+				}
+				return count;
+			}
+		};
+
 		tree.addTreeExpansionListener(new TreeExpansionListener()
 		{
 			@Override
@@ -74,6 +101,26 @@ public class DatabaseTreePanel implements Disposable
 			}
 		});
 		tree.setRootVisible(false);
+		new DoubleClickListener()
+		{
+			@Override
+			protected boolean onDoubleClick(MouseEvent event)
+			{
+				TreePath path = TreeUtil.getSelectedPathIfOne(tree);
+				if(path != null)
+				{
+					Object node = TreeUtil.getLastUserObject(path);
+					if(node instanceof DatabaseJdbcTableNode)
+					{
+
+						DataSourceEditorManager.getInstance(project).openEditor(((DatabaseJdbcTableNode) node).getDataSource(), ((DatabaseJdbcTableNode) node).getValue().getName());
+						return true;
+					}
+				}
+
+				return false;
+			}
+		}.installOn(tree);
 
 		MessageBusConnection connection = project.getMessageBus().connect(this);
 		connection.subscribe(DataSourceManager.TOPIC, new DataSourceListener()

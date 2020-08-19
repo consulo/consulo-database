@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
+import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -34,9 +35,19 @@ import java.util.Collection;
  */
 public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
 {
-	public DatabaseJdbcTableNode(Project project, @Nonnull JdbcTableState value)
+	@Nonnull
+	private final DataSource myDataSource;
+
+	public DatabaseJdbcTableNode(Project project, @Nonnull DataSource dataSource, @Nonnull JdbcTableState value)
 	{
 		super(project, value);
+		myDataSource = dataSource;
+	}
+
+	@Nonnull
+	public DataSource getDataSource()
+	{
+		return myDataSource;
 	}
 
 	@RequiredReadAction
@@ -52,6 +63,12 @@ public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
 	{
 		presentationData.setIcon(AllIcons.Nodes.DataTables);
 		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+	}
+
+	@Override
+	public boolean expandOnDoubleClick()
+	{
+		return false;
 	}
 
 	@Override

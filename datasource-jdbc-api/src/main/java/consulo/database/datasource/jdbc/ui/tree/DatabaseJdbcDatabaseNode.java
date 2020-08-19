@@ -48,7 +48,7 @@ public class DatabaseJdbcDatabaseNode extends AbstractTreeNode<JdbcDatabaseState
 	@Override
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		return Arrays.asList(new DatabaseJdbcIndexesNode(myProject, myDataSource), new DatabaseJdbcTablesNode(myProject, getValue()));
+		return Arrays.asList(new DatabaseJdbcIndexesNode(myProject, myDataSource), new DatabaseJdbcTablesNode(myProject, myDataSource, getValue()));
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.ui.DataSourceKeys;
-import consulo.database.impl.editor.DataSourcesDialog;
+import consulo.database.impl.configurable.editor.DataSourcesDialog;
 import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;

@@ -74,7 +74,7 @@ public class DatabaseKnownJdbcTablesNode extends AbstractTreeNode<String>
 
 		for(JdbcTableState table : tables)
 		{
-			nodes.add(new DatabaseJdbcTableNode(myProject, table));
+			nodes.add(new DatabaseJdbcTableNode(myProject, myDataSource, table));
 		}
 		return nodes;
 	}
