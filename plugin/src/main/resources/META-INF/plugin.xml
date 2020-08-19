@@ -32,6 +32,7 @@
 	<extensions defaultExtensionNs="consulo.database">
 		<provider implementation="consulo.database.mysql.MysqJdbcDataSourceProvider"/>
 		<provider implementation="consulo.database.mariadb.MariadbJdbDataSourceProvider"/>
+		<provider implementation="consulo.database.postgresql.PostgresqlJdbcDataSourceProvider"/>
 		<provider implementation="consulo.database.mongo.MongoDbDataSourceProvider"/>
 
 		<transport implementation="consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport"/>
