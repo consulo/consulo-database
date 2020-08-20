@@ -19,6 +19,7 @@ package consulo.database.impl.editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.FileEditorProvider;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 
@@ -28,7 +29,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-19
  */
-public class DataSourceFileEditorProvider implements FileEditorProvider
+public class DataSourceFileEditorProvider implements FileEditorProvider, DumbAware
 {
 	@Override
 	public boolean accept(@Nonnull Project project, @Nonnull VirtualFile file)

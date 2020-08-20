@@ -111,7 +111,7 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 			myToRemoveDataSource.add(original);
 		}
 
-		myDispatcher.getMulticaster().dataSourceEvent(new DataSourceEvent(myManager, DataSourceEvent.Action.ADD, dataSource));
+		myDispatcher.getMulticaster().dataSourceEvent(new DataSourceEvent(myManager, DataSourceEvent.Action.REMOVE, dataSource));
 	}
 
 	@Override
