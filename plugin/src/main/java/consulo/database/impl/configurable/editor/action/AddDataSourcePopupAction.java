@@ -23,13 +23,12 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
-import consulo.awt.TargetAWT;
 import consulo.database.datasource.model.EditableDataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.image.Image;
 
 import javax.annotation.Nonnull;
-import javax.swing.*;
 
 /**
  * @author VISTALL
@@ -52,9 +51,9 @@ public class AddDataSourcePopupAction extends DumbAwareAction
 		}
 
 		@Override
-		public Icon getIconFor(DataSourceProvider value)
+		public Image getIconFor(DataSourceProvider value)
 		{
-			return TargetAWT.to(value.getIcon());
+			return value.getIcon();
 		}
 
 		@Override
