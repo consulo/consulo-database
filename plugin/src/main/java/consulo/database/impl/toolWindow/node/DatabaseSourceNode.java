@@ -64,7 +64,11 @@ public class DatabaseSourceNode extends AbstractTreeNode<DataSource>
 		List<AbstractTreeNode<?>> result = new ArrayList<>();
 		for(DataSourceTreeNodeProvider provider : DataSourceTreeNodeProvider.EP_NAME.getExtensionList())
 		{
-			provider.fillTreeNodes(myProject, value, result::add);
+			if(provider.accept(value))
+			{
+				provider.fillTreeNodes(myProject, value, result::add);
+				break;
+			}
 		}
 		return result;
 	}

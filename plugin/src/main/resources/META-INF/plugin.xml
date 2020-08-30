@@ -38,7 +38,8 @@
 		<transport implementation="consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport"/>
 		<transport implementation="consulo.database.datasource.transport.FakeDataSourceTransport" order="last"/>
 
-		<treeNodeProvider implementation="consulo.database.datasource.jdbc.ui.JdbcDataSourceTreeNodeProvider"/>
+		<treeNodeProvider implementation="consulo.database.postgresql.PostgresqlDataSourceTreeNodeProvider" order="before jdbc"/>
+		<treeNodeProvider implementation="consulo.database.datasource.jdbc.ui.JdbcDataSourceTreeNodeProvider" id="jdbc"/>
 	</extensions>
 
 	<extensions defaultExtensionNs="com.intellij">

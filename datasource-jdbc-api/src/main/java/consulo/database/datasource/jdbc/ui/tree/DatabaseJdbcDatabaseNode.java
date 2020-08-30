@@ -35,7 +35,7 @@ import java.util.Collection;
  */
 public class DatabaseJdbcDatabaseNode extends AbstractTreeNode<JdbcDatabaseState>
 {
-	private final DataSource myDataSource;
+	protected final DataSource myDataSource;
 
 	public DatabaseJdbcDatabaseNode(Project project, DataSource dataSource, JdbcDatabaseState state)
 	{
@@ -48,7 +48,19 @@ public class DatabaseJdbcDatabaseNode extends AbstractTreeNode<JdbcDatabaseState
 	@Override
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		return Arrays.asList(new DatabaseJdbcIndexesNode(myProject, myDataSource), new DatabaseJdbcTablesNode(myProject, myDataSource, getValue()));
+		return Arrays.asList(createIndexesNodes(), createTablesNode());
+	}
+
+	@Nonnull
+	protected DatabaseJdbcIndexesNode createIndexesNodes()
+	{
+		return new DatabaseJdbcIndexesNode(myProject, myDataSource);
+	}
+
+	@Nonnull
+	protected DatabaseJdbcTablesNode createTablesNode()
+	{
+		return new DatabaseJdbcTablesNode(myProject, myDataSource, getValue());
 	}
 
 	@Override

@@ -14,25 +14,33 @@
  * limitations under the License.
  */
 
-package consulo.database.datasource.ui;
+package consulo.database.postgresql.node;
 
-import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.Project;
+import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
+import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcDatabaseNode;
+import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcTablesNode;
 import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
-import java.util.function.Consumer;
 
 /**
  * @author VISTALL
- * @since 2020-08-18
+ * @since 2020-08-30
  */
-public interface DataSourceTreeNodeProvider
+public class PostgresqlDatabaseNode extends DatabaseJdbcDatabaseNode
 {
-	ExtensionPointName<DataSourceTreeNodeProvider> EP_NAME = ExtensionPointName.create("consulo.database.treeNodeProvider");
+	public PostgresqlDatabaseNode(Project project,
+								  DataSource dataSource,
+								  JdbcDatabaseState state)
+	{
+		super(project, dataSource, state);
+	}
 
-	boolean accept(@Nonnull DataSource dataSource);
-
-	void fillTreeNodes(@Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull Consumer<AbstractTreeNode<?>> consumer);
+	@Nonnull
+	@Override
+	protected DatabaseJdbcTablesNode createTablesNode()
+	{
+		return new PostgresqlTablesNode(myProject, myDataSource, getValue());
+	}
 }

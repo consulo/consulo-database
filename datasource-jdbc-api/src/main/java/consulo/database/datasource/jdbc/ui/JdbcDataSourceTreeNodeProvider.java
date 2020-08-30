@@ -19,10 +19,10 @@ package consulo.database.datasource.jdbc.ui;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
+import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcState;
 import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcDatabaseNode;
-import consulo.database.datasource.jdbc.ui.tree.DatabaseKnownJdbcDatabaseNode;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.datasource.ui.DataSourceTreeNodeProvider;
@@ -38,12 +38,22 @@ import java.util.function.Consumer;
 public class JdbcDataSourceTreeNodeProvider implements DataSourceTreeNodeProvider
 {
 	@Override
+	public boolean accept(@Nonnull DataSource dataSource)
+	{
+		return dataSource.getProvider() instanceof JdbcDataSourceProvider;
+	}
+
+	@Override
 	public void fillTreeNodes(@Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull Consumer<AbstractTreeNode<?>> consumer)
 	{
 		String dbName = dataSource.getProperties().get(GenericPropertyKeys.DATABASE_NAME);
 		if(!StringUtil.isEmpty(dbName))
 		{
-			consumer.accept(new DatabaseKnownJdbcDatabaseNode(project, dataSource, dbName));
+			JdbcDatabaseState state = new JdbcDatabaseState();
+			state.setTablesState(null);
+			state.setName(dbName);
+
+			consumer.accept(createDatabaseNode(project, dataSource, state));
 		}
 		else
 		{
@@ -56,8 +66,14 @@ public class JdbcDataSourceTreeNodeProvider implements DataSourceTreeNodeProvide
 
 			for(JdbcDatabaseState databaseState : state.getDatabases().values())
 			{
-				consumer.accept(new DatabaseJdbcDatabaseNode(project, dataSource, databaseState));
+				consumer.accept(createDatabaseNode(project, dataSource, databaseState));
 			}
 		}
+	}
+
+	@Nonnull
+	protected DatabaseJdbcDatabaseNode createDatabaseNode(Project project, DataSource dataSource, JdbcDatabaseState state)
+	{
+		return new DatabaseJdbcDatabaseNode(project, dataSource, state);
 	}
 }
