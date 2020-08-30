@@ -45,6 +45,18 @@ public class DataSourceVirtualFile extends LightVirtualFile
 	}
 
 	@Nonnull
+	public String getChildId()
+	{
+		return myChildId;
+	}
+
+	@Nonnull
+	public DataSource getDataSource()
+	{
+		return myDataSource;
+	}
+
+	@Nonnull
 	@Override
 	public VirtualFileSystem getFileSystem()
 	{
@@ -56,5 +68,15 @@ public class DataSourceVirtualFile extends LightVirtualFile
 	public String getPath()
 	{
 		return myDataSource.getId() + ArchiveFileSystem.ARCHIVE_SEPARATOR + myChildId;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(obj instanceof DataSourceVirtualFile)
+		{
+			return getPath().equals(((DataSourceVirtualFile) obj).getPath());
+		}
+		return super.equals(obj);
 	}
 }

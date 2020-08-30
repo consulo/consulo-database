@@ -23,6 +23,7 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
   private static final org.apache.thrift.protocol.TField INT_VALUE_FIELD_DESC = new org.apache.thrift.protocol.TField("intValue", org.apache.thrift.protocol.TType.I32, (short)2);
   private static final org.apache.thrift.protocol.TField STRING_VALUE_FIELD_DESC = new org.apache.thrift.protocol.TField("stringValue", org.apache.thrift.protocol.TType.STRING, (short)3);
   private static final org.apache.thrift.protocol.TField BOOL_VALUE_FIELD_DESC = new org.apache.thrift.protocol.TField("boolValue", org.apache.thrift.protocol.TType.BOOL, (short)4);
+  private static final org.apache.thrift.protocol.TField LONG_VALUE_FIELD_DESC = new org.apache.thrift.protocol.TField("longValue", org.apache.thrift.protocol.TType.I64, (short)5);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -38,6 +39,7 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
   public int intValue; // optional
   public String stringValue; // optional
   public boolean boolValue; // optional
+  public long longValue; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -48,7 +50,8 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
     TYPE((short)1, "type"),
     INT_VALUE((short)2, "intValue"),
     STRING_VALUE((short)3, "stringValue"),
-    BOOL_VALUE((short)4, "boolValue");
+    BOOL_VALUE((short)4, "boolValue"),
+    LONG_VALUE((short)5, "longValue");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -71,6 +74,8 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
           return STRING_VALUE;
         case 4: // BOOL_VALUE
           return BOOL_VALUE;
+        case 5: // LONG_VALUE
+          return LONG_VALUE;
         default:
           return null;
       }
@@ -113,8 +118,9 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
   // isset id assignments
   private static final int __INTVALUE_ISSET_ID = 0;
   private static final int __BOOLVALUE_ISSET_ID = 1;
+  private static final int __LONGVALUE_ISSET_ID = 2;
   private byte __isset_bitfield = 0;
-  private static final _Fields optionals[] = {_Fields.INT_VALUE,_Fields.STRING_VALUE,_Fields.BOOL_VALUE};
+  private static final _Fields optionals[] = {_Fields.INT_VALUE,_Fields.STRING_VALUE,_Fields.BOOL_VALUE,_Fields.LONG_VALUE};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -126,6 +132,8 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.BOOL_VALUE, new org.apache.thrift.meta_data.FieldMetaData("boolValue", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+    tmpMap.put(_Fields.LONG_VALUE, new org.apache.thrift.meta_data.FieldMetaData("longValue", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(JdbcValue.class, metaDataMap);
   }
@@ -153,6 +161,7 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
       this.stringValue = other.stringValue;
     }
     this.boolValue = other.boolValue;
+    this.longValue = other.longValue;
   }
 
   public JdbcValue deepCopy() {
@@ -167,6 +176,8 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
     this.stringValue = null;
     setBoolValueIsSet(false);
     this.boolValue = false;
+    setLongValueIsSet(false);
+    this.longValue = 0;
   }
 
   /**
@@ -271,6 +282,29 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
     __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __BOOLVALUE_ISSET_ID, value);
   }
 
+  public long getLongValue() {
+    return this.longValue;
+  }
+
+  public JdbcValue setLongValue(long longValue) {
+    this.longValue = longValue;
+    setLongValueIsSet(true);
+    return this;
+  }
+
+  public void unsetLongValue() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __LONGVALUE_ISSET_ID);
+  }
+
+  /** Returns true if field longValue is set (has been assigned a value) and false otherwise */
+  public boolean isSetLongValue() {
+    return EncodingUtils.testBit(__isset_bitfield, __LONGVALUE_ISSET_ID);
+  }
+
+  public void setLongValueIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __LONGVALUE_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case TYPE:
@@ -305,6 +339,14 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
       }
       break;
 
+    case LONG_VALUE:
+      if (value == null) {
+        unsetLongValue();
+      } else {
+        setLongValue((Long)value);
+      }
+      break;
+
     }
   }
 
@@ -321,6 +363,9 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
 
     case BOOL_VALUE:
       return isBoolValue();
+
+    case LONG_VALUE:
+      return getLongValue();
 
     }
     throw new IllegalStateException();
@@ -341,6 +386,8 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
       return isSetStringValue();
     case BOOL_VALUE:
       return isSetBoolValue();
+    case LONG_VALUE:
+      return isSetLongValue();
     }
     throw new IllegalStateException();
   }
@@ -394,6 +441,15 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
         return false;
     }
 
+    boolean this_present_longValue = true && this.isSetLongValue();
+    boolean that_present_longValue = true && that.isSetLongValue();
+    if (this_present_longValue || that_present_longValue) {
+      if (!(this_present_longValue && that_present_longValue))
+        return false;
+      if (this.longValue != that.longValue)
+        return false;
+    }
+
     return true;
   }
 
@@ -420,6 +476,11 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
     list.add(present_boolValue);
     if (present_boolValue)
       list.add(boolValue);
+
+    boolean present_longValue = true && (isSetLongValue());
+    list.add(present_longValue);
+    if (present_longValue)
+      list.add(longValue);
 
     return list.hashCode();
   }
@@ -472,6 +533,16 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetLongValue()).compareTo(other.isSetLongValue());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetLongValue()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.longValue, other.longValue);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -519,6 +590,12 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
       if (!first) sb.append(", ");
       sb.append("boolValue:");
       sb.append(this.boolValue);
+      first = false;
+    }
+    if (isSetLongValue()) {
+      if (!first) sb.append(", ");
+      sb.append("longValue:");
+      sb.append(this.longValue);
       first = false;
     }
     sb.append(")");
@@ -598,6 +675,14 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 5: // LONG_VALUE
+            if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
+              struct.longValue = iprot.readI64();
+              struct.setLongValueIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -635,6 +720,11 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
         oprot.writeBool(struct.boolValue);
         oprot.writeFieldEnd();
       }
+      if (struct.isSetLongValue()) {
+        oprot.writeFieldBegin(LONG_VALUE_FIELD_DESC);
+        oprot.writeI64(struct.longValue);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -665,7 +755,10 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
       if (struct.isSetBoolValue()) {
         optionals.set(3);
       }
-      oprot.writeBitSet(optionals, 4);
+      if (struct.isSetLongValue()) {
+        optionals.set(4);
+      }
+      oprot.writeBitSet(optionals, 5);
       if (struct.isSetType()) {
         oprot.writeI32(struct.type.getValue());
       }
@@ -678,12 +771,15 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
       if (struct.isSetBoolValue()) {
         oprot.writeBool(struct.boolValue);
       }
+      if (struct.isSetLongValue()) {
+        oprot.writeI64(struct.longValue);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, JdbcValue struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(4);
+      BitSet incoming = iprot.readBitSet(5);
       if (incoming.get(0)) {
         struct.type = consulo.database.jdbc.rt.shared.JdbcValueType.findByValue(iprot.readI32());
         struct.setTypeIsSet(true);
@@ -699,6 +795,10 @@ public class JdbcValue implements org.apache.thrift.TBase<JdbcValue, JdbcValue._
       if (incoming.get(3)) {
         struct.boolValue = iprot.readBool();
         struct.setBoolValueIsSet(true);
+      }
+      if (incoming.get(4)) {
+        struct.longValue = iprot.readI64();
+        struct.setLongValueIsSet(true);
       }
     }
   }

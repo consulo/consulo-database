@@ -16,18 +16,32 @@
 
 package consulo.database.impl.editor;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.fileEditor.FileEditorStateLevel;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.ui.LoadingDecorator;
+import com.intellij.openapi.util.AsyncResult;
+import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.transport.DataSourceTransport;
+import consulo.database.impl.editor.actions.RefreshDataAction;
+import consulo.ui.UIAccess;
+import consulo.ui.annotation.RequiredUIAccess;
 import consulo.util.dataholder.UserDataHolderBase;
 import kava.beans.PropertyChangeListener;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
+import java.awt.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * @author VISTALL
@@ -35,25 +49,99 @@ import javax.swing.*;
  */
 public class DataSourceFileEditor extends UserDataHolderBase implements FileEditor
 {
-	private JPanel myTargetPanel;
+	private final Project myProject;
+	private final DataSourceVirtualFile myFile;
+	private final LoadingDecorator myLoadingDecorator;
+	private final AtomicBoolean myLoading = new AtomicBoolean();
+	private final DataSource myDataSource;
+	private final JPanel myTargetPanel;
 
-	public DataSourceFileEditor(Project project, VirtualFile file)
+	private JComponent myLastResult;
+
+	@RequiredUIAccess
+	public DataSourceFileEditor(Project project, DataSourceVirtualFile file)
 	{
-		myTargetPanel = new JPanel();
+		myProject = project;
+		myFile = file;
+		myDataSource = myFile.getDataSource();
+		myTargetPanel = new JPanel(new BorderLayout());
+		DataManager.registerDataProvider(myTargetPanel, key ->
+		{
+			if(key == DataSourceFileEditorKeys.EDITOR)
+			{
+				return DataSourceFileEditor.this;
+			}
+			return null;
+		});
+
+		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
+		builder.add(new RefreshDataAction());
+
+		myLoadingDecorator = new LoadingDecorator(myTargetPanel, this, 0);
+
+		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
+		toolbar.setTargetComponent(myTargetPanel);
+
+		myTargetPanel.add(toolbar.getComponent(), BorderLayout.NORTH);
+
+		UIAccess uiAccess = UIAccess.current();
+
+		loadData(uiAccess);
+	}
+
+	public void loadData(@Nonnull UIAccess uiAccess)
+	{
+		if(myLoading.compareAndSet(false, true))
+		{
+			myLoadingDecorator.startLoading(false);
+			Task.Backgroundable.queue(myProject, "Fetching data...", true, indicator ->
+			{
+				DataSourceTransport transport = null;
+				for(DataSourceTransport dataSourceTransport : DataSourceTransport.EP_NAME.getExtensionList())
+				{
+					if(dataSourceTransport.accept(myDataSource))
+					{
+						transport = dataSourceTransport;
+						break;
+					}
+				}
+
+				assert transport != null;
+
+				AsyncResult<Object> result = AsyncResult.undefined();
+
+				transport.fetchData(indicator, myProject, myDataSource, myFile.getChildId(), result);
+
+				final DataSourceTransport finalTransport = transport;
+				result.doWhenDone(o -> {
+					myLoadingDecorator.stopLoading();
+					myLoading.set(false);
+
+					uiAccess.give(() -> {
+						if(myLastResult != null)
+						{
+							myTargetPanel.remove(myLastResult);
+						}
+						Consumer setter = component -> myTargetPanel.add(myLastResult = (JComponent) component, BorderLayout.CENTER);
+						finalTransport.fetchDataEnded(indicator, myProject, myDataSource, myFile.getChildId(), o, setter);
+					});
+				});
+			});
+		}
 	}
 
 	@Nonnull
 	@Override
 	public JComponent getComponent()
 	{
-		return myTargetPanel;
+		return myLoadingDecorator.getComponent();
 	}
 
 	@Nullable
 	@Override
 	public JComponent getPreferredFocusedComponent()
 	{
-		return myTargetPanel;
+		return myLoadingDecorator.getComponent();
 	}
 
 	@Nonnull

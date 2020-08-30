@@ -10,7 +10,8 @@ package consulo.database.jdbc.rt.shared;
 public enum JdbcValueType implements org.apache.thrift.TEnum {
   _int(0),
   _string(1),
-  _bool(2);
+  _bool(2),
+  _long(3);
 
   private final int value;
 
@@ -37,6 +38,8 @@ public enum JdbcValueType implements org.apache.thrift.TEnum {
         return _string;
       case 2:
         return _bool;
+      case 3:
+        return _long;
       default:
         return null;
     }

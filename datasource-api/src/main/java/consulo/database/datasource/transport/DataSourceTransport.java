@@ -22,8 +22,11 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.DataSource;
+import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;
+import javax.swing.*;
+import java.util.function.Consumer;
 
 /**
  * @author VISTALL
@@ -38,6 +41,21 @@ public interface DataSourceTransport<STATE extends PersistentStateComponent<?>>
 	void testConnection(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<Void> result);
 
 	void loadInitialData(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<STATE> result);
+
+	default void fetchData(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String childId, @Nonnull AsyncResult<Object> result)
+	{
+		result.setDone();
+	}
+
+	@RequiredUIAccess
+	default void fetchDataEnded(@Nonnull ProgressIndicator indicator,
+								@Nonnull Project project,
+								@Nonnull DataSource dataSource,
+								@Nonnull String childId,
+								@Nonnull Object data,
+								@Nonnull Consumer<JComponent> setter)
+	{
+	}
 
 	@Nonnull
 	Class<STATE> getStateClass();

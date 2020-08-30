@@ -41,7 +41,7 @@ public class DataSourceFileEditorProvider implements FileEditorProvider, DumbAwa
 	@Override
 	public FileEditor createEditor(@Nonnull Project project, @Nonnull VirtualFile file)
 	{
-		return new DataSourceFileEditor(project, file);
+		return new DataSourceFileEditor(project, (DataSourceVirtualFile) file);
 	}
 
 	@Nonnull

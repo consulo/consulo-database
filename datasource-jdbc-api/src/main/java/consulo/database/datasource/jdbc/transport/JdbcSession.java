@@ -33,6 +33,7 @@ import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
+import consulo.net.util.NetUtil;
 import consulo.platform.Platform;
 import consulo.util.dataholder.Key;
 import consulo.util.lang.ref.SimpleReference;
@@ -81,6 +82,8 @@ public class JdbcSession implements AutoCloseable
 
 	private final CountDownLatch myCountDownLatch = new CountDownLatch(1);
 
+	private final int myPort;
+
 	public JdbcSession(@Nonnull ProgressIndicator indicator, @Nonnull DataSource dataSource) throws Exception
 	{
 		JdbcDataSourceProvider provider = (JdbcDataSourceProvider) dataSource.getProvider();
@@ -88,6 +91,8 @@ public class JdbcSession implements AutoCloseable
 		Path driverPath = prepareJdbcDriver(indicator, provider);
 
 		String jdbcUrl = provider.buildJdbcUrl(dataSource);
+
+		myPort = NetUtil.findAvailableSocketPort();
 
 		String login = dataSource.getProperties().get(GenericPropertyKeys.LOGIN);
 		String password = dataSource.getProperties().get(GenericPropertyKeys.PASSWORD);
@@ -110,6 +115,7 @@ public class JdbcSession implements AutoCloseable
 		simpleJavaParameters.getClassPath().add(driverPath.toFile());
 		simpleJavaParameters.setMainClass("consulo.database.jdbc.rt.Main");
 		simpleJavaParameters.setJdk(new FakeSdk(java_home));
+		simpleJavaParameters.getProgramParametersList().add(String.valueOf(myPort));
 
 		OSProcessHandler processHandler = simpleJavaParameters.createOSProcessHandler();
 		myProcessHandler = processHandler;
@@ -179,7 +185,7 @@ public class JdbcSession implements AutoCloseable
 
 		try
 		{
-			mySocket = new TSocket("localhost", 6645);
+			mySocket = new TSocket("localhost", myPort);
 
 			mySocket.open();
 

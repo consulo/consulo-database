@@ -34,9 +34,11 @@ public class Main
 {
 	public static void main(String[] args) throws Exception
 	{
+		int port = Integer.parseInt(args[0]);
+
 		JdbcExecutor.Processor<JdbcExecutorImpl> p = new JdbcExecutor.Processor<>(new JdbcExecutorImpl());
 
-		TServerSocket transport = new TServerSocket(new InetSocketAddress("localhost", 6645));
+		TServerSocket transport = new TServerSocket(new InetSocketAddress("localhost", port));
 
 		TSimpleServer.Args serverArgs = new TSimpleServer.Args(transport);
 		serverArgs = serverArgs.processor(p);

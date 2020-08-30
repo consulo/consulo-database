@@ -126,6 +126,9 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 					case _int:
 						statement.setInt(1, param.getIntValue());
 						break;
+					case _long:
+						statement.setLong(1, param.getLongValue());
+						break;
 					case _string:
 						statement.setString(i, param.getStringValue());
 						break;
@@ -147,7 +150,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 			int[] columnsTypes = new int[columnCount];
 			for(int j = 0; j < columnCount; j++)
 			{
-				String columnClassName = metaData.getColumnClassName(j + 1);
+				String columnClassName = metaData.getColumnName(j + 1);
 				columns.add(columnClassName);
 				columnsTypes[j] = metaData.getColumnType(j + 1);
 			}
@@ -173,15 +176,27 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 					values.add(value);
 					switch(columnType)
 					{
+						case Types.BIGINT:
+							value.setType(JdbcValueType._long);
+							value.setLongValue(resultSet.getLong(j + 1));
+							break;
 						case Types.INTEGER:
 						case Types.SMALLINT:
 						case Types.TINYINT:
+							value.setType(JdbcValueType._int);
 							value.setIntValue(resultSet.getInt(j + 1));
 							break;
 						case Types.BOOLEAN:
+							value.setType(JdbcValueType._bool);
 							value.setBoolValue(resultSet.getBoolean(j + 1));
 							break;
 						case Types.VARCHAR:
+							value.setType(JdbcValueType._string);
+							value.setStringValue(resultSet.getString(j + 1));
+							break;
+						default:
+							// FIXME [VISTALL] fallback
+							value.setType(JdbcValueType._string);
 							value.setStringValue(resultSet.getString(j + 1));
 							break;
 					}

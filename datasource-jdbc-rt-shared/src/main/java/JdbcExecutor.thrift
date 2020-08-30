@@ -37,7 +37,8 @@ enum JdbcValueType
 {
 	_int,
 	_string,
-	_bool
+	_bool,
+	_long
 }
 
 struct JdbcValue
@@ -49,6 +50,8 @@ struct JdbcValue
 	3: optional string stringValue;
 
 	4: optional bool boolValue;
+
+	5: optional i64 longValue;
 }
 
 service JdbcExecutor

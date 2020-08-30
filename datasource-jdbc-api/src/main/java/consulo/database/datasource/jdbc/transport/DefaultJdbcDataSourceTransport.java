@@ -21,19 +21,25 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ThrowableConsumer;
+import com.intellij.util.ui.ColumnInfo;
+import com.intellij.util.ui.ListTableModel;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.*;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
-import consulo.database.jdbc.rt.shared.JdbcColum;
-import consulo.database.jdbc.rt.shared.JdbcExecutor;
-import consulo.database.jdbc.rt.shared.JdbcTable;
+import consulo.database.impl.editor.ui.TableViewWithHScrolling;
+import consulo.database.jdbc.rt.shared.*;
 import consulo.logging.Logger;
+import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;
-import java.util.List;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * @author VISTALL
@@ -118,6 +124,106 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 
 			result.setDone(state);
 		});
+	}
+
+	@Override
+	public void fetchData(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String childId, @Nonnull AsyncResult<Object> result)
+	{
+		safeCall(indicator, dataSource, result, session ->
+		{
+			String countQuery = "SELECT COUNT(*) FROM " + childId;
+
+			JdbcQueryResult jdbcQueryResult = session.execute(client -> client.runQuery(countQuery, Collections.emptyList()));
+
+			List<JdbcQueryRow> rows = jdbcQueryResult.getRows();
+
+			JdbcQueryRow row = rows.get(0);
+
+			Number value = (Number) getValue(row, 0);
+
+			long rowsCount = value.longValue();
+
+			// TODO pagging
+			String query = "SELECT * FROM " + childId;
+
+			JdbcQueryResult queryResult = session.execute(client -> client.runQuery(query, Collections.emptyList()));
+
+			result.setDone(queryResult);
+		});
+	}
+
+	@RequiredUIAccess
+	@Override
+	public void fetchDataEnded(@Nonnull ProgressIndicator indicator,
+							   @Nonnull Project project,
+							   @Nonnull DataSource dataSource,
+							   @Nonnull String childId,
+							   @Nonnull Object data,
+							   @Nonnull Consumer<JComponent> setter)
+	{
+		JdbcQueryResult queryResult = (JdbcQueryResult) data;
+
+		List<ColumnInfo<JdbcQueryRow, String>> list = new ArrayList<>();
+		int o = 0;
+		for(String col : queryResult.getColumns())
+		{
+			final int index = o++;
+
+			String max = col;
+			for(JdbcQueryRow row : queryResult.getRows())
+			{
+				String item = String.valueOf(getValue(row, index));
+
+				if(max == null || item.length() > max.length())
+				{
+					max = item;
+				}
+			}
+
+			final String finalMax = max;
+			list.add(new ColumnInfo<JdbcQueryRow, String>(col)
+			{
+				@Override
+				public String valueOf(JdbcQueryRow item)
+				{
+					return String.valueOf(getValue(item, index));
+				}
+
+				@Nullable
+				@Override
+				public String getPreferredStringValue()
+				{
+					return finalMax;
+				}
+			});
+		}
+
+		TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(new ListTableModel<>(list.toArray(new ColumnInfo[0]), queryResult.getRows()));
+		tableView.setHorizontalScrollEnabled(true);
+
+		setter.accept(ScrollPaneFactory.createScrollPane(tableView, true));
+	}
+
+	private Object getValue(@Nonnull JdbcQueryRow row, int index)
+	{
+		List<JdbcValue> values = row.getValues();
+
+		JdbcValue value = values.get(index);
+
+		JdbcValueType type = value.getType();
+		switch(type)
+		{
+			case _int:
+				return value.getIntValue();
+			case _string:
+				return value.getStringValue();
+			case _bool:
+				return value.isBoolValue();
+			case _long:
+				return value.getLongValue();
+			default:
+				throw new UnsupportedOperationException(type.name());
+		}
 	}
 
 	@Nonnull
