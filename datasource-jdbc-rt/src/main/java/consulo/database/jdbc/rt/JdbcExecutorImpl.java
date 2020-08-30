@@ -16,10 +16,7 @@
 
 package consulo.database.jdbc.rt;
 
-import consulo.database.jdbc.rt.shared.FailError;
-import consulo.database.jdbc.rt.shared.JdbcColum;
-import consulo.database.jdbc.rt.shared.JdbcExecutor;
-import consulo.database.jdbc.rt.shared.JdbcTable;
+import consulo.database.jdbc.rt.shared.*;
 import org.apache.thrift.TException;
 
 import java.io.PrintWriter;
@@ -112,6 +109,85 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 			}
 
 			return list;
+		});
+	}
+
+	@Override
+	public JdbcQueryResult runQuery(String query, List<JdbcValue> params) throws FailError, TException
+	{
+		return call(conn ->
+		{
+			PreparedStatement statement = conn.prepareStatement(query);
+			int i = 1;
+			for(JdbcValue param : params)
+			{
+				switch(param.getType())
+				{
+					case _int:
+						statement.setInt(1, param.getIntValue());
+						break;
+					case _string:
+						statement.setString(i, param.getStringValue());
+						break;
+					case _bool:
+						statement.setBoolean(i, param.isBoolValue());
+						break;
+					default:
+						throw new UnsupportedOperationException(param.getType() + " not handled");
+				}
+
+				i++;
+			}
+
+			ResultSet resultSet = statement.executeQuery();
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			int columnCount = metaData.getColumnCount();
+
+			List<String> columns = new ArrayList<>();
+			int[] columnsTypes = new int[columnCount];
+			for(int j = 0; j < columnCount; j++)
+			{
+				String columnClassName = metaData.getColumnClassName(j + 1);
+				columns.add(columnClassName);
+				columnsTypes[j] = metaData.getColumnType(j + 1);
+			}
+
+			JdbcQueryResult result = new JdbcQueryResult();
+			result.setColumns(columns);
+
+			List<JdbcQueryRow> rows = new ArrayList<>();
+			result.setRows(rows);
+
+			while(resultSet.next())
+			{
+				JdbcQueryRow row = new JdbcQueryRow();
+				rows.add(row);
+				List<JdbcValue> values = new ArrayList<>();
+				row.setValues(values);
+
+				for(int j = 0; j < columnCount; j++)
+				{
+					int columnType = columnsTypes[j];
+
+					JdbcValue value = new JdbcValue();
+					values.add(value);
+					switch(columnType)
+					{
+						case Types.INTEGER:
+						case Types.SMALLINT:
+						case Types.TINYINT:
+							value.setIntValue(resultSet.getInt(j + 1));
+							break;
+						case Types.BOOLEAN:
+							value.setBoolValue(resultSet.getBoolean(j + 1));
+							break;
+						case Types.VARCHAR:
+							value.setStringValue(resultSet.getString(j + 1));
+							break;
+					}
+				}
+			}
+			return result;
 		});
 	}
 
