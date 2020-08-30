@@ -6,6 +6,7 @@
  */
 package consulo.database.jdbc.rt.shared;
 
+import org.apache.thrift.EncodingUtils;
 import org.apache.thrift.protocol.TTupleProtocol;
 import org.apache.thrift.scheme.IScheme;
 import org.apache.thrift.scheme.SchemeFactory;
@@ -20,6 +21,7 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
 
   private static final org.apache.thrift.protocol.TField NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("name", org.apache.thrift.protocol.TType.STRING, (short)1);
   private static final org.apache.thrift.protocol.TField TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("type", org.apache.thrift.protocol.TType.STRING, (short)2);
+  private static final org.apache.thrift.protocol.TField JDBC_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("jdbcType", org.apache.thrift.protocol.TType.I32, (short)3);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -29,11 +31,13 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
 
   public String name; // required
   public String type; // required
+  public int jdbcType; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     NAME((short)1, "name"),
-    TYPE((short)2, "type");
+    TYPE((short)2, "type"),
+    JDBC_TYPE((short)3, "jdbcType");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -52,6 +56,8 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
           return NAME;
         case 2: // TYPE
           return TYPE;
+        case 3: // JDBC_TYPE
+          return JDBC_TYPE;
         default:
           return null;
       }
@@ -92,6 +98,8 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
   }
 
   // isset id assignments
+  private static final int __JDBCTYPE_ISSET_ID = 0;
+  private byte __isset_bitfield = 0;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -99,6 +107,8 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.TYPE, new org.apache.thrift.meta_data.FieldMetaData("type", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.JDBC_TYPE, new org.apache.thrift.meta_data.FieldMetaData("jdbcType", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(JdbcColum.class, metaDataMap);
   }
@@ -108,23 +118,28 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
 
   public JdbcColum(
     String name,
-    String type)
+    String type,
+    int jdbcType)
   {
     this();
     this.name = name;
     this.type = type;
+    this.jdbcType = jdbcType;
+    setJdbcTypeIsSet(true);
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
   public JdbcColum(JdbcColum other) {
+    __isset_bitfield = other.__isset_bitfield;
     if (other.isSetName()) {
       this.name = other.name;
     }
     if (other.isSetType()) {
       this.type = other.type;
     }
+    this.jdbcType = other.jdbcType;
   }
 
   public JdbcColum deepCopy() {
@@ -135,6 +150,8 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
   public void clear() {
     this.name = null;
     this.type = null;
+    setJdbcTypeIsSet(false);
+    this.jdbcType = 0;
   }
 
   public String getName() {
@@ -185,6 +202,29 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
     }
   }
 
+  public int getJdbcType() {
+    return this.jdbcType;
+  }
+
+  public JdbcColum setJdbcType(int jdbcType) {
+    this.jdbcType = jdbcType;
+    setJdbcTypeIsSet(true);
+    return this;
+  }
+
+  public void unsetJdbcType() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __JDBCTYPE_ISSET_ID);
+  }
+
+  /** Returns true if field jdbcType is set (has been assigned a value) and false otherwise */
+  public boolean isSetJdbcType() {
+    return EncodingUtils.testBit(__isset_bitfield, __JDBCTYPE_ISSET_ID);
+  }
+
+  public void setJdbcTypeIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __JDBCTYPE_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case NAME:
@@ -203,6 +243,14 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
       }
       break;
 
+    case JDBC_TYPE:
+      if (value == null) {
+        unsetJdbcType();
+      } else {
+        setJdbcType((Integer)value);
+      }
+      break;
+
     }
   }
 
@@ -213,6 +261,9 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
 
     case TYPE:
       return getType();
+
+    case JDBC_TYPE:
+      return getJdbcType();
 
     }
     throw new IllegalStateException();
@@ -229,6 +280,8 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
       return isSetName();
     case TYPE:
       return isSetType();
+    case JDBC_TYPE:
+      return isSetJdbcType();
     }
     throw new IllegalStateException();
   }
@@ -264,6 +317,15 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
         return false;
     }
 
+    boolean this_present_jdbcType = true;
+    boolean that_present_jdbcType = true;
+    if (this_present_jdbcType || that_present_jdbcType) {
+      if (!(this_present_jdbcType && that_present_jdbcType))
+        return false;
+      if (this.jdbcType != that.jdbcType)
+        return false;
+    }
+
     return true;
   }
 
@@ -280,6 +342,11 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
     list.add(present_type);
     if (present_type)
       list.add(type);
+
+    boolean present_jdbcType = true;
+    list.add(present_jdbcType);
+    if (present_jdbcType)
+      list.add(jdbcType);
 
     return list.hashCode();
   }
@@ -308,6 +375,16 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
     }
     if (isSetType()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.type, other.type);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetJdbcType()).compareTo(other.isSetJdbcType());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetJdbcType()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.jdbcType, other.jdbcType);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -347,6 +424,10 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
       sb.append(this.type);
     }
     first = false;
+    if (!first) sb.append(", ");
+    sb.append("jdbcType:");
+    sb.append(this.jdbcType);
+    first = false;
     sb.append(")");
     return sb.toString();
   }
@@ -366,6 +447,8 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bitfield = 0;
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -406,6 +489,14 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 3: // JDBC_TYPE
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.jdbcType = iprot.readI32();
+              struct.setJdbcTypeIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -431,6 +522,9 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
         oprot.writeString(struct.type);
         oprot.writeFieldEnd();
       }
+      oprot.writeFieldBegin(JDBC_TYPE_FIELD_DESC);
+      oprot.writeI32(struct.jdbcType);
+      oprot.writeFieldEnd();
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -455,19 +549,25 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
       if (struct.isSetType()) {
         optionals.set(1);
       }
-      oprot.writeBitSet(optionals, 2);
+      if (struct.isSetJdbcType()) {
+        optionals.set(2);
+      }
+      oprot.writeBitSet(optionals, 3);
       if (struct.isSetName()) {
         oprot.writeString(struct.name);
       }
       if (struct.isSetType()) {
         oprot.writeString(struct.type);
       }
+      if (struct.isSetJdbcType()) {
+        oprot.writeI32(struct.jdbcType);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, JdbcColum struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(2);
+      BitSet incoming = iprot.readBitSet(3);
       if (incoming.get(0)) {
         struct.name = iprot.readString();
         struct.setNameIsSet(true);
@@ -475,6 +575,10 @@ public class JdbcColum implements org.apache.thrift.TBase<JdbcColum, JdbcColum._
       if (incoming.get(1)) {
         struct.type = iprot.readString();
         struct.setTypeIsSet(true);
+      }
+      if (incoming.get(2)) {
+        struct.jdbcType = iprot.readI32();
+        struct.setJdbcTypeIsSet(true);
       }
     }
   }

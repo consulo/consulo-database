@@ -29,15 +29,22 @@ public class JdbcTableColumState implements PersistentStateComponent<JdbcTableCo
 {
 	private String myName;
 	private String myType;
+	private int myJdbcType;
 
 	private JdbcTableColumState()
 	{
 	}
 
-	public JdbcTableColumState(String name, String type)
+	public JdbcTableColumState(String name, String type, int jdbcType)
 	{
 		myName = name;
 		myType = type;
+		myJdbcType = jdbcType;
+	}
+
+	public int getJdbcType()
+	{
+		return myJdbcType;
 	}
 
 	public String getName()

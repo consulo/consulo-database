@@ -65,4 +65,6 @@ public interface DataSourceTransport<STATE extends PersistentStateComponent<?>>
 
 	@Nonnull
 	Class<STATE> getStateClass();
+
+	int getStateVersion();
 }

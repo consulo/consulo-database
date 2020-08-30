@@ -19,6 +19,8 @@ struct JdbcColum
 	1: string name;
 
 	2: string type;
+
+	3: i32 jdbcType;
 }
 
 struct JdbcQueryResult
@@ -65,5 +67,7 @@ service JdbcExecutor
 	list<JdbcTable> listTables(1: string databaseName) throws (1: FailError fr);
 
 	JdbcQueryResult runQuery(1: string query, 2: list<JdbcValue> params) throws (1: FailError fr);
+
+	void setDatabase(1: string dbName) throws (1: FailError fr);
 }
 

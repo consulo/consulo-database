@@ -53,4 +53,10 @@ public class FakeDataSourceTransport implements DataSourceTransport<FakeResult>
 	{
 		return FakeResult.class;
 	}
+
+	@Override
+	public int getStateVersion()
+	{
+		return 1;
+	}
 }

@@ -119,7 +119,7 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 				transport.loadInitialData(indicator, myProject, dataSource, result);
 
 				result.doWhenDone(state -> {
-					myStates.put(dataSource.getId(), new DataSourceState(null, state));
+					myStates.put(dataSource.getId(), new DataSourceState(transport.getStateVersion(), null, state));
 
 					publisher.dataUpdated(dataSource, state);
 				});
@@ -159,6 +159,12 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 
 		DataSourceTransport transport = findTransport(dataSource);
 
+		if(dataSourceState.getVersion() != transport.getStateVersion())
+		{
+			myStates.remove(dataSource.getId());
+			return null;
+		}
+
 		return dataSourceState.getObjectState(dataSource, transport);
 	}
 
@@ -170,11 +176,13 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 		for(Map.Entry<UUID, DataSourceState> entry : myStates.entrySet())
 		{
 			Element stateElement = new Element("datasource");
+
 			rootElement.addContent(stateElement);
 
 			stateElement.setAttribute("id", entry.getKey().toString());
 
 			Element dataSourceState = new Element("data-state");
+			dataSourceState.setAttribute("version", String.valueOf(entry.getValue().getVersion()));
 			dataSourceState.addContent(entry.getValue().toXmlState());
 
 			stateElement.addContent(dataSourceState);
@@ -201,10 +209,12 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 			{
 				continue;
 			}
+
+			int version = Integer.parseInt(stateElement.getAttributeValue("version", "0"));
 		
 			Element firstChild = stateElement.getChildren().get(0);
 
-			myStates.put(uuid, new DataSourceState(firstChild, null));
+			myStates.put(uuid, new DataSourceState(version, firstChild, null));
 		}
 	}
 }

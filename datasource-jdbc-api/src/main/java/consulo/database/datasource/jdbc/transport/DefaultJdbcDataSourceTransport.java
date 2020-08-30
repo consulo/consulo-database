@@ -43,6 +43,7 @@ import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -141,9 +142,13 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 						  @Nonnull String childId,
 						  @Nonnull AsyncResult<Object> result)
 	{
-		// TODO use database name
 		safeCall(indicator, dataSource, result, session ->
 		{
+			session.execute(client -> {
+				client.setDatabase(databaseName);
+				return null;
+			});
+
 			String countQuery = "SELECT COUNT(*) FROM " + childId;
 
 			JdbcQueryResult jdbcQueryResult = session.execute(client -> client.runQuery(countQuery, Collections.emptyList()));
@@ -180,7 +185,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 		JdbcState dataState = DataSourceTransportManager.getInstance(project).getDataState(dataSource);
 
 		JdbcTableState tableState = null;
-		JdbcDatabaseState databaseState = dataState.getDatabases().get(dbName);
+		JdbcDatabaseState databaseState = dataState == null ? null : dataState.getDatabases().get(dbName);
 		if(databaseState != null)
 		{
 			tableState = databaseState.getTablesState().findTable(childId);
@@ -221,11 +226,12 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 			JdbcTableColumState column = tableState.findColumn(name);
 			if(column != null)
 			{
-				String type = column.getType();
-
-				if("int".equalsIgnoreCase(type))
+				switch(column.getJdbcType())
 				{
-					return new IntColumnInfo(index, name, preferedSize);
+					case Types.INTEGER:
+					case Types.SMALLINT:
+					case Types.TINYINT:
+						return new IntColumnInfo(index, name, preferedSize);
 				}
 			}
 		}
@@ -265,7 +271,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 
 			for(JdbcColum colum : jdbcTable.getColums())
 			{
-				tableState.addColumn(new JdbcTableColumState(colum.getName(), colum.getType()));
+				tableState.addColumn(new JdbcTableColumState(colum.getName(), colum.getType(), colum.getJdbcType()));
 			}
 			state.addTable(tableState);
 		}
@@ -277,5 +283,11 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 	public Class<JdbcState> getStateClass()
 	{
 		return JdbcState.class;
+	}
+
+	@Override
+	public int getStateVersion()
+	{
+		return 1;
 	}
 }

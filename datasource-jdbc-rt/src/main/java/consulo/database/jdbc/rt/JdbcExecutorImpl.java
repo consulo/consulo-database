@@ -101,9 +101,10 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 				while(columns.next())
 				{
 					String colName = columns.getString(4);
+					int jdbcColType = columns.getInt(5);
 					String colType = columns.getString(6);
 
-					columList.add(new JdbcColum(colName, colType));
+					columList.add(new JdbcColum(colName, colType, jdbcColType));
 				}
 				list.add(new JdbcTable(tableName, columList));
 			}
@@ -203,6 +204,16 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 				}
 			}
 			return result;
+		});
+	}
+
+	@Override
+	public void setDatabase(String dbName) throws FailError, TException
+	{
+		call(param ->
+		{
+			param.setCatalog(dbName);
+			return null;
 		});
 	}
 

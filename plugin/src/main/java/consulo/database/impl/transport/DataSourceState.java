@@ -18,10 +18,18 @@ public class DataSourceState
 
 	private Object myState;
 
-	public DataSourceState(Element xmlState, Object state)
+	private final int myVersion;
+
+	public DataSourceState(int version, Element xmlState, Object state)
 	{
-		myXmlState = xmlState == null ? null : xmlState.detach();
+		myVersion = version;
 		myState = state;
+		myXmlState = xmlState == null ? null : xmlState.detach();
+	}
+
+	public int getVersion()
+	{
+		return myVersion;
 	}
 
 	@Nonnull
