@@ -38,6 +38,19 @@ public class JdbcTablesState implements PersistentStateComponent<JdbcTablesState
 		return myTables;
 	}
 
+	@Nullable
+	public JdbcTableState findTable(@Nonnull String table)
+	{
+		for(JdbcTableState state : myTables)
+		{
+			if(table.equals(state.getName()))
+			{
+				return state;
+			}
+		}
+		return null;
+	}
+
 	public void setTables(List<JdbcTableState> tables)
 	{
 		myTables = tables;

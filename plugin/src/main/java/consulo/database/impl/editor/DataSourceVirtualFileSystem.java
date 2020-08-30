@@ -19,6 +19,7 @@ package consulo.database.impl.editor;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.DeprecatedVirtualFileSystem;
 import com.intellij.openapi.vfs.NonPhysicalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -29,6 +30,7 @@ import consulo.vfs.ArchiveFileSystem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -46,9 +48,9 @@ public class DataSourceVirtualFileSystem extends DeprecatedVirtualFileSystem imp
 	}
 
 	@Nonnull
-	public VirtualFile createFile(DataSource dataSource, String childId)
+	public VirtualFile createFile(DataSource dataSource, String dbName, String childId)
 	{
-		VirtualFile file = findFileByPath(dataSource.getId() + ArchiveFileSystem.ARCHIVE_SEPARATOR + childId);
+		VirtualFile file = findFileByPath(dataSource.getId() + ArchiveFileSystem.ARCHIVE_SEPARATOR + dbName + "/" + childId);
 		assert file != null;
 		return file;
 	}
@@ -67,14 +69,22 @@ public class DataSourceVirtualFileSystem extends DeprecatedVirtualFileSystem imp
 		String[] values = path.split(ArchiveFileSystem.ARCHIVE_SEPARATOR);
 
 		UUID uuid = UUID.fromString(values[0]);
-		String childId = values[1];
+
+		List<String> dbAndChildId = StringUtil.split(values[1], "/");
+		if(dbAndChildId.size() != 2)
+		{
+			return null;
+		}
+
+		String dbName = dbAndChildId.get(0);
+		String childId = dbAndChildId.get(1);
 
 		for(Project project : ProjectManager.getInstance().getOpenProjects())
 		{
 			DataSource dataSource = ReadAction.compute(() -> DataSourceManager.getInstance(project).findDataSource(uuid));
 			if(dataSource != null)
 			{
-				return new DataSourceVirtualFile(dataSource, childId, this);
+				return new DataSourceVirtualFile(dataSource, dbName, childId, this);
 			}
 		}
 		return null;

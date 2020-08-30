@@ -24,21 +24,28 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ThrowableConsumer;
 import com.intellij.util.ui.ColumnInfo;
+import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.ListTableModel;
+import com.intellij.util.ui.UIUtil;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.*;
+import consulo.database.datasource.jdbc.transport.columnInfo.BaseColumnInfo;
+import consulo.database.datasource.jdbc.transport.columnInfo.IntColumnInfo;
+import consulo.database.datasource.jdbc.transport.columnInfo.StringColumnInfo;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
+import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.impl.editor.ui.TableViewWithHScrolling;
 import consulo.database.jdbc.rt.shared.*;
 import consulo.logging.Logger;
 import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -127,8 +134,14 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 	}
 
 	@Override
-	public void fetchData(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String childId, @Nonnull AsyncResult<Object> result)
+	public void fetchData(@Nonnull ProgressIndicator indicator,
+						  @Nonnull Project project,
+						  @Nonnull DataSource dataSource,
+						  @Nonnull String databaseName,
+						  @Nonnull String childId,
+						  @Nonnull AsyncResult<Object> result)
 	{
+		// TODO use database name
 		safeCall(indicator, dataSource, result, session ->
 		{
 			String countQuery = "SELECT COUNT(*) FROM " + childId;
@@ -157,13 +170,23 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 	public void fetchDataEnded(@Nonnull ProgressIndicator indicator,
 							   @Nonnull Project project,
 							   @Nonnull DataSource dataSource,
+							   @Nonnull String dbName,
 							   @Nonnull String childId,
 							   @Nonnull Object data,
 							   @Nonnull Consumer<JComponent> setter)
 	{
 		JdbcQueryResult queryResult = (JdbcQueryResult) data;
 
-		List<ColumnInfo<JdbcQueryRow, String>> list = new ArrayList<>();
+		JdbcState dataState = DataSourceTransportManager.getInstance(project).getDataState(dataSource);
+
+		JdbcTableState tableState = null;
+		JdbcDatabaseState databaseState = dataState.getDatabases().get(dbName);
+		if(databaseState != null)
+		{
+			tableState = databaseState.getTablesState().findTable(childId);
+		}
+
+		List<ColumnInfo<JdbcQueryRow, ?>> list = new ArrayList<>();
 		int o = 0;
 		for(String col : queryResult.getColumns())
 		{
@@ -180,32 +203,36 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 				}
 			}
 
-			final String finalMax = max;
-			list.add(new ColumnInfo<JdbcQueryRow, String>(col)
-			{
-				@Override
-				public String valueOf(JdbcQueryRow item)
-				{
-					return String.valueOf(getValue(item, index));
-				}
-
-				@Nullable
-				@Override
-				public String getPreferredStringValue()
-				{
-					// two chapters as border
-					return finalMax + "ww";
-				}
-			});
+			list.add(createColumn(index, col, max, tableState));
 		}
 
 		TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(new ListTableModel<>(list.toArray(new ColumnInfo[0]), queryResult.getRows()));
 		tableView.setHorizontalScrollEnabled(true);
+		tableView.setFont(UIUtil.getLabelFont(UIUtil.FontSize.BIGGER));
+		tableView.setRowHeight(JBUI.scale(24));
 
 		setter.accept(ScrollPaneFactory.createScrollPane(tableView, true));
 	}
 
-	private Object getValue(@Nonnull JdbcQueryRow row, int index)
+	private static BaseColumnInfo<?> createColumn(int index, String name, String preferedSize, JdbcTableState tableState)
+	{
+		if(tableState != null)
+		{
+			JdbcTableColumState column = tableState.findColumn(name);
+			if(column != null)
+			{
+				String type = column.getType();
+
+				if("int".equalsIgnoreCase(type))
+				{
+					return new IntColumnInfo(index, name, preferedSize);
+				}
+			}
+		}
+		return new StringColumnInfo(index, name, preferedSize);
+	}
+
+	public static Object getValue(@Nonnull JdbcQueryRow row, int index)
 	{
 		List<JdbcValue> values = row.getValues();
 

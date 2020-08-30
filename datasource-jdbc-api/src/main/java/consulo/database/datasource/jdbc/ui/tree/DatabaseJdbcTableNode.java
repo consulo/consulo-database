@@ -37,17 +37,25 @@ public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
 {
 	@Nonnull
 	private final DataSource myDataSource;
+	private final String myDbName;
 
-	public DatabaseJdbcTableNode(Project project, @Nonnull DataSource dataSource, @Nonnull JdbcTableState value)
+	public DatabaseJdbcTableNode(Project project, @Nonnull DataSource dataSource, String dbName, @Nonnull JdbcTableState value)
 	{
 		super(project, value);
 		myDataSource = dataSource;
+		myDbName = dbName;
 	}
 
 	@Nonnull
 	public DataSource getDataSource()
 	{
 		return myDataSource;
+	}
+
+	@Nonnull
+	public String getDatabaseName()
+	{
+		return myDbName;
 	}
 
 	@RequiredReadAction
@@ -74,6 +82,6 @@ public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
 	@Override
 	public String toString()
 	{
-		return getValue().getName();
+		return myDbName + ":" + getValue().getName();
 	}
 }

@@ -19,6 +19,7 @@ package consulo.database.datasource.jdbc.provider.impl;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,19 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 	public void setColumns(List<JdbcTableColumState> columns)
 	{
 		myColumns = columns;
+	}
+
+	@Nullable
+	public JdbcTableColumState findColumn(@Nonnull String column)
+	{
+		for(JdbcTableColumState columState : myColumns)
+		{
+			if(column.equals(columState.getName()))
+			{
+				return columState;
+			}
+		}
+		return null;
 	}
 
 	public List<JdbcTableColumState> getColumns()

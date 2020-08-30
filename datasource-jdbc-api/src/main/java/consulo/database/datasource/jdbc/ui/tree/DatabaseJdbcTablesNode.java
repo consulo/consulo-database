@@ -103,7 +103,7 @@ public class DatabaseJdbcTablesNode extends AbstractTreeNode<JdbcDatabaseState>
 	@Nullable
 	protected AbstractTreeNode createTableNode(JdbcTableState table)
 	{
-		return new DatabaseJdbcTableNode(myProject, myDataSource, table);
+		return new DatabaseJdbcTableNode(myProject, myDataSource, getValue().getName(), table);
 	}
 
 	@Override

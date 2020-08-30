@@ -42,7 +42,12 @@ public interface DataSourceTransport<STATE extends PersistentStateComponent<?>>
 
 	void loadInitialData(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<STATE> result);
 
-	default void fetchData(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String childId, @Nonnull AsyncResult<Object> result)
+	default void fetchData(@Nonnull ProgressIndicator indicator,
+						   @Nonnull Project project,
+						   @Nonnull DataSource dataSource,
+						   @Nonnull String databaseName,
+						   @Nonnull String childId,
+						   @Nonnull AsyncResult<Object> result)
 	{
 		result.setDone();
 	}
@@ -51,6 +56,7 @@ public interface DataSourceTransport<STATE extends PersistentStateComponent<?>>
 	default void fetchDataEnded(@Nonnull ProgressIndicator indicator,
 								@Nonnull Project project,
 								@Nonnull DataSource dataSource,
+								@Nonnull String dbName,
 								@Nonnull String childId,
 								@Nonnull Object data,
 								@Nonnull Consumer<JComponent> setter)

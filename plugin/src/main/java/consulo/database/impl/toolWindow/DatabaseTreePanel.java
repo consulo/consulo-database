@@ -112,8 +112,8 @@ public class DatabaseTreePanel implements Disposable
 					Object node = TreeUtil.getLastUserObject(path);
 					if(node instanceof DatabaseJdbcTableNode)
 					{
-
-						DataSourceEditorManager.getInstance(project).openEditor(((DatabaseJdbcTableNode) node).getDataSource(), ((DatabaseJdbcTableNode) node).getValue().getName());
+						DataSourceEditorManager.getInstance(project).openEditor(((DatabaseJdbcTableNode) node).getDataSource(), ((DatabaseJdbcTableNode) node).getDatabaseName(), (
+								(DatabaseJdbcTableNode) node).getValue().getName());
 						return true;
 					}
 				}

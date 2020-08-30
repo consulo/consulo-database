@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package consulo.database.datasource.editor;
+package consulo.database.datasource.jdbc.transport.columnInfo;
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
+import consulo.database.jdbc.rt.shared.JdbcQueryRow;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author VISTALL
- * @since 2020-08-19
+ * @since 2020-08-30
  */
-public interface DataSourceEditorManager
+public class StringColumnInfo extends BaseColumnInfo<String>
 {
-	@Nonnull
-	static DataSourceEditorManager getInstance(@Nonnull Project project)
+	public StringColumnInfo(int index, String name, String preferedSize)
 	{
-		return ServiceManager.getService(project, DataSourceEditorManager.class);
+		super(index, name, preferedSize);
 	}
 
-	void openEditor(@Nonnull DataSource dataSource, @Nonnull String dbName, @Nonnull String childId);
+	@Nullable
+	@Override
+	public String valueOf(JdbcQueryRow row)
+	{
+		return String.valueOf(DefaultJdbcDataSourceTransport.getValue(row, myIndex));
+	}
 }

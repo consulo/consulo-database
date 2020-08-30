@@ -32,16 +32,24 @@ import javax.annotation.Nonnull;
 public class DataSourceVirtualFile extends LightVirtualFile
 {
 	private final DataSource myDataSource;
+	private final String myDatabaseName;
 	private final String myChildId;
 	private final VirtualFileSystem myVirtualFileSystem;
 
-	public DataSourceVirtualFile(DataSource dataSource, String childId, VirtualFileSystem virtualFileSystem)
+	public DataSourceVirtualFile(@Nonnull DataSource dataSource, @Nonnull String databaseName, @Nonnull String childId, @Nonnull VirtualFileSystem virtualFileSystem)
 	{
 		super("[" + dataSource.getName() + "] " + childId);
 
 		myDataSource = dataSource;
+		myDatabaseName = databaseName;
 		myChildId = childId;
 		myVirtualFileSystem = virtualFileSystem;
+	}
+
+	@Nonnull
+	public String getDatabaseName()
+	{
+		return myDatabaseName;
 	}
 
 	@Nonnull
@@ -67,7 +75,7 @@ public class DataSourceVirtualFile extends LightVirtualFile
 	@Override
 	public String getPath()
 	{
-		return myDataSource.getId() + ArchiveFileSystem.ARCHIVE_SEPARATOR + myChildId;
+		return myDataSource.getId() + ArchiveFileSystem.ARCHIVE_SEPARATOR + myDatabaseName + "/" + myChildId;
 	}
 
 	@Override

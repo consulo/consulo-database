@@ -42,9 +42,9 @@ public class DataSourceEditorManagerImpl implements DataSourceEditorManager
 	}
 
 	@Override
-	public void openEditor(@Nonnull DataSource dataSource, @Nonnull String childId)
+	public void openEditor(@Nonnull DataSource dataSource, @Nonnull String dbName, @Nonnull String childId)
 	{
-		VirtualFile file = DataSourceVirtualFileSystem.getInstance().createFile(dataSource, childId);
+		VirtualFile file = DataSourceVirtualFileSystem.getInstance().createFile(dataSource, dbName, childId);
 
 		FileEditorManager.getInstance(myProject).openFile(file, true);
 	}
