@@ -193,7 +193,8 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 				@Override
 				public String getPreferredStringValue()
 				{
-					return finalMax;
+					// two chapters as border
+					return finalMax + "ww";
 				}
 			});
 		}
