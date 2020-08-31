@@ -12,6 +12,8 @@ struct JdbcTable
 	1: string name;
 
 	2: list<JdbcColum> colums;
+
+	3: string type;
 }
 
 struct JdbcColum

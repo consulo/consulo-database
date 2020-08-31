@@ -22,6 +22,7 @@ import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.util.lang.StringUtil;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -56,4 +57,9 @@ public abstract class JdbcDataSourceProvider implements DataSourceProvider
 	}
 
 	public abstract void fillDrivers(Map<String, String> map);
+
+	public boolean isTableType(@Nullable String type)
+	{
+		return "TABLE".equals(type);
+	}
 }

@@ -22,6 +22,7 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
@@ -103,6 +104,11 @@ public class DatabaseJdbcTablesNode extends AbstractTreeNode<JdbcDatabaseState>
 	@Nullable
 	protected AbstractTreeNode createTableNode(JdbcTableState table)
 	{
+		JdbcDataSourceProvider provider = (JdbcDataSourceProvider) myDataSource.getProvider();
+		if(!provider.isTableType(table.getType()))
+		{
+			return null;
+		}
 		return new DatabaseJdbcTableNode(myProject, myDataSource, getValue().getName(), table);
 	}
 

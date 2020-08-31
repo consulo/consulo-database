@@ -16,14 +16,10 @@
 
 package consulo.database.postgresql.node;
 
-import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
-import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcTablesNode;
 import consulo.database.datasource.model.DataSource;
-
-import javax.annotation.Nullable;
 
 /**
  * @author VISTALL
@@ -31,31 +27,8 @@ import javax.annotation.Nullable;
  */
 public class PostgresqlTablesNode extends DatabaseJdbcTablesNode
 {
-	public PostgresqlTablesNode(Project project,
-								DataSource dataSource,
-								JdbcDatabaseState jdbcDatabaseState)
+	public PostgresqlTablesNode(Project project, DataSource dataSource, JdbcDatabaseState jdbcDatabaseState)
 	{
 		super(project, dataSource, jdbcDatabaseState);
-	}
-
-	@Nullable
-	@Override
-	protected AbstractTreeNode createTableNode(JdbcTableState table)
-	{
-		String name = table.getName();
-		if(name.endsWith("_pkey") ||
-				name.startsWith("pg_") ||
-				name.startsWith("_pg_") ||
-				name.startsWith("sql_") ||
-				name.endsWith("_grants") ||
-				name.endsWith("_usage") ||
-				name.endsWith("_options") ||
-				name.endsWith("_privileges") ||
-				name.endsWith("_seq") ||
-				name.endsWith("_constraints"))
-		{
-			return null;
-		}
-		return super.createTableNode(table);
 	}
 }

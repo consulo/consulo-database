@@ -34,6 +34,8 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 
 	private List<JdbcTableColumState> myColumns = new ArrayList<>();
 
+	private String myType;
+
 	public void setName(String name)
 	{
 		myName = name;
@@ -70,6 +72,16 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 	public List<JdbcTableColumState> getColumns()
 	{
 		return myColumns;
+	}
+
+	public String getType()
+	{
+		return myType;
+	}
+
+	public void setType(String type)
+	{
+		myType = type;
 	}
 
 	@Nullable

@@ -268,6 +268,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 		{
 			JdbcTableState tableState = new JdbcTableState();
 			tableState.setName(jdbcTable.getName());
+			tableState.setType(jdbcTable.getType());
 
 			for(JdbcColum colum : jdbcTable.getColums())
 			{
@@ -288,6 +289,6 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 	@Override
 	public int getStateVersion()
 	{
-		return 1;
+		return 2;
 	}
 }

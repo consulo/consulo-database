@@ -93,20 +93,29 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 			ResultSet rs = md.getTables(null, null, "%", null);
 			while(rs.next())
 			{
-				String tableName = rs.getString(3);
+				String tableSchem = rs.getString("TABLE_SCHEM");
+				String tableName = rs.getString("TABLE_NAME");
+				String type = rs.getString("TABLE_TYPE");
 
 				List<JdbcColum> columList = new ArrayList<>();
 
 				ResultSet columns = md.getColumns(null, null, tableName, null);
 				while(columns.next())
 				{
-					String colName = columns.getString(4);
-					int jdbcColType = columns.getInt(5);
-					String colType = columns.getString(6);
+					String colName = columns.getString("COLUMN_NAME");
+					int jdbcColType = columns.getInt("DATA_TYPE");
+					String colType = columns.getString("TYPE_NAME");
 
 					columList.add(new JdbcColum(colName, colType, jdbcColType));
 				}
-				list.add(new JdbcTable(tableName, columList));
+
+//				ResultSet primaryKeys = md.getPrimaryKeys(databaseName, tableSchem, tableName);
+//				while(primaryKeys.next())
+//				{
+//
+//				}
+
+				list.add(new JdbcTable(tableName, columList, type));
 			}
 
 			return list;
