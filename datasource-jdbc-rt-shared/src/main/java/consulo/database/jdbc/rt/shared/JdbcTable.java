@@ -21,6 +21,7 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
   private static final org.apache.thrift.protocol.TField NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("name", org.apache.thrift.protocol.TType.STRING, (short)1);
   private static final org.apache.thrift.protocol.TField COLUMS_FIELD_DESC = new org.apache.thrift.protocol.TField("colums", org.apache.thrift.protocol.TType.LIST, (short)2);
   private static final org.apache.thrift.protocol.TField TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("type", org.apache.thrift.protocol.TType.STRING, (short)3);
+  private static final org.apache.thrift.protocol.TField SCHEME_FIELD_DESC = new org.apache.thrift.protocol.TField("scheme", org.apache.thrift.protocol.TType.STRING, (short)4);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -31,12 +32,14 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
   public String name; // required
   public List<JdbcColum> colums; // required
   public String type; // required
+  public String scheme; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     NAME((short)1, "name"),
     COLUMS((short)2, "colums"),
-    TYPE((short)3, "type");
+    TYPE((short)3, "type"),
+    SCHEME((short)4, "scheme");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -57,6 +60,8 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
           return COLUMS;
         case 3: // TYPE
           return TYPE;
+        case 4: // SCHEME
+          return SCHEME;
         default:
           return null;
       }
@@ -107,6 +112,8 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT            , "JdbcColum"))));
     tmpMap.put(_Fields.TYPE, new org.apache.thrift.meta_data.FieldMetaData("type", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.SCHEME, new org.apache.thrift.meta_data.FieldMetaData("scheme", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(JdbcTable.class, metaDataMap);
   }
@@ -117,12 +124,14 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
   public JdbcTable(
     String name,
     List<JdbcColum> colums,
-    String type)
+    String type,
+    String scheme)
   {
     this();
     this.name = name;
     this.colums = colums;
     this.type = type;
+    this.scheme = scheme;
   }
 
   /**
@@ -142,6 +151,9 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     if (other.isSetType()) {
       this.type = other.type;
     }
+    if (other.isSetScheme()) {
+      this.scheme = other.scheme;
+    }
   }
 
   public JdbcTable deepCopy() {
@@ -153,6 +165,7 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     this.name = null;
     this.colums = null;
     this.type = null;
+    this.scheme = null;
   }
 
   public String getName() {
@@ -242,6 +255,30 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     }
   }
 
+  public String getScheme() {
+    return this.scheme;
+  }
+
+  public JdbcTable setScheme(String scheme) {
+    this.scheme = scheme;
+    return this;
+  }
+
+  public void unsetScheme() {
+    this.scheme = null;
+  }
+
+  /** Returns true if field scheme is set (has been assigned a value) and false otherwise */
+  public boolean isSetScheme() {
+    return this.scheme != null;
+  }
+
+  public void setSchemeIsSet(boolean value) {
+    if (!value) {
+      this.scheme = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case NAME:
@@ -268,6 +305,14 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       }
       break;
 
+    case SCHEME:
+      if (value == null) {
+        unsetScheme();
+      } else {
+        setScheme((String)value);
+      }
+      break;
+
     }
   }
 
@@ -281,6 +326,9 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
 
     case TYPE:
       return getType();
+
+    case SCHEME:
+      return getScheme();
 
     }
     throw new IllegalStateException();
@@ -299,6 +347,8 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       return isSetColums();
     case TYPE:
       return isSetType();
+    case SCHEME:
+      return isSetScheme();
     }
     throw new IllegalStateException();
   }
@@ -343,6 +393,15 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
         return false;
     }
 
+    boolean this_present_scheme = true && this.isSetScheme();
+    boolean that_present_scheme = true && that.isSetScheme();
+    if (this_present_scheme || that_present_scheme) {
+      if (!(this_present_scheme && that_present_scheme))
+        return false;
+      if (!this.scheme.equals(that.scheme))
+        return false;
+    }
+
     return true;
   }
 
@@ -364,6 +423,11 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     list.add(present_type);
     if (present_type)
       list.add(type);
+
+    boolean present_scheme = true && (isSetScheme());
+    list.add(present_scheme);
+    if (present_scheme)
+      list.add(scheme);
 
     return list.hashCode();
   }
@@ -402,6 +466,16 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     }
     if (isSetType()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.type, other.type);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetScheme()).compareTo(other.isSetScheme());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetScheme()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.scheme, other.scheme);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -447,6 +521,14 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       sb.append("null");
     } else {
       sb.append(this.type);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("scheme:");
+    if (this.scheme == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.scheme);
     }
     first = false;
     sb.append(")");
@@ -527,6 +609,14 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 4: // SCHEME
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.scheme = iprot.readString();
+              struct.setSchemeIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -564,6 +654,11 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
         oprot.writeString(struct.type);
         oprot.writeFieldEnd();
       }
+      if (struct.scheme != null) {
+        oprot.writeFieldBegin(SCHEME_FIELD_DESC);
+        oprot.writeString(struct.scheme);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -591,7 +686,10 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       if (struct.isSetType()) {
         optionals.set(2);
       }
-      oprot.writeBitSet(optionals, 3);
+      if (struct.isSetScheme()) {
+        optionals.set(3);
+      }
+      oprot.writeBitSet(optionals, 4);
       if (struct.isSetName()) {
         oprot.writeString(struct.name);
       }
@@ -607,12 +705,15 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       if (struct.isSetType()) {
         oprot.writeString(struct.type);
       }
+      if (struct.isSetScheme()) {
+        oprot.writeString(struct.scheme);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, JdbcTable struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(3);
+      BitSet incoming = iprot.readBitSet(4);
       if (incoming.get(0)) {
         struct.name = iprot.readString();
         struct.setNameIsSet(true);
@@ -634,6 +735,10 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       if (incoming.get(2)) {
         struct.type = iprot.readString();
         struct.setTypeIsSet(true);
+      }
+      if (incoming.get(3)) {
+        struct.scheme = iprot.readString();
+        struct.setSchemeIsSet(true);
       }
     }
   }

@@ -29,6 +29,7 @@ import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.tree.TreeUtil;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.editor.DataSourceEditorManager;
+import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcTableNode;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.DataSourceEvent;
@@ -112,8 +113,10 @@ public class DatabaseTreePanel implements Disposable
 					Object node = TreeUtil.getLastUserObject(path);
 					if(node instanceof DatabaseJdbcTableNode)
 					{
-						DataSourceEditorManager.getInstance(project).openEditor(((DatabaseJdbcTableNode) node).getDataSource(), ((DatabaseJdbcTableNode) node).getDatabaseName(), (
-								(DatabaseJdbcTableNode) node).getValue().getName());
+						DatabaseJdbcTableNode jdbcTableNode = (DatabaseJdbcTableNode) node;
+						JdbcTableState value = jdbcTableNode.getValue();
+						String fullName = value.getNameWithScheme();
+						DataSourceEditorManager.getInstance(project).openEditor(jdbcTableNode.getDataSource(), jdbcTableNode.getDatabaseName(), fullName);
 						return true;
 					}
 				}

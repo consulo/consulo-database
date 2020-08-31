@@ -115,7 +115,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface
 //
 //				}
 
-				list.add(new JdbcTable(tableName, columList, type));
+				list.add(new JdbcTable(tableName, columList, type, tableSchem));
 			}
 
 			return list;

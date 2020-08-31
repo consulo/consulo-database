@@ -36,6 +36,8 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 
 	private String myType;
 
+	private String myScheme;
+
 	public void setName(String name)
 	{
 		myName = name;
@@ -43,6 +45,16 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 
 	public String getName()
 	{
+		return myName;
+	}
+
+	@Nonnull
+	public String getNameWithScheme()
+	{
+		if(myScheme != null)
+		{
+			return myScheme + "." + myName;
+		}
 		return myName;
 	}
 
@@ -82,6 +94,16 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 	public void setType(String type)
 	{
 		myType = type;
+	}
+
+	public void setScheme(String scheme)
+	{
+		myScheme = scheme;
+	}
+
+	public String getScheme()
+	{
+		return myScheme;
 	}
 
 	@Nullable

@@ -39,11 +39,11 @@ public class JdbcTablesState implements PersistentStateComponent<JdbcTablesState
 	}
 
 	@Nullable
-	public JdbcTableState findTable(@Nonnull String table)
+	public JdbcTableState findTable(@Nonnull String tableWithScheme)
 	{
 		for(JdbcTableState state : myTables)
 		{
-			if(table.equals(state.getName()))
+			if(tableWithScheme.equals(state.getNameWithScheme()))
 			{
 				return state;
 			}

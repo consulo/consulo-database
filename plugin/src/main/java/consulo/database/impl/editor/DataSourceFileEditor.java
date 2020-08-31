@@ -110,7 +110,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 
 				AsyncResult<Object> result = AsyncResult.undefined();
 
-				transport.fetchData(indicator, myProject, myDataSource, myFile.getDatabaseName(),myFile.getChildId(), result);
+				transport.fetchData(indicator, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), result);
 
 				final DataSourceTransport finalTransport = transport;
 				result.doWhenDone(o -> {

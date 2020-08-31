@@ -67,10 +67,16 @@ public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
 	}
 
 	@Override
-	protected void update(PresentationData presentationData)
+	protected void update(PresentationData data)
 	{
-		presentationData.setIcon(AllIcons.Nodes.DataTables);
-		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+		data.setIcon(AllIcons.Nodes.DataTables);
+
+		String scheme = getValue().getScheme();
+		if(scheme != null)
+		{
+			data.addText(scheme + ".", SimpleTextAttributes.GRAYED_ATTRIBUTES);
+		}
+		data.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 	}
 
 	@Override
