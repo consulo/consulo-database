@@ -21,6 +21,7 @@
 	<version>SNAPSHOT</version>
 	<vendor>consulo.io</vendor>
 	<localize>consulo.database.DatabaseLocalize</localize>
+	<experimental>true</experimental>
 
 	<extensionPoints>
 		<extensionPoint name="provider" interface="consulo.database.datasource.provider.DataSourceProvider"/>
