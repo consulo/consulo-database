@@ -18,6 +18,7 @@ package consulo.database.datasource.jdbc.transport.columnInfo;
 
 import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
 import consulo.database.jdbc.rt.shared.JdbcQueryRow;
+import consulo.disposer.Disposable;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
@@ -28,9 +29,9 @@ import java.util.Comparator;
  */
 public class IntColumnInfo extends BaseColumnInfo<Integer>
 {
-	public IntColumnInfo(int index, String name, String preferedSize)
+	public IntColumnInfo(int index, String name, String preferedSize, Disposable parent)
 	{
-		super(index, name, preferedSize);
+		super(index, name, preferedSize, parent);
 	}
 
 	@Override

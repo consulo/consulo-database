@@ -16,27 +16,37 @@
 
 package consulo.database.datasource.jdbc.transport.columnInfo;
 
-import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
-import consulo.database.jdbc.rt.shared.JdbcQueryRow;
-import consulo.disposer.Disposable;
+import com.intellij.ui.EditorTextField;
 
-import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
+import java.awt.*;
 
 /**
  * @author VISTALL
- * @since 2020-08-30
+ * @since 2020-09-01
  */
-public class StringColumnInfo extends BaseColumnInfo<String>
+public class EditorTableCellEditor extends AbstractCellEditor implements TableCellEditor
 {
-	public StringColumnInfo(int index, String name, String preferedSize, Disposable parent)
+	private String myValue;
+
+	public EditorTableCellEditor(String value)
 	{
-		super(index, name, preferedSize, parent);
+		myValue = value;
 	}
 
-	@Nullable
 	@Override
-	public String valueOf(JdbcQueryRow row)
+	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
 	{
-		return String.valueOf(DefaultJdbcDataSourceTransport.getValue(row, myIndex));
+		EditorTextField field = new EditorTextField(myValue);
+		field.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+		field.setFontInheritedFromLAF(false);
+		return field;
+	}
+
+	@Override
+	public Object getCellEditorValue()
+	{
+		return myValue;
 	}
 }

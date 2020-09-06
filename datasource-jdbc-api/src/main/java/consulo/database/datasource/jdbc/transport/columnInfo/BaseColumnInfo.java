@@ -16,10 +16,17 @@
 
 package consulo.database.datasource.jdbc.transport.columnInfo;
 
+import com.intellij.openapi.fileTypes.PlainTextFileType;
+import com.intellij.ui.EditorTextFieldCellRenderer;
 import com.intellij.util.ui.ColumnInfo;
+import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
 import consulo.database.jdbc.rt.shared.JdbcQueryRow;
+import consulo.disposer.Disposable;
 
 import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 /**
  * @author VISTALL
@@ -29,12 +36,41 @@ public abstract class BaseColumnInfo<T> extends ColumnInfo<JdbcQueryRow, T>
 {
 	protected final int myIndex;
 	private String myPreferedSize;
+	private final Disposable myParent;
 
-	public BaseColumnInfo(int index, String name, String preferedSize)
+	public BaseColumnInfo(int index, String name, String preferedSize, Disposable parent)
 	{
 		super(name);
 		myIndex = index;
 		myPreferedSize = preferedSize;
+		myParent = parent;
+	}
+
+	@Override
+	public boolean isCellEditable(JdbcQueryRow row)
+	{
+		return true;
+	}
+
+	@Nullable
+	@Override
+	public TableCellEditor getEditor(JdbcQueryRow o)
+	{
+		return new EditorTableCellEditor(String.valueOf(DefaultJdbcDataSourceTransport.getValue(o, myIndex)));
+	}
+
+	@Nullable
+	@Override
+	public TableCellRenderer getRenderer(JdbcQueryRow jdbcQueryRow)
+	{
+		return new EditorTextFieldCellRenderer(null, PlainTextFileType.INSTANCE, false, myParent)
+		{
+			@Override
+			protected String getText(JTable table, Object value, int row, int column)
+			{
+				return String.valueOf(DefaultJdbcDataSourceTransport.getValue(jdbcQueryRow, myIndex));
+			}
+		};
 	}
 
 	@Nullable

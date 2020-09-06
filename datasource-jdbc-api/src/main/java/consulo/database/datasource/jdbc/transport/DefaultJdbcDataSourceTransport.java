@@ -26,7 +26,6 @@ import com.intellij.util.ThrowableConsumer;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.ListTableModel;
-import com.intellij.util.ui.UIUtil;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.*;
@@ -38,6 +37,7 @@ import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.impl.editor.ui.TableViewWithHScrolling;
 import consulo.database.jdbc.rt.shared.*;
+import consulo.disposer.Disposable;
 import consulo.logging.Logger;
 import consulo.ui.annotation.RequiredUIAccess;
 
@@ -208,18 +208,18 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 				}
 			}
 
-			list.add(createColumn(index, col, max, tableState));
+			// todo disposable
+			list.add(createColumn(index, col, max, tableState, Disposable.newDisposable()));
 		}
 
 		TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(new ListTableModel<>(list.toArray(new ColumnInfo[0]), queryResult.getRows()));
 		tableView.setHorizontalScrollEnabled(true);
-		tableView.setFont(UIUtil.getLabelFont(UIUtil.FontSize.BIGGER));
-		tableView.setRowHeight(JBUI.scale(24));
+		tableView.setRowHeight(JBUI.scale(20));
 
 		setter.accept(ScrollPaneFactory.createScrollPane(tableView, true));
 	}
 
-	private static BaseColumnInfo<?> createColumn(int index, String name, String preferedSize, JdbcTableState tableState)
+	private static BaseColumnInfo<?> createColumn(int index, String name, String preferedSize, JdbcTableState tableState, Disposable parent)
 	{
 		if(tableState != null)
 		{
@@ -231,11 +231,11 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 					case Types.INTEGER:
 					case Types.SMALLINT:
 					case Types.TINYINT:
-						return new IntColumnInfo(index, name, preferedSize);
+						return new IntColumnInfo(index, name, preferedSize, parent);
 				}
 			}
 		}
-		return new StringColumnInfo(index, name, preferedSize);
+		return new StringColumnInfo(index, name, preferedSize, parent);
 	}
 
 	public static Object getValue(@Nonnull JdbcQueryRow row, int index)
