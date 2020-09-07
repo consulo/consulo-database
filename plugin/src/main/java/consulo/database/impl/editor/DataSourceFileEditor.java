@@ -123,7 +123,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 							myTargetPanel.remove(myLastResult);
 						}
 						Consumer setter = component -> myTargetPanel.add(myLastResult = (JComponent) component, BorderLayout.CENTER);
-						finalTransport.fetchDataEnded(indicator, myProject, myDataSource,myFile.getDatabaseName(), myFile.getChildId(), o, setter);
+						finalTransport.fetchDataEnded(indicator, myProject, myDataSource,myFile.getDatabaseName(), myFile.getChildId(), o, DataSourceFileEditor.this, setter);
 					});
 				});
 			});

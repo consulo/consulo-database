@@ -22,6 +22,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.DataSource;
+import consulo.disposer.Disposable;
 import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;
@@ -59,6 +60,7 @@ public interface DataSourceTransport<STATE extends PersistentStateComponent<?>>
 								@Nonnull String dbName,
 								@Nonnull String childId,
 								@Nonnull Object data,
+								@Nonnull Disposable parent,
 								@Nonnull Consumer<JComponent> setter)
 	{
 	}

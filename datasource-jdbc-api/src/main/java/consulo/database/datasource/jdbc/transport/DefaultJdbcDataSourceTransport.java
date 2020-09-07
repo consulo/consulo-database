@@ -178,6 +178,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 							   @Nonnull String dbName,
 							   @Nonnull String childId,
 							   @Nonnull Object data,
+							   @Nonnull Disposable parent,
 							   @Nonnull Consumer<JComponent> setter)
 	{
 		JdbcQueryResult queryResult = (JdbcQueryResult) data;
@@ -208,8 +209,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 				}
 			}
 
-			// todo disposable
-			list.add(createColumn(index, col, max, tableState, Disposable.newDisposable()));
+			list.add(createColumn(index, col, max, tableState, parent));
 		}
 
 		TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(new ListTableModel<>(list.toArray(new ColumnInfo[0]), queryResult.getRows()));
