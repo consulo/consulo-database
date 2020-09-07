@@ -38,7 +38,7 @@ public class DataSourceVirtualFile extends LightVirtualFile
 
 	public DataSourceVirtualFile(@Nonnull DataSource dataSource, @Nonnull String databaseName, @Nonnull String childId, @Nonnull VirtualFileSystem virtualFileSystem)
 	{
-		super("[" + dataSource.getName() + "] " + childId);
+		super("[" + dataSource.getName() + "] " + childId, DataSourceFileType.INSTANCE, "");
 
 		myDataSource = dataSource;
 		myDatabaseName = databaseName;
