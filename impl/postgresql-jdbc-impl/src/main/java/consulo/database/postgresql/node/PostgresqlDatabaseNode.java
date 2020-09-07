@@ -19,10 +19,7 @@ package consulo.database.postgresql.node;
 import com.intellij.openapi.project.Project;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
 import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcDatabaseNode;
-import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcTablesNode;
 import consulo.database.datasource.model.DataSource;
-
-import javax.annotation.Nonnull;
 
 /**
  * @author VISTALL
@@ -35,12 +32,5 @@ public class PostgresqlDatabaseNode extends DatabaseJdbcDatabaseNode
 								  JdbcDatabaseState state)
 	{
 		super(project, dataSource, state);
-	}
-
-	@Nonnull
-	@Override
-	protected DatabaseJdbcTablesNode createTablesNode()
-	{
-		return new PostgresqlTablesNode(myProject, myDataSource, getValue());
 	}
 }
