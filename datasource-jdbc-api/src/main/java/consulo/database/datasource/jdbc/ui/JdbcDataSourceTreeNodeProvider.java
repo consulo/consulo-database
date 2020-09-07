@@ -53,7 +53,11 @@ public class JdbcDataSourceTreeNodeProvider implements DataSourceTreeNodeProvide
 			state.setTablesState(null);
 			state.setName(dbName);
 
-			consumer.accept(createDatabaseNode(project, dataSource, state));
+			DatabaseJdbcDatabaseNode node = createDatabaseNode(project, dataSource, state);
+			for(AbstractTreeNode child : node.getChildren())
+			{
+				consumer.accept(child);
+			}
 		}
 		else
 		{
