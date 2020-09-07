@@ -21,9 +21,12 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.DataSourceManager;
+import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author VISTALL
@@ -42,7 +45,10 @@ public class DatabaseRootNode extends AbstractTreeNode<Object>
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
 		DataSourceManager dataSourceManager = DataSourceManager.getInstance(myProject);
-		return DatabaseProviderNode.split(getProject(), dataSourceManager.getModel());
+
+		List<? extends DataSource> dataSources = dataSourceManager.getDataSources();
+
+		return dataSources.stream().map(o -> new DatabaseSourceNode(myProject, o)).collect(Collectors.toList());
 	}
 
 	@Override
