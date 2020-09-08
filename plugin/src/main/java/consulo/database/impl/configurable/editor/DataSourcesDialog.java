@@ -68,17 +68,21 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 
 	private Configurable mySelectedConfigurable;
 
-	private EditableDataSourceModel myEditableDataSourceModel;
+	private final EditableDataSourceModel myEditableDataSourceModel;
 
 	public DataSourcesDialog(@Nonnull Project project, @Nullable DataSource selectedDataSource)
+	{
+		this(project, DataSourceManager.getInstance(project).createEditableModel(), selectedDataSource);
+	}
+
+	public DataSourcesDialog(@Nonnull Project project, @Nonnull EditableDataSourceModel editableDataSourceModel, @Nullable DataSource selectedDataSource)
 	{
 		super(project);
 		myProject = project;
 		mySelectedDataSource = selectedDataSource;
+		myEditableDataSourceModel = editableDataSourceModel;
 
-		setTitle("Edit DataSources");
-
-		myEditableDataSourceModel = DataSourceManager.getInstance(project).createEditableModel();
+		setTitle("Add/Edit DataSources");
 
 		init();
 	}

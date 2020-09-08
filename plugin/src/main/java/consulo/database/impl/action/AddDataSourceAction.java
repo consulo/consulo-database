@@ -20,8 +20,17 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.ui.popup.PopupStep;
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
+import consulo.database.datasource.DataSourceManager;
+import consulo.database.datasource.model.EditableDataSource;
+import consulo.database.datasource.model.EditableDataSourceModel;
+import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.database.impl.configurable.editor.DataSourcesDialog;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.image.Image;
 
 import javax.annotation.Nonnull;
 
@@ -31,6 +40,48 @@ import javax.annotation.Nonnull;
  */
 public class AddDataSourceAction extends DumbAwareAction
 {
+	private class StepImpl extends BaseListPopupStep<DataSourceProvider>
+	{
+		private final Project myProject;
+
+		private StepImpl(@Nonnull Project project)
+		{
+			super("Choose Data Source", DataSourceProvider.EP_NAME.getExtensionList());
+			myProject = project;
+		}
+
+		@Nonnull
+		@Override
+		public String getTextFor(DataSourceProvider value)
+		{
+			return value.getName().getValue();
+		}
+
+		@Override
+		public Image getIconFor(DataSourceProvider value)
+		{
+			return value.getIcon();
+		}
+
+		@Override
+		public PopupStep onChosen(DataSourceProvider selectedValue, boolean finalChoice)
+		{
+			return doFinalStep(() -> createAndShowDialog(selectedValue));
+		}
+
+		@RequiredUIAccess
+		private void createAndShowDialog(DataSourceProvider selectedValue)
+		{
+			EditableDataSourceModel editableModel = DataSourceManager.getInstance(myProject).createEditableModel();
+
+			EditableDataSource newDataSource = editableModel.newDataSource("New " + selectedValue.getName() + " Connection", selectedValue);
+
+			DataSourcesDialog dialog = new DataSourcesDialog(myProject, editableModel, newDataSource);
+			
+			dialog.showAsync();
+		}
+	}
+
 	public AddDataSourceAction()
 	{
 		super("Add Datasource", null, AllIcons.General.Add);
@@ -46,7 +97,8 @@ public class AddDataSourceAction extends DumbAwareAction
 			return;
 		}
 
-		DataSourcesDialog dialog = new DataSourcesDialog(project, null);
-		dialog.showAsync();
+		ListPopup popup = JBPopupFactory.getInstance().createListPopup(new StepImpl(project));
+
+		popup.showUnderneathOf(e.getInputEvent().getComponent());
 	}
 }
