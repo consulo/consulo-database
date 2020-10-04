@@ -24,7 +24,8 @@ import consulo.ui.Component;
 import consulo.ui.IntBox;
 import consulo.ui.TextBox;
 import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.layout.VerticalLayout;
+import consulo.ui.layout.DockLayout;
+import consulo.ui.layout.TabbedLayout;
 import consulo.ui.shared.border.BorderStyle;
 import consulo.ui.util.FormBuilder;
 
@@ -48,34 +49,39 @@ public class JdbcConfigurable extends SimpleConfigurableByProperties
 	@Override
 	protected Component createLayout(PropertyBuilder propertyBuilder)
 	{
-		VerticalLayout layout = VerticalLayout.create();
-		layout.addBorders(BorderStyle.EMPTY, null, 10);
+		EditablePropertiesHolder propertiesHolder = myDataSource.getProperties();
+
+		TabbedLayout tabs = TabbedLayout.create();
 
 		FormBuilder builder = new FormBuilder();
 
-		EditablePropertiesHolder properties = myDataSource.getProperties();
-
 		TextBox hostBox = TextBox.create();
 		builder.addLabeled("Host", hostBox);
-		propertyBuilder.add(hostBox, () -> properties.get(GenericPropertyKeys.HOST), it -> properties.set(GenericPropertyKeys.HOST, it));
+		propertyBuilder.add(hostBox, () -> propertiesHolder.get(GenericPropertyKeys.HOST), it -> propertiesHolder.set(GenericPropertyKeys.HOST, it));
 
 		IntBox portBox = IntBox.create();
 		builder.addLabeled("Port", portBox);
-		propertyBuilder.add(portBox, () -> properties.get(GenericPropertyKeys.PORT), it -> properties.set(GenericPropertyKeys.PORT, it));
+		propertyBuilder.add(portBox, () -> propertiesHolder.get(GenericPropertyKeys.PORT), it -> propertiesHolder.set(GenericPropertyKeys.PORT, it));
 
 		TextBox loginBox = TextBox.create();
 		builder.addLabeled("Login", loginBox);
-		propertyBuilder.add(loginBox, () -> properties.get(GenericPropertyKeys.LOGIN), it -> properties.set(GenericPropertyKeys.LOGIN, it));
+		propertyBuilder.add(loginBox, () -> propertiesHolder.get(GenericPropertyKeys.LOGIN), it -> propertiesHolder.set(GenericPropertyKeys.LOGIN, it));
 
 		TextBox passwordBox = TextBox.create();
 		builder.addLabeled("Password", passwordBox);
-		propertyBuilder.add(passwordBox, () -> properties.get(GenericPropertyKeys.PASSWORD), it -> properties.set(GenericPropertyKeys.PASSWORD, it));
+		propertyBuilder.add(passwordBox, () -> propertiesHolder.get(GenericPropertyKeys.PASSWORD), it -> propertiesHolder.set(GenericPropertyKeys.PASSWORD, it));
 
 		TextBox databaseNameBox = TextBox.create();
 		builder.addLabeled("Database Name", databaseNameBox);
-		propertyBuilder.add(databaseNameBox, () -> properties.get(GenericPropertyKeys.DATABASE_NAME), it -> properties.set(GenericPropertyKeys.DATABASE_NAME, it));
+		propertyBuilder.add(databaseNameBox, () -> propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME), it -> propertiesHolder.set(GenericPropertyKeys.DATABASE_NAME, it));
 
-		layout.add(builder.build());
-		return layout;
+		Component component = builder.build();
+		component.addBorders(BorderStyle.EMPTY, null, 10);
+		tabs.addTab("Connection", component);
+
+		DockLayout properties = DockLayout.create();
+
+		tabs.addTab("Properties", properties);
+		return tabs;
 	}
 }
