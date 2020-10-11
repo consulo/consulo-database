@@ -20,6 +20,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.UnnamedConfigurable;
 import consulo.database.datasource.json.JsonDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
+import consulo.database.mongo.icon.MongoIconGroup;
 import consulo.localize.LocalizeValue;
 import consulo.ui.Component;
 import consulo.ui.Label;
@@ -54,7 +55,7 @@ public class MongoDbDataSourceProvider implements JsonDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return MongoIcons.MongoDb;
+		return MongoIconGroup.mongodb();
 	}
 
 	@Nonnull

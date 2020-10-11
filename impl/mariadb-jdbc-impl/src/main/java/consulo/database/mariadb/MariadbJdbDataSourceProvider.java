@@ -23,6 +23,7 @@ import consulo.database.datasource.jdbc.configurable.JdbcConfigurable;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.database.mariadb.icon.MariadbIconGroup;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 
@@ -53,7 +54,7 @@ public class MariadbJdbDataSourceProvider extends JdbcDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return MariadbIcons.Mariadb;
+		return MariadbIconGroup.mariadb();
 	}
 
 	@Nonnull

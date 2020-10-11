@@ -47,8 +47,10 @@
 				<extensions>true</extensions>
 				<executions>
 					<execution>
+						<id>gen</id>
 						<phase>generate-sources</phase>
 						<goals>
+							<goal>generate-icon</goal>
 							<goal>generate-localize</goal>
 						</goals>
 					</execution>
