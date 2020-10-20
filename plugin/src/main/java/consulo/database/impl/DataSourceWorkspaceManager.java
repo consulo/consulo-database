@@ -3,12 +3,12 @@ package consulo.database.impl;
 import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.jdom.Element;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * @author VISTALL

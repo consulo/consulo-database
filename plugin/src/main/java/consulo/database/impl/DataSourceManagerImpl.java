@@ -32,12 +32,12 @@ import consulo.database.impl.model.DataSourceImpl;
 import consulo.database.impl.model.DataSourceModelImpl;
 import consulo.database.impl.model.EditableDataSourceModelImpl;
 import consulo.database.impl.model.UnknownDataSourceProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.jdom.Element;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

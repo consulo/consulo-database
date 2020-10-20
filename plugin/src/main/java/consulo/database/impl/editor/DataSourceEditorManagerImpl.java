@@ -21,10 +21,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import consulo.database.datasource.editor.DataSourceEditorManager;
 import consulo.database.datasource.model.DataSource;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * @author VISTALL
