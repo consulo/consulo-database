@@ -24,9 +24,9 @@ import consulo.ui.Component;
 import consulo.ui.IntBox;
 import consulo.ui.TextBox;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.border.BorderStyle;
 import consulo.ui.layout.DockLayout;
 import consulo.ui.layout.TabbedLayout;
-import consulo.ui.shared.border.BorderStyle;
 import consulo.ui.util.FormBuilder;
 
 import javax.annotation.Nonnull;

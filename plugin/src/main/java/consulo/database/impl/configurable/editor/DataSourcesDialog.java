@@ -32,6 +32,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.intellij.util.ui.update.UiNotifyConnector;
+import consulo.application.ui.WholeWestDialogWrapper;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.*;
 import consulo.database.datasource.ui.DataSourceKeys;
@@ -40,9 +41,8 @@ import consulo.database.impl.action.RemoveDataSourceAction;
 import consulo.database.impl.configurable.editor.action.AddDataSourcePopupAction;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.options.ConfigurableUIMigrationUtil;
-import consulo.ui.SwingUIDecorator;
-import consulo.ui.WholeWestDialogWrapper;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.decorator.SwingUIDecorator;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
