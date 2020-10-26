@@ -180,6 +180,7 @@ public abstract class NamedConfigurable<T> implements Configurable
 	}
 
 	@Nullable
+	@RequiredUIAccess
 	protected Component createTopRightComponent(TextBox nameField)
 	{
 		return null;

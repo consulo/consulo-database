@@ -1,2 +1,4 @@
 toolwindow.title:
   text: Database
+label.application.aware.text:
+  text: Application aware

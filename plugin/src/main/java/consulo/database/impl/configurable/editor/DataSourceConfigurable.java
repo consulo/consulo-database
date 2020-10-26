@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
+import consulo.database.localize.DatabaseLocalize;
 import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.border.BorderPosition;
@@ -86,11 +87,12 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		}
 	}
 
+	@RequiredUIAccess
 	@Nullable
 	@Override
 	protected Component createTopRightComponent(TextBox nameField)
 	{
-		CheckBox applicationAwareBox = CheckBox.create("Application aware");
+		CheckBox applicationAwareBox = CheckBox.create(DatabaseLocalize.labelApplicationAwareText());
 		applicationAwareBox.addValueListener(event ->
 		{
 			myDataSource.setApplicationAware(event.getValue());
