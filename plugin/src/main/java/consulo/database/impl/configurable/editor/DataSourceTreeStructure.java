@@ -32,13 +32,11 @@ import java.util.List;
  */
 public class DataSourceTreeStructure extends AbstractTreeStructureBase
 {
-	private final DataSourceModel myDataSourceModel;
 	private final DataSourceEditorRootNode myRoot;
 
 	public DataSourceTreeStructure(Project project, DataSourceModel dataSourceModel)
 	{
 		super(project);
-		myDataSourceModel = dataSourceModel;
 		myRoot = new DataSourceEditorRootNode(myProject, dataSourceModel);
 	}
 

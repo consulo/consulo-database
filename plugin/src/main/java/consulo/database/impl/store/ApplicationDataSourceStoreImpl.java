@@ -14,34 +14,23 @@
  * limitations under the License.
  */
 
-package consulo.database.datasource.model;
+package consulo.database.impl.store;
 
-import consulo.database.datasource.configurable.PropertiesHolder;
-import consulo.database.datasource.provider.DataSourceProvider;
-
-import javax.annotation.Nonnull;
-import java.util.UUID;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import jakarta.inject.Singleton;
 
 /**
  * @author VISTALL
- * @since 2020-08-12
+ * @since 2020-10-26
  */
-public interface DataSource
+@Singleton
+@State(name = "DataSourceManager", storages = @Storage("datasource.xml"))
+public class ApplicationDataSourceStoreImpl extends DataManagerStoreImpl
 {
-	@Nonnull
-	DataSourceProvider getProvider();
-
-	@Nonnull
-	String getName();
-
-	/**
-	 * @return unique uuid for datasource. this id never change
-	 */
-	@Nonnull
-	UUID getId();
-
-	@Nonnull
-	PropertiesHolder getProperties();
-
-	boolean isApplicationAware();
+	@Override
+	protected boolean isApplicationAware()
+	{
+		return true;
+	}
 }

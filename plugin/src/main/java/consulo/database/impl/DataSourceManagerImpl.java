@@ -16,7 +16,6 @@
 
 package consulo.database.impl;
 
-import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
@@ -26,21 +25,18 @@ import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.DataSourceEvent;
 import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.model.EditableDataSourceModel;
-import consulo.database.datasource.provider.DataSourceProvider;
-import consulo.database.impl.configurable.PropertiesHolderImpl;
 import consulo.database.impl.model.DataSourceImpl;
 import consulo.database.impl.model.DataSourceModelImpl;
 import consulo.database.impl.model.EditableDataSourceModelImpl;
-import consulo.database.impl.model.UnknownDataSourceProvider;
+import consulo.database.impl.store.ApplicationDataSourceStoreImpl;
+import consulo.database.impl.store.ProjectDataSourceStoreImpl;
+import consulo.disposer.Disposable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.jdom.Element;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author VISTALL
@@ -48,7 +44,7 @@ import java.util.UUID;
  */
 @Singleton
 @State(name = "DataSourceManagerImpl", storages = @Storage("datasource.xml"))
-public class DataSourceManagerImpl implements DataSourceManager, PersistentStateComponent<Element>
+public class DataSourceManagerImpl implements DataSourceManager, Disposable
 {
 	private final Project myProject;
 
@@ -56,10 +52,30 @@ public class DataSourceManagerImpl implements DataSourceManager, PersistentState
 
 	private EditableDataSourceModel myEditableDataSourceModel;
 
+	private final ApplicationDataSourceStoreImpl myApplicationDataSourceStore;
+	private final ProjectDataSourceStoreImpl myProjectDataSourceStore;
+
 	@Inject
-	public DataSourceManagerImpl(Project project)
+	public DataSourceManagerImpl(Project project, ApplicationDataSourceStoreImpl applicationDataSourceStore, ProjectDataSourceStoreImpl projectDataSourceStore)
 	{
 		myProject = project;
+		myApplicationDataSourceStore = applicationDataSourceStore;
+		myProjectDataSourceStore = projectDataSourceStore;
+
+		// call it before listeners add
+		dataStoreChanged();
+
+		myApplicationDataSourceStore.addListener(this::dataStoreChanged, this);
+		myProjectDataSourceStore.addListener(this::dataStoreChanged, this);
+	}
+
+	private void dataStoreChanged()
+	{
+		List<DataSourceImpl> dataSources = new ArrayList<>();
+		dataSources.addAll(myApplicationDataSourceStore.getDataSources());
+		dataSources.addAll(myProjectDataSourceStore.getDataSources());
+
+		myModel.replaceAll(dataSources);
 	}
 
 	public void notifyListeners(@Nonnull List<DataSourceEvent> events)
@@ -68,74 +84,6 @@ public class DataSourceManagerImpl implements DataSourceManager, PersistentState
 		{
 			myProject.getMessageBus().syncPublisher(TOPIC).dataSourceEvent(event);
 		}
-	}
-
-	@Nullable
-	@Override
-	public Element getState()
-	{
-		Element state = new Element("state");
-		for(DataSource source : myModel.getDataSources())
-		{
-			Element dataSourceElement = new Element("datasource");
-			dataSourceElement.setAttribute("id", source.getId().toString());
-			dataSourceElement.setAttribute("name", source.getName());
-			dataSourceElement.setAttribute("provider", source.getProvider().getId());
-
-			PropertiesHolderImpl h = (PropertiesHolderImpl) source.getProperties();
-
-			dataSourceElement.addContent(h.toXmlState());
-
-			state.addContent(dataSourceElement);
-		}
-		return state;
-	}
-
-	@Override
-	public void loadState(Element state)
-	{
-		List<DataSourceImpl> dataSources = new ArrayList<>();
-
-		for(Element element : state.getChildren())
-		{
-			String id = element.getAttributeValue("id");
-			String name = element.getAttributeValue("name");
-			String provider = element.getAttributeValue("provider");
-			if(id == null || name == null || provider == null)
-			{
-				continue;
-			}
-
-			DataSourceProvider dataSourceProvider = findProvider(provider);
-
-			DataSourceImpl dataSource = new DataSourceImpl(UUID.fromString(id), name, dataSourceProvider, myModel);
-
-			Element propertiesElement = element.getChild(PropertiesHolderImpl.TAG_NAME);
-			if(propertiesElement != null)
-			{
-				PropertiesHolderImpl h = (PropertiesHolderImpl) dataSource.getProperties();
-
-				h.fromXmlState(propertiesElement);
-			}
-
-			dataSources.add(dataSource);
-		}
-
-		myModel.replaceAll(dataSources);
-	}
-
-	@Nonnull
-	private DataSourceProvider findProvider(String id)
-	{
-		for(DataSourceProvider provider : DataSourceProvider.EP_NAME.getExtensionList())
-		{
-			if(id.equals(provider.getId()))
-			{
-				return provider;
-			}
-		}
-
-		return new UnknownDataSourceProvider(id);
 	}
 
 	@RequiredReadAction
@@ -161,8 +109,31 @@ public class DataSourceManagerImpl implements DataSourceManager, PersistentState
 		return myEditableDataSourceModel;
 	}
 
-	public void resetModel()
+	@Override
+	public void dispose()
 	{
+	}
+
+	public void resetModelAndRefreshStore()
+	{
+		List<DataSourceImpl> applicationDataSources = new ArrayList<>();
+		List<DataSourceImpl> projectDataSources = new ArrayList<>();
+
+		for(DataSource dataSource : myModel.getDataSources())
+		{
+			if(dataSource.isApplicationAware())
+			{
+				applicationDataSources.add((DataSourceImpl) dataSource);
+			}
+			else
+			{
+				projectDataSources.add((DataSourceImpl) dataSource);
+			}
+		}
+
+		myApplicationDataSourceStore.setDataSources(applicationDataSources);
+		myProjectDataSourceStore.setDataSources(projectDataSources);
+
 		myEditableDataSourceModel = null;
 	}
 }

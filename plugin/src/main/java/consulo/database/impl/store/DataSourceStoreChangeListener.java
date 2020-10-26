@@ -14,34 +14,19 @@
  * limitations under the License.
  */
 
-package consulo.database.datasource.model;
+package consulo.database.impl.store;
 
-import consulo.database.datasource.configurable.PropertiesHolder;
-import consulo.database.datasource.provider.DataSourceProvider;
+import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
-import java.util.UUID;
+import java.util.EventListener;
+import java.util.List;
 
 /**
  * @author VISTALL
- * @since 2020-08-12
+ * @since 2020-10-26
  */
-public interface DataSource
+public interface DataSourceStoreChangeListener extends EventListener
 {
-	@Nonnull
-	DataSourceProvider getProvider();
-
-	@Nonnull
-	String getName();
-
-	/**
-	 * @return unique uuid for datasource. this id never change
-	 */
-	@Nonnull
-	UUID getId();
-
-	@Nonnull
-	PropertiesHolder getProperties();
-
-	boolean isApplicationAware();
+	void storeChanged();
 }

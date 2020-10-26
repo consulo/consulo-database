@@ -55,6 +55,9 @@
 
 		<getDataRule implementation="consulo.database.impl.toolWindow.dataRules.DataSourceTreeRule"/>
 
+		<projectService serviceImplementation="consulo.database.impl.store.ProjectDataSourceStoreImpl"/>
+		<applicationService serviceImplementation="consulo.database.impl.store.ApplicationDataSourceStoreImpl"/>
+
 		<toolWindow id="Database"
 					icon="consulo.database.DatabaseIconGroup@toolwindowdatabase"
 					dispayName="consulo.database.DatabaseLocalize@toolwindow.title"

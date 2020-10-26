@@ -68,7 +68,7 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 	@Override
 	public EditableDataSource newDataSource(@Nonnull String name, @Nonnull DataSourceProvider dataSourceProvider)
 	{
-		EditableDataSourceImpl source = new EditableDataSourceImpl(this, name, dataSourceProvider);
+		EditableDataSourceImpl source = new EditableDataSourceImpl(name, dataSourceProvider);
 
 		dataSourceProvider.fillDefaultProperties(source.getProperties());
 
@@ -82,7 +82,7 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 	@Override
 	public EditableDataSource newDataSourceCopy(@Nonnull String name, @Nonnull DataSource original)
 	{
-		EditableDataSourceImpl newDataSource = new EditableDataSourceImpl(this, name, original.getProvider());
+		EditableDataSourceImpl newDataSource = new EditableDataSourceImpl(name, original.getProvider());
 
 		newDataSource.myPropertiesHolder.copyFrom((PropertiesHolderImpl) original.getProperties());
 
@@ -131,7 +131,7 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 			}
 			else
 			{
-				DataSourceImpl newDataSource = new DataSourceImpl(myOriginalModel);
+				DataSourceImpl newDataSource = new DataSourceImpl();
 				newDataSource.copyFrom(dataSource);
 
 				myOriginalModel.myDataSources.add(newDataSource);
@@ -157,6 +157,6 @@ public class EditableDataSourceModelImpl extends DataSourceModelImpl<EditableDat
 	{
 		myDataSources.clear();
 
-		myManager.resetModel();
+		myManager.resetModelAndRefreshStore();
 	}
 }

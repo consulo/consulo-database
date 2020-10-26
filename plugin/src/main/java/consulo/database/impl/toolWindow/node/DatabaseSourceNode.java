@@ -24,6 +24,9 @@ import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.ui.DataSourceTreeNodeProvider;
+import consulo.platform.base.icon.PlatformIconGroup;
+import consulo.ui.image.Image;
+import consulo.ui.image.ImageEffects;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -48,7 +51,12 @@ public class DatabaseSourceNode extends AbstractTreeNode<DataSource>
 		DataSource dataSource = getValue();
 
 		presentationData.addText(dataSource.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-		presentationData.setIcon(dataSource.getProvider().getIcon());
+		Image image = dataSource.getProvider().getIcon();
+		if(dataSource.isApplicationAware())
+		{
+			image = ImageEffects.layered(image, PlatformIconGroup.nodesSymlink());
+		}
+		presentationData.setIcon(image);
 	}
 
 	@RequiredReadAction

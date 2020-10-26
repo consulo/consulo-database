@@ -270,11 +270,13 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 			{
 				DataSourceConfigurable c = new DataSourceConfigurable(myProject, dataSource, treeUpdater);
 
+				JComponent component = ConfigurableUIMigrationUtil.createComponent(c);
+
 				c.reset();
 
 				mySelectedConfigurable = c;
 
-				myConfigurablePanel.add(ConfigurableUIMigrationUtil.createComponent(c), BorderLayout.CENTER);
+				myConfigurablePanel.add(component, BorderLayout.CENTER);
 			}
 		});
 	}

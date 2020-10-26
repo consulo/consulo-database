@@ -20,19 +20,16 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.UnnamedConfigurable;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.ui.NamedConfigurable;
 import com.intellij.openapi.util.AsyncResult;
-import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.components.BorderLayoutPanel;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
-import consulo.options.ConfigurableUIMigrationUtil;
+import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
-import org.jetbrains.annotations.Nls;
+import consulo.ui.border.BorderPosition;
+import consulo.ui.border.BorderStyle;
+import consulo.ui.layout.DockLayout;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.annotation.Nullable;
 
 /**
  * @author VISTALL
@@ -43,14 +40,19 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 	private final Project myProject;
 
 	private final EditableDataSource myDataSource;
+	private final Runnable myTreeUpdater;
 
 	private UnnamedConfigurable myInnerConfigurable;
 
+	private CheckBox myApplicationAwareBox;
+
+	@RequiredUIAccess
 	public DataSourceConfigurable(Project project, EditableDataSource dataSource, Runnable treeUpdater)
 	{
 		super(true, treeUpdater);
 		myProject = project;
 		myDataSource = dataSource;
+		myTreeUpdater = treeUpdater;
 	}
 
 	@RequiredUIAccess
@@ -74,8 +76,9 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 	@Override
 	public void reset()
 	{
-		// need create ui
-		createComponent();
+		updateName();
+
+		myApplicationAwareBox.setValue(myDataSource.isApplicationAware());
 
 		if(myInnerConfigurable != null)
 		{
@@ -83,7 +86,30 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		}
 	}
 
-	@Nls
+	@Nullable
+	@Override
+	protected Component createTopRightComponent(TextBox nameField)
+	{
+		CheckBox applicationAwareBox = CheckBox.create("Application aware");
+		applicationAwareBox.addValueListener(event ->
+		{
+			myDataSource.setApplicationAware(event.getValue());
+
+			myTreeUpdater.run();
+		});
+
+		return myApplicationAwareBox = applicationAwareBox;
+	}
+
+	@RequiredUIAccess
+	@Override
+	public void disposeUIResources()
+	{
+		super.disposeUIResources();
+
+		myInnerConfigurable = null;
+	}
+
 	@Override
 	public String getDisplayName()
 	{
@@ -110,18 +136,17 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 
 	@Override
 	@RequiredUIAccess
-	public JComponent createOptionsPanel()
+	public Component createOptionsPanel()
 	{
 		if(myInnerConfigurable == null)
 		{
 			myInnerConfigurable = myDataSource.getProvider().createConfigurable(myDataSource);
 		}
 
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(ConfigurableUIMigrationUtil.createComponent(myInnerConfigurable), BorderLayout.CENTER);
+		DockLayout panel = DockLayout.create();
+		panel.center(myInnerConfigurable.createUIComponent());
 
-		JButton testButton = new JButton("Test Connection");
-		testButton.addActionListener(e ->
+		Button testButton = Button.create("Test Connection", () ->
 		{
 			try
 			{
@@ -136,9 +161,9 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 
 			AsyncResult<Void> result = dataSourceTransportManager.testConnection(myDataSource);
 
-			result.doWhenDone(() -> {
-				SwingUtilities.invokeLater(() -> Messages.showInfoMessage(myProject, "Connection success", "DataSource"));
-			});
+			UIAccess uiAccess = UIAccess.current();
+
+			result.doWhenDone(() -> uiAccess.give(() -> Alerts.okInfo("Connection success").showAsync()));
 
 			result.doWhenRejectedWithThrowable(throwable -> {
 				if(throwable instanceof ProcessCanceledException)
@@ -146,13 +171,14 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 					// canceled no need info
 					return;
 				}
-				SwingUtilities.invokeLater(() -> Messages.showErrorDialog(myProject, "Connection failed: " + throwable.getMessage(), "DataSource"));
+				uiAccess.give(() -> Alerts.okError("Connection failed: " + throwable.getMessage()).showAsync());
 			});
 		});
 
-		JPanel buttonPanel = new BorderLayoutPanel().addToRight(testButton);
-		buttonPanel.setBorder(JBUI.Borders.empty(0, 10));
-		panel.add(buttonPanel, BorderLayout.SOUTH);
+		DockLayout buttonPanel = DockLayout.create().right(testButton);
+		buttonPanel.addBorder(BorderPosition.RIGHT, BorderStyle.EMPTY, null, 10);
+
+		panel.bottom(buttonPanel);
 
 		return panel;
 	}

@@ -18,7 +18,6 @@ package consulo.database.impl.model;
 
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.model.DataSource;
-import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.database.impl.configurable.PropertiesHolderImpl;
 
@@ -36,23 +35,20 @@ public class DataSourceImpl implements DataSource
 	protected UUID myId;
 	protected String myName;
 	protected DataSourceProvider myProvider;
-
-	protected final DataSourceModel myModel;
-
+	protected boolean myApplicationAware;
 	protected PropertiesHolderImpl myPropertiesHolder;
 
-	public DataSourceImpl(UUID id, String name, DataSourceProvider provider, DataSourceModel model)
+	public DataSourceImpl(UUID id, String name, DataSourceProvider provider, boolean applicationAware)
 	{
-		this(model);
 		myId = id;
 		myName = name;
 		myProvider = provider;
+		myApplicationAware = applicationAware;
 		myPropertiesHolder = new PropertiesHolderImpl(CONTAINER_NAME);
 	}
 
-	protected DataSourceImpl(DataSourceModel model)
+	protected DataSourceImpl()
 	{
-		myModel = model;
 		myPropertiesHolder = new PropertiesHolderImpl(CONTAINER_NAME);
 	}
 
@@ -60,6 +56,7 @@ public class DataSourceImpl implements DataSource
 	{
 		myName = dataSource.getName();
 		myProvider = dataSource.getProvider();
+		myApplicationAware = dataSource.isApplicationAware();
 		myPropertiesHolder.copyFrom(dataSource.myPropertiesHolder);
 	}
 
@@ -93,6 +90,12 @@ public class DataSourceImpl implements DataSource
 	public PropertiesHolder getProperties()
 	{
 		return myPropertiesHolder;
+	}
+
+	@Override
+	public boolean isApplicationAware()
+	{
+		return myApplicationAware;
 	}
 
 	@Override

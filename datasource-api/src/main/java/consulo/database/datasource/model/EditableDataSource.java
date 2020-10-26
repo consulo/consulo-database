@@ -28,6 +28,8 @@ public interface EditableDataSource extends DataSource
 {
 	void setName(@Nonnull String name);
 
+	void setApplicationAware(boolean aware);
+
 	@Override
 	@Nonnull
 	EditablePropertiesHolder getProperties();
