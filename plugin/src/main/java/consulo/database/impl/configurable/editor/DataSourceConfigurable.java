@@ -148,7 +148,7 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		DockLayout panel = DockLayout.create();
 		panel.center(myInnerConfigurable.createUIComponent());
 
-		Button testButton = Button.create("Test Connection", () ->
+		Button testButton = Button.create("Test Connection", (e) ->
 		{
 			try
 			{
