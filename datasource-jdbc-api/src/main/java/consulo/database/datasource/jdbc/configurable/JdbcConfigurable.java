@@ -53,7 +53,7 @@ public class JdbcConfigurable extends SimpleConfigurableByProperties
 
 		TabbedLayout tabs = TabbedLayout.create();
 
-		FormBuilder builder = new FormBuilder();
+		FormBuilder builder = FormBuilder.create();
 
 		TextBox hostBox = TextBox.create();
 		builder.addLabeled("Host", hostBox);

@@ -58,6 +58,9 @@
 		<projectService serviceImplementation="consulo.database.impl.store.ProjectDataSourceStoreImpl"/>
 		<applicationService serviceImplementation="consulo.database.impl.store.ApplicationDataSourceStoreImpl"/>
 
+		<fileTypeFactory implementation="consulo.sql.lang.api.SqlFileTypeFactory"/>
+
+		<editorFactoryListener implementation="consulo.database.impl.sql.SqlEditorFactoryListener"/>
 		<toolWindow id="Database"
 					icon="consulo.database.DatabaseIconGroup@toolwindowdatabase"
 					dispayName="consulo.database.DatabaseLocalize@toolwindow.title"

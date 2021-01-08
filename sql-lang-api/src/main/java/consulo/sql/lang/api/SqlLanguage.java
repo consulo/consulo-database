@@ -14,15 +14,31 @@
  * limitations under the License.
  */
 
-package consulo.database.impl.store;
+package consulo.sql.lang.api;
 
-import java.util.EventListener;
+import com.intellij.lang.Language;
+import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.intellij.openapi.fileTypes.PlainTextLanguage;
+
+import javax.annotation.Nullable;
 
 /**
  * @author VISTALL
- * @since 2020-10-26
+ * @since 2020-10-31
  */
-public interface DataSourceStoreChangeListener extends EventListener
+public class SqlLanguage extends Language
 {
-	void storeChanged();
+	public static final SqlLanguage INSTANCE = new SqlLanguage();
+
+	public SqlLanguage()
+	{
+		super(PlainTextLanguage.INSTANCE, "SQL");
+	}
+
+	@Nullable
+	@Override
+	public LanguageFileType getAssociatedFileType()
+	{
+		return SqlFileType.INSTANCE;
+	}
 }

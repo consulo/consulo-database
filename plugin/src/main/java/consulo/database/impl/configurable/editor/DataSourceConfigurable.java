@@ -24,6 +24,7 @@ import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.localize.DatabaseLocalize;
+import consulo.preferences.NamedConfigurable;
 import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.border.BorderPosition;

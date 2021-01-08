@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package consulo.database.impl.store;
+package consulo.sql.lang.api;
 
-import java.util.EventListener;
+import com.intellij.openapi.fileTypes.FileTypeConsumer;
+import com.intellij.openapi.fileTypes.FileTypeFactory;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author VISTALL
- * @since 2020-10-26
+ * @since 2020-10-31
  */
-public interface DataSourceStoreChangeListener extends EventListener
+public class SqlFileTypeFactory extends FileTypeFactory
 {
-	void storeChanged();
+	@Override
+	public void createFileTypes(@Nonnull FileTypeConsumer fileTypeConsumer)
+	{
+		fileTypeConsumer.consume(SqlFileType.INSTANCE);
+	}
 }

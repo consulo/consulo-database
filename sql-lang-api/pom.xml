@@ -15,13 +15,14 @@
   - See the License for the specific language governing permissions and
   - limitations under the License.
   -->
+
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>consulo</groupId>
-		<artifactId>arch.managment</artifactId>
+		<artifactId>arch.ide-provided</artifactId>
 		<version>2-SNAPSHOT</version>
 		<relativePath/>
 	</parent>
@@ -37,22 +38,28 @@
 		</repository>
 	</repositories>
 
-	<groupId>consulo.plugin</groupId>
-	<artifactId>consulo.database.parent</artifactId>
-	<version>2-SNAPSHOT</version>
-	<packaging>pom</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>consulo.maven</groupId>
+				<artifactId>consulo-maven-plugin</artifactId>
+				<version>2-SNAPSHOT</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate-localize</goal>
+							<goal>generate-icon</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-	<modules>
-		<module>datasource-api</module>
-		<module>datasource-jdbc-api</module>
-		<module>datasource-json-api</module>
-		<module>datasource-jdbc-rt</module>
-		<module>datasource-jdbc-rt-shared</module>
-		<module>impl/mysql-jdbc-impl</module>
-		<module>impl/mariadb-jdbc-impl</module>
-		<module>impl/postgresql-jdbc-impl</module>
-		<module>impl/mongo-impl</module>
-		<module>sql-lang-api</module>
-		<module>plugin</module>
-	</modules>
+	<groupId>consulo.plugin</groupId>
+	<artifactId>consulo.database-sql.lang.api</artifactId>
+	<version>2-SNAPSHOT</version>
+	<packaging>jar</packaging>
 </project>
