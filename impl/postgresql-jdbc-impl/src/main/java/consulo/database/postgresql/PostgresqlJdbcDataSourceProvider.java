@@ -19,13 +19,17 @@ package consulo.database.postgresql;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.options.UnnamedConfigurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
+import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
+import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.jdbc.configurable.JdbcConfigurable;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.database.datasource.provider.DataSourceConfigurationException;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
+import consulo.util.lang.StringUtil;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -70,6 +74,16 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider
 		propertiesHolder.set(GenericPropertyKeys.PORT, 5432);
 		propertiesHolder.set(GenericPropertyKeys.LOGIN, "postgres");
 		propertiesHolder.set(GenericPropertyKeys.PASSWORD, "postgres");
+	}
+
+	@Override
+	public void validateConfiguration(@Nonnull PropertiesHolder propertiesHolder) throws DataSourceConfigurationException
+	{
+		String dbName = propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME);
+		if(StringUtil.isEmptyOrSpaces(dbName))
+		{
+			throw new DataSourceConfigurationException(LocalizeValue.localizeTODO("Database must be not empty"));
+		}
 	}
 
 	@Override

@@ -22,8 +22,10 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.database.datasource.provider.DataSourceConfigurationException;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.localize.DatabaseLocalize;
+import consulo.localize.LocalizeValue;
 import consulo.preferences.NamedConfigurable;
 import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
@@ -149,7 +151,7 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		DockLayout panel = DockLayout.create();
 		panel.center(myInnerConfigurable.createUIComponent());
 
-		Button testButton = Button.create("Test Connection", (e) ->
+		Button testButton = Button.create(LocalizeValue.localizeTODO("Test Connection"), (event) ->
 		{
 			try
 			{
@@ -157,6 +159,16 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 			}
 			catch(ConfigurationException ignored)
 			{
+				return;
+			}
+
+			try
+			{
+				myDataSource.getProvider().validateConfiguration(myDataSource.getProperties());
+			}
+			catch(DataSourceConfigurationException e)
+			{
+				Alerts.okError(e.getMessageValue()).showAsync();
 				return;
 			}
 
