@@ -16,6 +16,7 @@
 
 package consulo.database.impl.model;
 
+import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.DataSourceModel;
 

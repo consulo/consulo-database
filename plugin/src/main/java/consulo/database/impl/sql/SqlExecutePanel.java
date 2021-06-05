@@ -16,14 +16,23 @@
 
 package consulo.database.impl.sql;
 
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.content.ContentManager;
+import com.intellij.ui.content.MessageView;
 import com.intellij.util.containers.ContainerUtil;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
-import consulo.localize.LocalizeValue;
+import consulo.database.datasource.transport.DataSourceTransportManager;
+import consulo.disposer.Disposable;
 import consulo.platform.base.icon.PlatformIconGroup;
 import consulo.ui.annotation.RequiredUIAccess;
 
@@ -44,7 +53,7 @@ public class SqlExecutePanel
 	private UUID myDataSourceId;
 
 	@RequiredReadAction
-	public SqlExecutePanel(@Nonnull Project project)
+	public SqlExecutePanel(@Nonnull Project project, Editor editor)
 	{
 		DataSourceManager dataSourceManager = DataSourceManager.getInstance(project);
 
@@ -55,61 +64,40 @@ public class SqlExecutePanel
 		}
 
 		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
-		builder.add(new AnAction("Execute", null, PlatformIconGroup.actionsExecute())
+		builder.add(new DumbAwareAction("Execute", null, PlatformIconGroup.actionsExecute())
 		{
 			@RequiredUIAccess
 			@Override
 			public void actionPerformed(@Nonnull AnActionEvent anActionEvent)
 			{
+				DataSourceTransportManager transportManager = DataSourceTransportManager.getInstance(project);
 
-			}
-		});
+				DataSource dataSource = dataSourceManager.findDataSource(myDataSourceId);
 
-		builder.add(new ComboBoxAction()
-		{
-			@Nonnull
-			@Override
-			@RequiredReadAction
-			protected ActionGroup createPopupActionGroup(JComponent button)
-			{
-				ActionGroup.Builder itemBuild = ActionGroup.newImmutableBuilder();
-				for(DataSource dataSource : dataSourceManager.getDataSources())
-				{
-					itemBuild.add(new AnAction(dataSource.getName(), "", dataSource.getProvider().getIcon())
-					{
-						@RequiredUIAccess
-						@Override
-						public void actionPerformed(@Nonnull AnActionEvent anActionEvent)
-						{
-							myDataSourceId = dataSource.getId();
-						}
+				assert dataSource != null;
+
+				String text = editor.getDocument().getText();
+
+				transportManager.runQuery(dataSource, text).doWhenDone((result) -> {
+					MessageView messageView = MessageView.getInstance(project);
+
+					messageView.runWhenInitialized(() -> {
+						ContentManager contentManager = messageView.getContentManager();
+
+						Disposable parent = Disposable.newDisposable();
+						//DefaultJdbcDataSourceTransport.buildResultUI(result, project, dataSource, text, null, parent);
 					});
-				}
-				return itemBuild.build();
-			}
-
-			@RequiredUIAccess
-			@Override
-			public void update(@Nonnull AnActionEvent e)
-			{
-				Presentation presentation = e.getPresentation();
-				DataSource source = myDataSourceId == null ? null : dataSourceManager.findDataSource(myDataSourceId);
-				if(source == null)
-				{
-					presentation.setIcon(null);
-					presentation.setTextValue(LocalizeValue.of("<Select DataSource>"));
-				}
-				else
-				{
-					presentation.setTextValue(LocalizeValue.of(source.getName()));
-					presentation.setIcon(source.getProvider().getIcon());
-				}
+					System.out.println("test");
+				});
 			}
 		});
+
+		builder.add(new DataSourceChooseAction(dataSourceManager, () -> myDataSourceId, it -> myDataSourceId = it));
 
 		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("SqlExecute", builder.build(), true);
 
 		myPanel.add(toolbar.getComponent(), BorderLayout.WEST);
+		myPanel.setBorder(JBUI.Borders.customLine(UIUtil.getBorderColor(), 0, 0, 1, 0));
 	}
 
 	public JPanel getPanel()

@@ -27,12 +27,12 @@ import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LoadingDecorator;
-import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.impl.editor.actions.RefreshDataAction;
 import consulo.ui.UIAccess;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.util.concurrent.AsyncResult;
 import consulo.util.dataholder.UserDataHolderBase;
 import kava.beans.PropertyChangeListener;
 
@@ -123,7 +123,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 							myTargetPanel.remove(myLastResult);
 						}
 						Consumer setter = component -> myTargetPanel.add(myLastResult = (JComponent) component, BorderLayout.CENTER);
-						finalTransport.fetchDataEnded(indicator, myProject, myDataSource,myFile.getDatabaseName(), myFile.getChildId(), o, DataSourceFileEditor.this, setter);
+						finalTransport.fetchDataEnded(indicator, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), o, DataSourceFileEditor.this, setter);
 					});
 				});
 			});

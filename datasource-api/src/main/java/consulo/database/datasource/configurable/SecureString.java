@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 consulo.io
+ * Copyright 2013-2021 consulo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,45 @@
 
 package consulo.database.datasource.configurable;
 
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
+
 /**
  * @author VISTALL
- * @since 2020-08-16
+ * @since 05/04/2021
  */
-public interface GenericPropertyKeys
+public class SecureString implements Supplier<String>
 {
-	GenericPropertyKey<String> HOST = GenericPropertyKey.create("host", String.class, "localhost");
+	private static final SecureString EMPTY = of("");
 
-	GenericPropertyKey<Integer> PORT = GenericPropertyKey.create("port", Integer.class, 0);
+	@Nonnull
+	public static SecureString of()
+	{
+		return EMPTY;
+	}
 
-	GenericPropertyKey<String> LOGIN = GenericPropertyKey.create("login", String.class);
+	@Nonnull
+	public static SecureString of(@Nonnull String value)
+	{
+		return new SecureString(value);
+	}
 
-	GenericPropertyKey<SecureString> PASSWORD = GenericPropertyKey.create("password", SecureString.class, SecureString.of());
+	private final String myValue;
 
-	GenericPropertyKey<String> DATABASE_NAME = GenericPropertyKey.create("database-name", String.class);
+	private SecureString(@Nonnull String value)
+	{
+		myValue = value;
+	}
+
+	@Override
+	public String get()
+	{
+		return myValue;
+	}
+
+	@Override
+	public String toString()
+	{
+		return get();
+	}
 }

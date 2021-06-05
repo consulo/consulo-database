@@ -49,7 +49,7 @@ public class SqlEditorFactoryListener implements EditorFactoryListener
 
 			if(psiFile != null && psiFile.getViewProvider().getFileType() == SqlFileType.INSTANCE)
 			{
-				SqlExecutePanel panel = new SqlExecutePanel(project);
+				SqlExecutePanel panel = new SqlExecutePanel(project, editor);
 
 				editor.setHeaderComponent(panel.getPanel());
 			}

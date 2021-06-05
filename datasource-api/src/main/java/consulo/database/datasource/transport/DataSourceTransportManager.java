@@ -19,10 +19,10 @@ package consulo.database.datasource.transport;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.AsyncResult;
 import com.intellij.util.messages.Topic;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.model.DataSource;
+import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
 
@@ -47,4 +47,7 @@ public interface DataSourceTransportManager
 	void refreshAll();
 
 	<T extends PersistentStateComponent<?>> T getDataState(@Nonnull DataSource dataSource);
+
+	@Nonnull
+	AsyncResult<Object> runQuery(@Nonnull DataSource dataSource, @Nonnull String query);
 }

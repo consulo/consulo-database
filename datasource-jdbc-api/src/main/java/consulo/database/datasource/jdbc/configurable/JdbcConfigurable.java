@@ -16,12 +16,16 @@
 
 package consulo.database.datasource.jdbc.configurable;
 
+import com.intellij.ide.passwordSafe.PasswordSafe;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
+import consulo.database.datasource.configurable.SecureString;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.logging.Logger;
 import consulo.options.SimpleConfigurableByProperties;
 import consulo.ui.Component;
 import consulo.ui.IntBox;
+import consulo.ui.PasswordBox;
 import consulo.ui.TextBox;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.border.BorderStyle;
@@ -37,6 +41,8 @@ import javax.annotation.Nonnull;
  */
 public class JdbcConfigurable extends SimpleConfigurableByProperties
 {
+	private static final Logger LOG = Logger.getInstance(JdbcConfigurable.class);
+
 	private final EditableDataSource myDataSource;
 
 	public JdbcConfigurable(EditableDataSource dataSource)
@@ -67,9 +73,9 @@ public class JdbcConfigurable extends SimpleConfigurableByProperties
 		builder.addLabeled("Login", loginBox);
 		propertyBuilder.add(loginBox, () -> propertiesHolder.get(GenericPropertyKeys.LOGIN), it -> propertiesHolder.set(GenericPropertyKeys.LOGIN, it));
 
-		TextBox passwordBox = TextBox.create();
+		PasswordBox passwordBox = PasswordBox.create();
 		builder.addLabeled("Password", passwordBox);
-		propertyBuilder.add(passwordBox, () -> propertiesHolder.get(GenericPropertyKeys.PASSWORD), it -> propertiesHolder.set(GenericPropertyKeys.PASSWORD, it));
+		propertyBuilder.add(passwordBox, () -> propertiesHolder.get(GenericPropertyKeys.PASSWORD).get(), it -> propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.of(it)));
 
 		TextBox databaseNameBox = TextBox.create();
 		builder.addLabeled("Database Name", databaseNameBox);

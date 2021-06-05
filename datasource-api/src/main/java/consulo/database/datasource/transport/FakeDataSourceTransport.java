@@ -18,8 +18,8 @@ package consulo.database.datasource.transport;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.DataSource;
+import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
 

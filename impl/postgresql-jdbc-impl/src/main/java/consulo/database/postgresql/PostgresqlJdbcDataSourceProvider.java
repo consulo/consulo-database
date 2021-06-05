@@ -18,10 +18,7 @@ package consulo.database.postgresql;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.options.UnnamedConfigurable;
-import consulo.database.datasource.configurable.EditablePropertiesHolder;
-import consulo.database.datasource.configurable.GenericPropertyKey;
-import consulo.database.datasource.configurable.GenericPropertyKeys;
-import consulo.database.datasource.configurable.PropertiesHolder;
+import consulo.database.datasource.configurable.*;
 import consulo.database.datasource.jdbc.configurable.JdbcConfigurable;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
@@ -73,7 +70,7 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider
 	{
 		propertiesHolder.set(GenericPropertyKeys.PORT, 5432);
 		propertiesHolder.set(GenericPropertyKeys.LOGIN, "postgres");
-		propertiesHolder.set(GenericPropertyKeys.PASSWORD, "postgres");
+		propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.of());
 	}
 
 	@Override

@@ -19,6 +19,7 @@ package consulo.database.impl.configurable;
 import com.intellij.util.ObjectUtil;
 import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.PropertiesHolder;
+import consulo.database.datasource.configurable.SecureString;
 import org.jdom.Element;
 
 import javax.annotation.Nonnull;
@@ -66,6 +67,13 @@ public class PropertiesHolderImpl implements PropertiesHolder
 				if(key.getTypeClass() == String.class)
 				{
 					value = xmlValue;
+					xmlValue = null;
+					return (T) value;
+				}
+
+				if(key.getTypeClass() == SecureString.class)
+				{
+					value = SecureString.of(xmlValue);
 					xmlValue = null;
 					return (T) value;
 				}

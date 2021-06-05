@@ -30,6 +30,7 @@ import com.intellij.util.io.DownloadUtil;
 import consulo.container.boot.ContainerPathManager;
 import consulo.container.plugin.PluginManager;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
+import consulo.database.datasource.configurable.SecureString;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
@@ -95,11 +96,11 @@ public class JdbcSession implements AutoCloseable
 		myPort = NetUtil.findAvailableSocketPort();
 
 		String login = dataSource.getProperties().get(GenericPropertyKeys.LOGIN);
-		String password = dataSource.getProperties().get(GenericPropertyKeys.PASSWORD);
+		SecureString password = dataSource.getProperties().get(GenericPropertyKeys.PASSWORD);
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("user", login);
-		properties.put("password", password);
+		properties.put("password", password.get());
 
 		SimpleReference<Integer> exitCodeRef = SimpleReference.create();
 

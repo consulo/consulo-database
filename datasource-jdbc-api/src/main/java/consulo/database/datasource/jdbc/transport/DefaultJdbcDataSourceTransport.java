@@ -19,7 +19,6 @@ package consulo.database.datasource.jdbc.transport;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.AsyncResult;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ThrowableConsumer;
@@ -40,6 +39,7 @@ import consulo.database.jdbc.rt.shared.*;
 import consulo.disposer.Disposable;
 import consulo.logging.Logger;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -183,11 +183,16 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 	{
 		JdbcQueryResult queryResult = (JdbcQueryResult) data;
 
+		setter.accept(buildResultUI(queryResult, project, dataSource, dbName, childId, parent));
+	}
+
+	public static JComponent buildResultUI(JdbcQueryResult queryResult, Project project, DataSource dataSource, String dbName, String childId, Disposable parent)
+	{
 		JdbcState dataState = DataSourceTransportManager.getInstance(project).getDataState(dataSource);
 
 		JdbcTableState tableState = null;
 		JdbcDatabaseState databaseState = dataState == null ? null : dataState.getDatabases().get(dbName);
-		if(databaseState != null)
+		if(databaseState != null && childId != null)
 		{
 			tableState = databaseState.getTablesState().findTable(childId);
 		}
@@ -212,11 +217,20 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 			list.add(createColumn(index, col, max, tableState, parent));
 		}
 
-		TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(new ListTableModel<>(list.toArray(new ColumnInfo[0]), queryResult.getRows()));
+		TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(new ListTableModel<>(list.toArray(ColumnInfo[]::new), queryResult.getRows()));
 		tableView.setHorizontalScrollEnabled(true);
 		tableView.setRowHeight(JBUI.scale(20));
 
-		setter.accept(ScrollPaneFactory.createScrollPane(tableView, true));
+		return ScrollPaneFactory.createScrollPane(tableView, true);
+	}
+
+	@Override
+	public void runQuery(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String query, @Nonnull AsyncResult<Object> result)
+	{
+		safeCall(indicator, dataSource, result, session ->
+		{
+			result.setDone(session.execute(client -> client.runQuery(query, Collections.emptyList())));
+		});
 	}
 
 	private static BaseColumnInfo<?> createColumn(int index, String name, String preferedSize, JdbcTableState tableState, Disposable parent)

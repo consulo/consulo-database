@@ -20,11 +20,11 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.UnnamedConfigurable;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.AsyncResult;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.provider.DataSourceConfigurationException;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.localize.DatabaseLocalize;
+import consulo.disposer.Disposable;
 import consulo.localize.LocalizeValue;
 import consulo.preferences.NamedConfigurable;
 import consulo.ui.*;
@@ -32,6 +32,7 @@ import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.border.BorderPosition;
 import consulo.ui.border.BorderStyle;
 import consulo.ui.layout.DockLayout;
+import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nullable;
 
@@ -93,7 +94,7 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 	@RequiredUIAccess
 	@Nullable
 	@Override
-	protected Component createTopRightComponent(TextBox nameField)
+	protected Component createTopRightComponent(TextBox nameField, Disposable parentUIDisposable)
 	{
 		CheckBox applicationAwareBox = CheckBox.create(DatabaseLocalize.labelApplicationAwareText());
 		applicationAwareBox.addValueListener(event ->
@@ -141,7 +142,7 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 
 	@Override
 	@RequiredUIAccess
-	public Component createOptionsPanel()
+	public Component createOptionsPanel(Disposable parentUIDisposable)
 	{
 		if(myInnerConfigurable == null)
 		{
@@ -149,7 +150,7 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		}
 
 		DockLayout panel = DockLayout.create();
-		panel.center(myInnerConfigurable.createUIComponent());
+		panel.center(myInnerConfigurable.createUIComponent(parentUIDisposable));
 
 		Button testButton = Button.create(LocalizeValue.localizeTODO("Test Connection"), (event) ->
 		{

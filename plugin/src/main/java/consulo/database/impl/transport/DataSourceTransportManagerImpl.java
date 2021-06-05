@@ -24,7 +24,6 @@ import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.AsyncResult;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
@@ -33,6 +32,7 @@ import consulo.database.datasource.model.DataSourceListener;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.DataSourceTransportListener;
 import consulo.database.datasource.transport.DataSourceTransportManager;
+import consulo.util.concurrent.AsyncResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.jdom.Element;
@@ -166,6 +166,22 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 		}
 
 		return dataSourceState.getObjectState(dataSource, transport);
+	}
+
+	@Nonnull
+	@Override
+	public AsyncResult<Object> runQuery(@Nonnull DataSource dataSource, @Nonnull String query)
+	{
+		DataSourceTransport transport = findTransport(dataSource);
+
+		AsyncResult<Object> result = AsyncResult.undefined();
+
+		Task.Backgroundable.queue(myProject, "Executing query...", true, indicator ->
+		{
+			transport.runQuery(indicator, myProject, dataSource, query, result);
+		});
+
+		return result;
 	}
 
 	@Nullable
