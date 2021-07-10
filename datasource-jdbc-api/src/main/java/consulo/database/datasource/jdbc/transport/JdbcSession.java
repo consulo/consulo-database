@@ -106,7 +106,7 @@ public class JdbcSession implements AutoCloseable
 
 		Platform platform = Platform.current();
 
-		String java_home = platform.os().getEnvironmentVariable("JAVA_HOME");
+		String java_home = platform.jvm().getRuntimeProperty("java.home");
 
 		SimpleJavaParameters simpleJavaParameters = new SimpleJavaParameters();
 		simpleJavaParameters.getClassPath().add(new File(PluginManager.getPluginPath(DefaultJdbcDataSourceTransport.class), "rt/consulo.database-datasource.jdbc.rt.jar"));
