@@ -17,9 +17,10 @@
 package consulo.database.datasource.ui;
 
 import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.project.Project;
 import consulo.database.datasource.model.DataSource;
+import consulo.extensions.StrictExtensionPointName;
 
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;
@@ -30,7 +31,7 @@ import java.util.function.Consumer;
  */
 public interface DataSourceTreeNodeProvider
 {
-	ExtensionPointName<DataSourceTreeNodeProvider> EP_NAME = ExtensionPointName.create("consulo.database.treeNodeProvider");
+	StrictExtensionPointName<Application, DataSourceTreeNodeProvider> EP_NAME = StrictExtensionPointName.forApplication("consulo.database.treeNodeProvider");
 
 	boolean accept(@Nonnull DataSource dataSource);
 

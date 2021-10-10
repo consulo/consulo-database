@@ -25,6 +25,7 @@ import consulo.database.datasource.model.DataSource;
 import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author VISTALL
@@ -46,6 +47,7 @@ public interface DataSourceTransportManager
 	@RequiredReadAction
 	void refreshAll();
 
+	@Nullable
 	<T extends PersistentStateComponent<?>> T getDataState(@Nonnull DataSource dataSource);
 
 	@Nonnull

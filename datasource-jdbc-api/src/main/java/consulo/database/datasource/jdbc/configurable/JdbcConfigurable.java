@@ -16,11 +16,12 @@
 
 package consulo.database.datasource.jdbc.configurable;
 
-import com.intellij.ide.passwordSafe.PasswordSafe;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.configurable.SecureString;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.disposer.Disposable;
+import consulo.localize.LocalizeValue;
 import consulo.logging.Logger;
 import consulo.options.SimpleConfigurableByProperties;
 import consulo.ui.Component;
@@ -53,7 +54,7 @@ public class JdbcConfigurable extends SimpleConfigurableByProperties
 	@RequiredUIAccess
 	@Nonnull
 	@Override
-	protected Component createLayout(PropertyBuilder propertyBuilder)
+	protected Component createLayout(PropertyBuilder propertyBuilder, @Nonnull Disposable uiDisposable)
 	{
 		EditablePropertiesHolder propertiesHolder = myDataSource.getProperties();
 
@@ -62,23 +63,23 @@ public class JdbcConfigurable extends SimpleConfigurableByProperties
 		FormBuilder builder = FormBuilder.create();
 
 		TextBox hostBox = TextBox.create();
-		builder.addLabeled("Host", hostBox);
+		builder.addLabeled(LocalizeValue.localizeTODO("Host"), hostBox);
 		propertyBuilder.add(hostBox, () -> propertiesHolder.get(GenericPropertyKeys.HOST), it -> propertiesHolder.set(GenericPropertyKeys.HOST, it));
 
 		IntBox portBox = IntBox.create();
-		builder.addLabeled("Port", portBox);
+		builder.addLabeled(LocalizeValue.localizeTODO("Port"), portBox);
 		propertyBuilder.add(portBox, () -> propertiesHolder.get(GenericPropertyKeys.PORT), it -> propertiesHolder.set(GenericPropertyKeys.PORT, it));
 
 		TextBox loginBox = TextBox.create();
-		builder.addLabeled("Login", loginBox);
+		builder.addLabeled(LocalizeValue.localizeTODO("Login"), loginBox);
 		propertyBuilder.add(loginBox, () -> propertiesHolder.get(GenericPropertyKeys.LOGIN), it -> propertiesHolder.set(GenericPropertyKeys.LOGIN, it));
 
 		PasswordBox passwordBox = PasswordBox.create();
-		builder.addLabeled("Password", passwordBox);
+		builder.addLabeled(LocalizeValue.localizeTODO("Password"), passwordBox);
 		propertyBuilder.add(passwordBox, () -> propertiesHolder.get(GenericPropertyKeys.PASSWORD).get(), it -> propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.of(it)));
 
 		TextBox databaseNameBox = TextBox.create();
-		builder.addLabeled("Database Name", databaseNameBox);
+		builder.addLabeled(LocalizeValue.localizeTODO("Database Name"), databaseNameBox);
 		propertyBuilder.add(databaseNameBox, () -> propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME), it -> propertiesHolder.set(GenericPropertyKeys.DATABASE_NAME, it));
 
 		Component component = builder.build();

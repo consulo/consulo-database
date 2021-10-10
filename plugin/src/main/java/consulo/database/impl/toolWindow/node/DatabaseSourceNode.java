@@ -18,6 +18,7 @@ package consulo.database.impl.toolWindow.node;
 
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
@@ -70,7 +71,7 @@ public class DatabaseSourceNode extends AbstractTreeNode<DataSource>
 			return Collections.emptyList();
 		}
 		List<AbstractTreeNode<?>> result = new ArrayList<>();
-		for(DataSourceTreeNodeProvider provider : DataSourceTreeNodeProvider.EP_NAME.getExtensionList())
+		for(DataSourceTreeNodeProvider provider : DataSourceTreeNodeProvider.EP_NAME.getExtensionList(Application.get()))
 		{
 			if(provider.accept(value))
 			{
