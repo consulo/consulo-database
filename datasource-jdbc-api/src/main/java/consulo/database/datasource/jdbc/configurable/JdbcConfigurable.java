@@ -24,14 +24,12 @@ import consulo.disposer.Disposable;
 import consulo.localize.LocalizeValue;
 import consulo.logging.Logger;
 import consulo.options.SimpleConfigurableByProperties;
-import consulo.ui.Component;
-import consulo.ui.IntBox;
-import consulo.ui.PasswordBox;
-import consulo.ui.TextBox;
+import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.border.BorderStyle;
 import consulo.ui.layout.DockLayout;
 import consulo.ui.layout.TabbedLayout;
+import consulo.ui.style.StandardColors;
 import consulo.ui.util.FormBuilder;
 
 import javax.annotation.Nonnull;
@@ -82,6 +80,10 @@ public class JdbcConfigurable extends SimpleConfigurableByProperties
 		builder.addLabeled(LocalizeValue.localizeTODO("Database Name"), databaseNameBox);
 		propertyBuilder.add(databaseNameBox, () -> propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME), it -> propertiesHolder.set(GenericPropertyKeys.DATABASE_NAME, it));
 
+		Label warningLabel = Label.create(LocalizeValue.localizeTODO("WARNING: Password stored as plain text, use only for testing"));
+		warningLabel.setForegroundColor(StandardColors.RED);
+
+		builder.addBottom(warningLabel);
 		Component component = builder.build();
 		component.addBorders(BorderStyle.EMPTY, null, 10);
 		tabs.addTab("Connection", component);
