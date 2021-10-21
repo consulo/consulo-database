@@ -53,18 +53,6 @@ public interface DataSourceTransport<STATE extends PersistentStateComponent<?>>
 		result.setDone();
 	}
 
-	@RequiredUIAccess
-	default void fetchDataEnded(@Nonnull ProgressIndicator indicator,
-								@Nonnull Project project,
-								@Nonnull DataSource dataSource,
-								@Nonnull String dbName,
-								@Nonnull String childId,
-								@Nonnull Object data,
-								@Nonnull Disposable parent,
-								@Nonnull Consumer<JComponent> setter)
-	{
-	}
-
 	default void runQuery(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String query, @Nonnull AsyncResult<Object> result)
 	{
 		result.reject("Unsupported");

@@ -23,6 +23,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.wm.ToolWindowId;
+import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.content.MessageView;
 import com.intellij.util.containers.ContainerUtil;
@@ -32,13 +36,17 @@ import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
+import consulo.database.impl.editor.DataSourceFileEditor;
 import consulo.disposer.Disposable;
 import consulo.platform.base.icon.PlatformIconGroup;
+import consulo.ui.UIAccess;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,7 +61,7 @@ public class SqlExecutePanel
 	private UUID myDataSourceId;
 
 	@RequiredReadAction
-	public SqlExecutePanel(@Nonnull Project project, Editor editor)
+	public SqlExecutePanel(@Nonnull Project project, Editor editor, String fileName)
 	{
 		DataSourceManager dataSourceManager = DataSourceManager.getInstance(project);
 
@@ -70,6 +78,8 @@ public class SqlExecutePanel
 			@Override
 			public void actionPerformed(@Nonnull AnActionEvent anActionEvent)
 			{
+				UIAccess uiAccess = UIAccess.current();
+
 				DataSourceTransportManager transportManager = DataSourceTransportManager.getInstance(project);
 
 				DataSource dataSource = dataSourceManager.findDataSource(myDataSourceId);
@@ -78,16 +88,41 @@ public class SqlExecutePanel
 
 				String text = editor.getDocument().getText();
 
-				transportManager.runQuery(dataSource, text).doWhenDone((result) -> {
-					MessageView messageView = MessageView.getInstance(project);
+				AsyncResult<Object> query = transportManager.runQuery(dataSource, text);
+				query.doWhenRejectedWithThrowable(e ->
+				{
+					uiAccess.give(() ->
+					{
+						MessageView messageView = MessageView.getInstance(project);
 
-					messageView.runWhenInitialized(() -> {
-						ContentManager contentManager = messageView.getContentManager();
-
-						Disposable parent = Disposable.newDisposable();
-						//DefaultJdbcDataSourceTransport.buildResultUI(result, project, dataSource, text, null, parent);
+						messageView.runWhenInitialized(() ->
+						{
+							ToolWindowManager.getInstance(project).notifyByBalloon(ToolWindowId.MESSAGES_WINDOW, MessageType.ERROR, e.getMessage());
+						});
 					});
-					System.out.println("test");
+				});
+				query.doWhenDone((result) ->
+				{
+					uiAccess.give(() ->
+					{
+						MessageView messageView = MessageView.getInstance(project);
+
+						messageView.runWhenInitialized(() ->
+						{
+							ContentManager contentManager = messageView.getContentManager();
+
+							Disposable uiDisposable = Disposable.newDisposable();
+
+							JComponent component = DataSourceFileEditor.buildUI(result, project, dataSource, null, null, uiDisposable);
+							Content content = contentManager.getFactory().createContent(component, fileName + ": " + LocalDateTime.now(), true);
+							content.setDisposer(uiDisposable);
+
+							contentManager.addContent(content);
+							contentManager.setSelectedContent(content);
+
+							uiAccess.give(() -> messageView.getToolWindow().activate(null));
+						});
+					});
 				});
 			}
 		});
@@ -95,6 +130,7 @@ public class SqlExecutePanel
 		builder.add(new DataSourceChooseAction(dataSourceManager, () -> myDataSourceId, it -> myDataSourceId = it));
 
 		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("SqlExecute", builder.build(), true);
+		toolbar.setTargetComponent(editor.getComponent());
 
 		myPanel.add(toolbar.getComponent(), BorderLayout.WEST);
 		myPanel.setBorder(JBUI.Borders.customLine(UIUtil.getBorderColor(), 0, 0, 1, 0));

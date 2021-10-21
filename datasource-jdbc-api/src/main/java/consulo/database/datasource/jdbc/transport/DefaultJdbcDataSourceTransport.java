@@ -38,7 +38,6 @@ import consulo.database.impl.editor.ui.TableViewWithHScrolling;
 import consulo.database.jdbc.rt.shared.*;
 import consulo.disposer.Disposable;
 import consulo.logging.Logger;
-import consulo.ui.annotation.RequiredUIAccess;
 import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
@@ -47,7 +46,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @author VISTALL
@@ -170,31 +168,18 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 		});
 	}
 
-	@RequiredUIAccess
-	@Override
-	public void fetchDataEnded(@Nonnull ProgressIndicator indicator,
-							   @Nonnull Project project,
-							   @Nonnull DataSource dataSource,
-							   @Nonnull String dbName,
-							   @Nonnull String childId,
-							   @Nonnull Object data,
-							   @Nonnull Disposable parent,
-							   @Nonnull Consumer<JComponent> setter)
-	{
-		JdbcQueryResult queryResult = (JdbcQueryResult) data;
-
-		setter.accept(buildResultUI(queryResult, project, dataSource, dbName, childId, parent));
-	}
-
 	public static JComponent buildResultUI(JdbcQueryResult queryResult, Project project, DataSource dataSource, String dbName, String childId, Disposable parent)
 	{
 		JdbcState dataState = DataSourceTransportManager.getInstance(project).getDataState(dataSource);
-
 		JdbcTableState tableState = null;
-		JdbcDatabaseState databaseState = dataState == null ? null : dataState.getDatabases().get(dbName);
-		if(databaseState != null && childId != null)
+
+		if(dbName != null)
 		{
-			tableState = databaseState.getTablesState().findTable(childId);
+			JdbcDatabaseState databaseState = dataState == null ? null : dataState.getDatabases().get(dbName);
+			if(databaseState != null && childId != null)
+			{
+				tableState = databaseState.getTablesState().findTable(childId);
+			}
 		}
 
 		List<ColumnInfo<JdbcQueryRow, ?>> list = new ArrayList<>();
@@ -229,7 +214,14 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 	{
 		safeCall(indicator, dataSource, result, session ->
 		{
-			result.setDone(session.execute(client -> client.runQuery(query, Collections.emptyList())));
+			try
+			{
+				result.setDone(session.execute(client -> client.runQuery(query, List.of())));
+			}
+			catch(TypeNotPresentException e)
+			{
+				result.rejectWithThrowable(e);
+			}
 		});
 	}
 

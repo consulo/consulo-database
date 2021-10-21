@@ -27,9 +27,12 @@ import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LoadingDecorator;
+import com.intellij.ui.components.JBLabel;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
+import consulo.database.datasource.transport.ui.DataSourceTransportResultPresentation;
 import consulo.database.impl.editor.actions.RefreshDataAction;
+import consulo.disposer.Disposable;
 import consulo.ui.UIAccess;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.util.concurrent.AsyncResult;
@@ -41,7 +44,6 @@ import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 /**
  * @author VISTALL
@@ -112,7 +114,6 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 
 				transport.fetchData(indicator, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), result);
 
-				final DataSourceTransport finalTransport = transport;
 				result.doWhenDone(o -> {
 					myLoadingDecorator.stopLoading();
 					myLoading.set(false);
@@ -122,12 +123,34 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 						{
 							myTargetPanel.remove(myLastResult);
 						}
-						Consumer setter = component -> myTargetPanel.add(myLastResult = (JComponent) component, BorderLayout.CENTER);
-						finalTransport.fetchDataEnded(indicator, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), o, DataSourceFileEditor.this, setter);
+
+						JComponent newComponent = buildUI(o, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), DataSourceFileEditor.this);
+						myTargetPanel.add(myLastResult = newComponent, BorderLayout.CENTER);
 					});
 				});
 			});
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static JComponent buildUI(@Nonnull Object result, @Nonnull Project project, DataSource dataSource, String dbName, String childId, Disposable parent)
+	{
+		DataSourceTransportResultPresentation target = null;
+		for(DataSourceTransportResultPresentation presentation : DataSourceTransportResultPresentation.EP_NAME.getExtensionList())
+		{
+			if(presentation.accept(result))
+			{
+				target = presentation;
+				break;
+			}
+		}
+
+		if(target == null)
+		{
+			return new JBLabel("Not supported result");
+		}
+
+		return target.buildComponentForResult(result, project, dataSource, dbName, childId, parent);
 	}
 
 	@Nonnull

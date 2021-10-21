@@ -26,6 +26,7 @@
 	<extensionPoints>
 		<extensionPoint name="provider" interface="consulo.database.datasource.provider.DataSourceProvider"/>
 		<extensionPoint name="transport" interface="consulo.database.datasource.transport.DataSourceTransport"/>
+		<extensionPoint name="transportResultPresentation" interface="consulo.database.datasource.transport.ui.DataSourceTransportResultPresentation"/>
 
 		<extensionPoint name="treeNodeProvider" interface="consulo.database.datasource.ui.DataSourceTreeNodeProvider"/>
 	</extensionPoints>
@@ -41,6 +42,8 @@
 
 		<treeNodeProvider implementation="consulo.database.postgresql.PostgresqlDataSourceTreeNodeProvider" order="before jdbc"/>
 		<treeNodeProvider implementation="consulo.database.datasource.jdbc.ui.JdbcDataSourceTreeNodeProvider" id="jdbc"/>
+
+		<transportResultPresentation implementation="consulo.database.datasource.jdbc.transport.ui.DefaultJdbcDataSourceTransportResultPresentation" id="jdbc"/>
 	</extensions>
 
 	<extensions defaultExtensionNs="com.intellij">
