@@ -62,6 +62,9 @@
 		<applicationService serviceImplementation="consulo.database.impl.store.ApplicationDataSourceStoreImpl"/>
 
 		<fileTypeFactory implementation="consulo.sql.lang.api.SqlFileTypeFactory"/>
+		<lang.parserDefinition language="SQL" implementationClass="consulo.sql.lang.impl.parser.SqlParserDefinition"/>
+		<lang.defineVersion language="SQL" implementationClass="consulo.sql.lang.impl.version.sql92.Sql92LanguageVersion"/>
+		<lang.syntaxHighlighterFactory language="SQL" implementationClass="consulo.sql.lang.impl.highlight.SqlSyntaxHighlighterFactory"/>
 
 		<editorFactoryListener implementation="consulo.database.impl.sql.SqlEditorFactoryListener"/>
 		<toolWindow id="Database"
