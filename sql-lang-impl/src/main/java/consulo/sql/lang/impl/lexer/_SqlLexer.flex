@@ -19,6 +19,12 @@ import consulo.sql.lang.impl.psi.SqlTokenType;
 
 WHITE_SPACE_CHAR=[\ \r\t\f\n]
 
+C_STYLE_COMMENT="/*""*"*("/"|([^"/""*"]{COMMENT_TAIL}))?
+
+COMMENT_TAIL=([^"*"]*("*"+[^"*""/"])?)*("*"+"/")?
+
+END_OF_LINE_COMMENT="-""-"[^\r\n]*
+
 IDENTIFIER=[:jletter:] [:jletterdigit:]*
 
 ESCAPE_SEQUENCE=\\[^\r\n]
@@ -30,6 +36,10 @@ DIGIT=[0-9]
 NUMBER={DIGIT}*
 
 %%
+
+<YYINITIAL> {C_STYLE_COMMENT} { return SqlTokenType.C_STYLE_COMMENT; }
+
+<YYINITIAL> {END_OF_LINE_COMMENT} { return SqlTokenType.END_OF_LINE_COMMENT; }
 
 <YYINITIAL> {WHITE_SPACE_CHAR}+ { return TokenType.WHITE_SPACE; }
 

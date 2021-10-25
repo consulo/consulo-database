@@ -18,6 +18,7 @@ package consulo.sql.lang.impl.psi;
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import consulo.sql.lang.api.SqlLanguage;
 
 /**
@@ -37,4 +38,12 @@ public interface SqlTokenType extends TokenType
 	IElementType NUMBER = new IElementType("SQL_NUMBER", SqlLanguage.INSTANCE);
 
 	IElementType SINGLE_QUOTED_LITERAL = new IElementType("SQL_SINGLE_QUOTED_LITERAL", SqlLanguage.INSTANCE);
+
+	IElementType C_STYLE_COMMENT = new IElementType("SQL_C_STYLE_COMMENT", SqlLanguage.INSTANCE);
+
+	IElementType END_OF_LINE_COMMENT = new IElementType("SQL_END_OF_LINE_COMMENT", SqlLanguage.INSTANCE);
+
+	TokenSet COMMENTS = TokenSet.create(C_STYLE_COMMENT, END_OF_LINE_COMMENT);
+
+	TokenSet STRINGS = TokenSet.create(SINGLE_QUOTED_LITERAL);
 }

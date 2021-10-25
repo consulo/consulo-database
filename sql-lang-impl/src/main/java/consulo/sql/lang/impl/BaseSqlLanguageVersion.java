@@ -23,6 +23,7 @@ import consulo.lang.LanguageVersionWithParsing;
 import consulo.sql.lang.api.SqlLanguageVersion;
 import consulo.sql.lang.impl.lexer.SqlLexer;
 import consulo.sql.lang.impl.parser.SqlParser;
+import consulo.sql.lang.impl.psi.SqlTokenType;
 
 import javax.annotation.Nonnull;
 
@@ -75,13 +76,13 @@ public class BaseSqlLanguageVersion extends SqlLanguageVersion implements Langua
 	@Override
 	public TokenSet getCommentTokens()
 	{
-		return TokenSet.EMPTY;
+		return SqlTokenType.COMMENTS;
 	}
 
 	@Nonnull
 	@Override
 	public TokenSet getStringLiteralElements()
 	{
-		return TokenSet.EMPTY;
+		return SqlTokenType.STRINGS;
 	}
 }

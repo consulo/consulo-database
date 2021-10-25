@@ -46,6 +46,8 @@ public class SqlSyntaxHighlighter extends LanguageVersionableSyntaxHighlighter
 		safeMap(ourTextAttributes, SqlTokenType.IDENTIFIER, DefaultLanguageHighlighterColors.IDENTIFIER);
 		safeMap(ourTextAttributes, SqlTokenType.SINGLE_QUOTED_LITERAL, DefaultLanguageHighlighterColors.STRING);
 		safeMap(ourTextAttributes, SqlTokenType.NUMBER, DefaultLanguageHighlighterColors.NUMBER);
+		safeMap(ourTextAttributes, SqlTokenType.C_STYLE_COMMENT, DefaultLanguageHighlighterColors.BLOCK_COMMENT);
+		safeMap(ourTextAttributes, SqlTokenType.END_OF_LINE_COMMENT, DefaultLanguageHighlighterColors.LINE_COMMENT);
 	}
 
 	public SqlSyntaxHighlighter(LanguageVersion languageVersion)
