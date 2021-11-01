@@ -23,6 +23,11 @@
 	<localize>consulo.database.DatabaseLocalize</localize>
 	<experimental>true</experimental>
 
+	<permissions>
+		<permission type="SOCKET"/>
+		<permission type="PROCESS"/>
+	</permissions>
+
 	<extensionPoints>
 		<extensionPoint name="provider" interface="consulo.database.datasource.provider.DataSourceProvider"/>
 		<extensionPoint name="transport" interface="consulo.database.datasource.transport.DataSourceTransport"/>
