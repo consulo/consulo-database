@@ -23,6 +23,11 @@
 	<localize>consulo.database.DatabaseLocalize</localize>
 	<experimental>true</experimental>
 
+	<tags>
+		<tag>database</tag>
+		<tag>custom.language</tag>
+	</tags>
+
 	<permissions>
 		<permission type="SOCKET"/>
 		<permission type="PROCESS"/>
