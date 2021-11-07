@@ -29,8 +29,11 @@
 	</tags>
 
 	<permissions>
-		<permission type="SOCKET"/>
-		<permission type="PROCESS"/>
+		<permission type="SOCKET_CONNECT"/>
+		<!--required for search free port on OS for start process-->
+		<permission type="SOCKET_BIND"/>
+		<permission type="PROCESS_CREATE"/>
+		<permission type="GET_ENV"/>
 	</permissions>
 
 	<extensionPoints>
