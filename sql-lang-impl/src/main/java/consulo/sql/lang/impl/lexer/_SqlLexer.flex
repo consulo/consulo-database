@@ -27,9 +27,9 @@ END_OF_LINE_COMMENT="-""-"[^\r\n]*
 
 IDENTIFIER=[:jletter:] [:jletterdigit:]*
 
-ESCAPE_SEQUENCE=\\[^\r\n]
+ESCAPE_SEQUENCE=(\'\')
 
-SINGLE_QUOTED_LITERAL="'"([^\\\'\r\n]|{ESCAPE_SEQUENCE})*("'"|\\)?
+SINGLE_QUOTED_LITERAL="'"([^\\\']|{ESCAPE_SEQUENCE})*("'"|\\)?
 
 DIGIT=[0-9]
 
