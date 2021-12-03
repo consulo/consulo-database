@@ -16,7 +16,6 @@
 
 package consulo.database.mysql;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.options.UnnamedConfigurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
@@ -25,6 +24,7 @@ import consulo.database.datasource.jdbc.configurable.JdbcConfigurable;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
+import consulo.database.icon.DatabaseIconGroup;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 
@@ -55,7 +55,7 @@ public class MysqJdbcDataSourceProvider extends JdbcDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return AllIcons.Providers.Mysql;
+		return DatabaseIconGroup.mysql();
 	}
 
 	@Nonnull

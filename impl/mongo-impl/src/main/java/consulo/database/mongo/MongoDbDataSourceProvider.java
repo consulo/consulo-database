@@ -20,7 +20,8 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.UnnamedConfigurable;
 import consulo.database.datasource.json.JsonDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
-import consulo.database.mongo.icon.MongoIconGroup;
+import consulo.database.icon.DatabaseIconGroup;
+import consulo.disposer.Disposable;
 import consulo.localize.LocalizeValue;
 import consulo.ui.Component;
 import consulo.ui.Label;
@@ -55,7 +56,7 @@ public class MongoDbDataSourceProvider implements JsonDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return MongoIconGroup.mongodb();
+		return DatabaseIconGroup.mongoDB();
 	}
 
 	@Nonnull
@@ -67,7 +68,7 @@ public class MongoDbDataSourceProvider implements JsonDataSourceProvider
 			@RequiredUIAccess
 			@Nullable
 			@Override
-			public Component createUIComponent()
+			public Component createUIComponent(@Nonnull Disposable uiDisposable)
 			{
 				return DockLayout.create().center(Label.create("mongo db test"));
 			}

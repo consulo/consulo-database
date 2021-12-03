@@ -16,14 +16,17 @@
 
 package consulo.database.postgresql;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.options.UnnamedConfigurable;
-import consulo.database.datasource.configurable.*;
+import consulo.database.datasource.configurable.EditablePropertiesHolder;
+import consulo.database.datasource.configurable.GenericPropertyKeys;
+import consulo.database.datasource.configurable.PropertiesHolder;
+import consulo.database.datasource.configurable.SecureString;
 import consulo.database.datasource.jdbc.configurable.JdbcConfigurable;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.provider.DataSourceConfigurationException;
+import consulo.database.icon.DatabaseIconGroup;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 import consulo.util.lang.StringUtil;
@@ -55,7 +58,7 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return AllIcons.Providers.Postgresql;
+		return DatabaseIconGroup.postgresql();
 	}
 
 	@Nonnull
