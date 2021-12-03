@@ -69,8 +69,6 @@
 
 		<virtualFileSystem implementation="consulo.database.impl.editor.DataSourceVirtualFileSystem"/>
 
-		<getDataRule implementation="consulo.database.impl.toolWindow.dataRules.DataSourceTreeRule"/>
-
 		<projectService serviceImplementation="consulo.database.impl.store.ProjectDataSourceStoreImpl"/>
 		<applicationService serviceImplementation="consulo.database.impl.store.ApplicationDataSourceStoreImpl"/>
 

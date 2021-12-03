@@ -16,12 +16,14 @@
 
 package consulo.database.impl.toolWindow;
 
-import com.intellij.openapi.actionSystem.AnSeparator;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
@@ -29,6 +31,7 @@ import consulo.database.impl.action.AddDataSourceAction;
 import consulo.database.impl.action.EditDataSourceAction;
 import consulo.database.impl.action.RefreshDataSourcesAction;
 import consulo.database.impl.action.RemoveDataSourceAction;
+import consulo.ui.annotation.RequiredUIAccess;
 
 import javax.annotation.Nonnull;
 
@@ -40,20 +43,31 @@ public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware
 {
 	public static final String ID = "Database";
 
+	@RequiredUIAccess
 	@Override
 	public void createToolWindowContent(@Nonnull Project project, @Nonnull ToolWindow toolWindow)
 	{
-		ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
-
-		toolWindowEx.setTitleActions(new AddDataSourceAction(), new RemoveDataSourceAction(null), new EditDataSourceAction(), AnSeparator.create(), new RefreshDataSourcesAction());
-
 		ContentManager contentManager = toolWindow.getContentManager();
 
 		ContentFactory factory = contentManager.getFactory();
 
-		DatabaseTreePanel panel = new DatabaseTreePanel(project);
+		SimpleToolWindowPanel toolWindowPanel = new SimpleToolWindowPanel(true, true);
 
-		Content content = factory.createContent(panel.getRootPanel(), null, false);
+		DatabaseTreePanel panel = new DatabaseTreePanel(project);
+		toolWindowPanel.setContent(panel.getRootPanel());
+
+		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
+		builder.add(new AddDataSourceAction());
+		builder.add(new RemoveDataSourceAction(null));
+		builder.add(new EditDataSourceAction());
+		builder.addSeparator();
+		builder.add(new RefreshDataSourcesAction());
+
+		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DatabaseToolWindow", builder.build(), true);
+		toolbar.setTargetComponent(panel.getRootPanel());
+		toolWindowPanel.setToolbar(toolbar.getComponent());
+
+		Content content = factory.createContent(toolWindowPanel, null, false);
 
 		content.setDisposer(panel);
 
