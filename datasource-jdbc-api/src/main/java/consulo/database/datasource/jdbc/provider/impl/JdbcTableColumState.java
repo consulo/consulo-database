@@ -30,16 +30,20 @@ public class JdbcTableColumState implements PersistentStateComponent<JdbcTableCo
 	private String myName;
 	private String myType;
 	private int myJdbcType;
+	private String myDefaultValue;
+	private int mySize;
 
 	private JdbcTableColumState()
 	{
 	}
 
-	public JdbcTableColumState(String name, String type, int jdbcType)
+	public JdbcTableColumState(String name, String type, int jdbcType, String defaultValue, int size)
 	{
 		myName = name;
 		myType = type;
 		myJdbcType = jdbcType;
+		myDefaultValue = defaultValue;
+		mySize = size;
 	}
 
 	public int getJdbcType()
@@ -65,6 +69,31 @@ public class JdbcTableColumState implements PersistentStateComponent<JdbcTableCo
 	public void setName(String name)
 	{
 		myName = name;
+	}
+
+	public String getDefaultValue()
+	{
+		return myDefaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue)
+	{
+		myDefaultValue = defaultValue;
+	}
+
+	public void setJdbcType(int jdbcType)
+	{
+		myJdbcType = jdbcType;
+	}
+
+	public int getSize()
+	{
+		return mySize;
+	}
+
+	public void setSize(int size)
+	{
+		mySize = size;
 	}
 
 	@Nullable

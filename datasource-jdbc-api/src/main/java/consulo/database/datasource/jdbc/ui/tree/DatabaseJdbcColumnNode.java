@@ -26,6 +26,7 @@ import consulo.database.datasource.jdbc.provider.impl.JdbcTableColumState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.ui.image.ImageKey;
+import consulo.util.lang.StringUtil;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -55,22 +56,35 @@ public class DatabaseJdbcColumnNode extends AbstractTreeNode<JdbcTableColumState
 	}
 
 	@Override
-	protected void update(PresentationData presentationData)
+	protected void update(PresentationData presentation)
 	{
 		ImageKey icon = DatabaseIconGroup.nodesColumn();
 		List<JdbcPrimaryKeyState> primaryKeys = myJdbcTableState.getPrimaryKeys();
+		JdbcTableColumState value = getValue();
 		for(JdbcPrimaryKeyState primaryKey : primaryKeys)
 		{
-			if(getValue().getName().equals(primaryKey.getColumnName()))
+			if(value.getName().equals(primaryKey.getColumnName()))
 			{
 				icon = DatabaseIconGroup.nodesPrimary_key();
 				break;
 			}
 		}
 
-		presentationData.setIcon(icon);
-		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-		presentationData.addText(" : " + getValue().getType(), SimpleTextAttributes.GRAY_ATTRIBUTES);
+		presentation.setIcon(icon);
+		presentation.addText(value.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+		presentation.addText(" : " + value.getType(), SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES);
+
+		int size = value.getSize();
+		if(size > 0)
+		{
+			presentation.addText(" (" + size + ")", SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES);
+		}
+
+		String defaultValue = value.getDefaultValue();
+		if(!StringUtil.isEmptyOrSpaces(defaultValue))
+		{
+			presentation.addText(" = " + defaultValue, SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES);
+		}
 	}
 
 	@Override
