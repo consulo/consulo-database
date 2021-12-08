@@ -14,6 +14,7 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
   private static final org.apache.thrift.protocol.TField COLUMS_FIELD_DESC = new org.apache.thrift.protocol.TField("colums", org.apache.thrift.protocol.TType.LIST, (short)2);
   private static final org.apache.thrift.protocol.TField TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("type", org.apache.thrift.protocol.TType.STRING, (short)3);
   private static final org.apache.thrift.protocol.TField SCHEME_FIELD_DESC = new org.apache.thrift.protocol.TField("scheme", org.apache.thrift.protocol.TType.STRING, (short)4);
+  private static final org.apache.thrift.protocol.TField PRIMARY_KEYS_FIELD_DESC = new org.apache.thrift.protocol.TField("primaryKeys", org.apache.thrift.protocol.TType.LIST, (short)5);
 
   private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new JdbcTableStandardSchemeFactory();
   private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new JdbcTableTupleSchemeFactory();
@@ -22,13 +23,15 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
   public @org.apache.thrift.annotation.Nullable java.util.List<JdbcColum> colums; // required
   public @org.apache.thrift.annotation.Nullable java.lang.String type; // required
   public @org.apache.thrift.annotation.Nullable java.lang.String scheme; // required
+  public @org.apache.thrift.annotation.Nullable java.util.List<JdbcTablePrimaryKey> primaryKeys; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     NAME((short)1, "name"),
     COLUMS((short)2, "colums"),
     TYPE((short)3, "type"),
-    SCHEME((short)4, "scheme");
+    SCHEME((short)4, "scheme"),
+    PRIMARY_KEYS((short)5, "primaryKeys");
 
     private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -52,6 +55,8 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
           return TYPE;
         case 4: // SCHEME
           return SCHEME;
+        case 5: // PRIMARY_KEYS
+          return PRIMARY_KEYS;
         default:
           return null;
       }
@@ -105,6 +110,9 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.SCHEME, new org.apache.thrift.meta_data.FieldMetaData("scheme", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.PRIMARY_KEYS, new org.apache.thrift.meta_data.FieldMetaData("primaryKeys", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT            , "JdbcTablePrimaryKey"))));
     metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(JdbcTable.class, metaDataMap);
   }
@@ -116,13 +124,15 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     java.lang.String name,
     java.util.List<JdbcColum> colums,
     java.lang.String type,
-    java.lang.String scheme)
+    java.lang.String scheme,
+    java.util.List<JdbcTablePrimaryKey> primaryKeys)
   {
     this();
     this.name = name;
     this.colums = colums;
     this.type = type;
     this.scheme = scheme;
+    this.primaryKeys = primaryKeys;
   }
 
   /**
@@ -145,6 +155,13 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     if (other.isSetScheme()) {
       this.scheme = other.scheme;
     }
+    if (other.isSetPrimaryKeys()) {
+      java.util.List<JdbcTablePrimaryKey> __this__primaryKeys = new java.util.ArrayList<JdbcTablePrimaryKey>(other.primaryKeys.size());
+      for (JdbcTablePrimaryKey other_element : other.primaryKeys) {
+        __this__primaryKeys.add(new JdbcTablePrimaryKey(other_element));
+      }
+      this.primaryKeys = __this__primaryKeys;
+    }
   }
 
   public JdbcTable deepCopy() {
@@ -157,6 +174,7 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     this.colums = null;
     this.type = null;
     this.scheme = null;
+    this.primaryKeys = null;
   }
 
   @org.apache.thrift.annotation.Nullable
@@ -275,6 +293,47 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     }
   }
 
+  public int getPrimaryKeysSize() {
+    return (this.primaryKeys == null) ? 0 : this.primaryKeys.size();
+  }
+
+  @org.apache.thrift.annotation.Nullable
+  public java.util.Iterator<JdbcTablePrimaryKey> getPrimaryKeysIterator() {
+    return (this.primaryKeys == null) ? null : this.primaryKeys.iterator();
+  }
+
+  public void addToPrimaryKeys(JdbcTablePrimaryKey elem) {
+    if (this.primaryKeys == null) {
+      this.primaryKeys = new java.util.ArrayList<JdbcTablePrimaryKey>();
+    }
+    this.primaryKeys.add(elem);
+  }
+
+  @org.apache.thrift.annotation.Nullable
+  public java.util.List<JdbcTablePrimaryKey> getPrimaryKeys() {
+    return this.primaryKeys;
+  }
+
+  public JdbcTable setPrimaryKeys(@org.apache.thrift.annotation.Nullable java.util.List<JdbcTablePrimaryKey> primaryKeys) {
+    this.primaryKeys = primaryKeys;
+    return this;
+  }
+
+  public void unsetPrimaryKeys() {
+    this.primaryKeys = null;
+  }
+
+  /** Returns true if field primaryKeys is set (has been assigned a value) and false otherwise */
+  public boolean isSetPrimaryKeys() {
+    return this.primaryKeys != null;
+  }
+
+  public void setPrimaryKeysIsSet(boolean value) {
+    if (!value) {
+      this.primaryKeys = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, @org.apache.thrift.annotation.Nullable java.lang.Object value) {
     switch (field) {
     case NAME:
@@ -309,6 +368,14 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       }
       break;
 
+    case PRIMARY_KEYS:
+      if (value == null) {
+        unsetPrimaryKeys();
+      } else {
+        setPrimaryKeys((java.util.List<JdbcTablePrimaryKey>)value);
+      }
+      break;
+
     }
   }
 
@@ -326,6 +393,9 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
 
     case SCHEME:
       return getScheme();
+
+    case PRIMARY_KEYS:
+      return getPrimaryKeys();
 
     }
     throw new java.lang.IllegalStateException();
@@ -346,6 +416,8 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       return isSetType();
     case SCHEME:
       return isSetScheme();
+    case PRIMARY_KEYS:
+      return isSetPrimaryKeys();
     }
     throw new java.lang.IllegalStateException();
   }
@@ -399,6 +471,15 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
         return false;
     }
 
+    boolean this_present_primaryKeys = true && this.isSetPrimaryKeys();
+    boolean that_present_primaryKeys = true && that.isSetPrimaryKeys();
+    if (this_present_primaryKeys || that_present_primaryKeys) {
+      if (!(this_present_primaryKeys && that_present_primaryKeys))
+        return false;
+      if (!this.primaryKeys.equals(that.primaryKeys))
+        return false;
+    }
+
     return true;
   }
 
@@ -421,6 +502,10 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     hashCode = hashCode * 8191 + ((isSetScheme()) ? 131071 : 524287);
     if (isSetScheme())
       hashCode = hashCode * 8191 + scheme.hashCode();
+
+    hashCode = hashCode * 8191 + ((isSetPrimaryKeys()) ? 131071 : 524287);
+    if (isSetPrimaryKeys())
+      hashCode = hashCode * 8191 + primaryKeys.hashCode();
 
     return hashCode;
   }
@@ -469,6 +554,16 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
     }
     if (isSetScheme()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.scheme, other.scheme);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = java.lang.Boolean.compare(isSetPrimaryKeys(), other.isSetPrimaryKeys());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetPrimaryKeys()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.primaryKeys, other.primaryKeys);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -523,6 +618,14 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       sb.append("null");
     } else {
       sb.append(this.scheme);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("primaryKeys:");
+    if (this.primaryKeys == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.primaryKeys);
     }
     first = false;
     sb.append(")");
@@ -611,6 +714,25 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 5: // PRIMARY_KEYS
+            if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+              {
+                org.apache.thrift.protocol.TList _list3 = iprot.readListBegin();
+                struct.primaryKeys = new java.util.ArrayList<JdbcTablePrimaryKey>(_list3.size);
+                @org.apache.thrift.annotation.Nullable JdbcTablePrimaryKey _elem4;
+                for (int _i5 = 0; _i5 < _list3.size; ++_i5)
+                {
+                  _elem4 = new JdbcTablePrimaryKey();
+                  _elem4.read(iprot);
+                  struct.primaryKeys.add(_elem4);
+                }
+                iprot.readListEnd();
+              }
+              struct.setPrimaryKeysIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -635,9 +757,9 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
         oprot.writeFieldBegin(COLUMS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.colums.size()));
-          for (JdbcColum _iter3 : struct.colums)
+          for (JdbcColum _iter6 : struct.colums)
           {
-            _iter3.write(oprot);
+            _iter6.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -651,6 +773,18 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       if (struct.scheme != null) {
         oprot.writeFieldBegin(SCHEME_FIELD_DESC);
         oprot.writeString(struct.scheme);
+        oprot.writeFieldEnd();
+      }
+      if (struct.primaryKeys != null) {
+        oprot.writeFieldBegin(PRIMARY_KEYS_FIELD_DESC);
+        {
+          oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.primaryKeys.size()));
+          for (JdbcTablePrimaryKey _iter7 : struct.primaryKeys)
+          {
+            _iter7.write(oprot);
+          }
+          oprot.writeListEnd();
+        }
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -683,16 +817,19 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       if (struct.isSetScheme()) {
         optionals.set(3);
       }
-      oprot.writeBitSet(optionals, 4);
+      if (struct.isSetPrimaryKeys()) {
+        optionals.set(4);
+      }
+      oprot.writeBitSet(optionals, 5);
       if (struct.isSetName()) {
         oprot.writeString(struct.name);
       }
       if (struct.isSetColums()) {
         {
           oprot.writeI32(struct.colums.size());
-          for (JdbcColum _iter4 : struct.colums)
+          for (JdbcColum _iter8 : struct.colums)
           {
-            _iter4.write(oprot);
+            _iter8.write(oprot);
           }
         }
       }
@@ -702,26 +839,35 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       if (struct.isSetScheme()) {
         oprot.writeString(struct.scheme);
       }
+      if (struct.isSetPrimaryKeys()) {
+        {
+          oprot.writeI32(struct.primaryKeys.size());
+          for (JdbcTablePrimaryKey _iter9 : struct.primaryKeys)
+          {
+            _iter9.write(oprot);
+          }
+        }
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, JdbcTable struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
-      java.util.BitSet incoming = iprot.readBitSet(4);
+      java.util.BitSet incoming = iprot.readBitSet(5);
       if (incoming.get(0)) {
         struct.name = iprot.readString();
         struct.setNameIsSet(true);
       }
       if (incoming.get(1)) {
         {
-          org.apache.thrift.protocol.TList _list5 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-          struct.colums = new java.util.ArrayList<JdbcColum>(_list5.size);
-          @org.apache.thrift.annotation.Nullable JdbcColum _elem6;
-          for (int _i7 = 0; _i7 < _list5.size; ++_i7)
+          org.apache.thrift.protocol.TList _list10 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.colums = new java.util.ArrayList<JdbcColum>(_list10.size);
+          @org.apache.thrift.annotation.Nullable JdbcColum _elem11;
+          for (int _i12 = 0; _i12 < _list10.size; ++_i12)
           {
-            _elem6 = new JdbcColum();
-            _elem6.read(iprot);
-            struct.colums.add(_elem6);
+            _elem11 = new JdbcColum();
+            _elem11.read(iprot);
+            struct.colums.add(_elem11);
           }
         }
         struct.setColumsIsSet(true);
@@ -733,6 +879,20 @@ public class JdbcTable implements org.apache.thrift.TBase<JdbcTable, JdbcTable._
       if (incoming.get(3)) {
         struct.scheme = iprot.readString();
         struct.setSchemeIsSet(true);
+      }
+      if (incoming.get(4)) {
+        {
+          org.apache.thrift.protocol.TList _list13 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.primaryKeys = new java.util.ArrayList<JdbcTablePrimaryKey>(_list13.size);
+          @org.apache.thrift.annotation.Nullable JdbcTablePrimaryKey _elem14;
+          for (int _i15 = 0; _i15 < _list13.size; ++_i15)
+          {
+            _elem14 = new JdbcTablePrimaryKey();
+            _elem14.read(iprot);
+            struct.primaryKeys.add(_elem14);
+          }
+        }
+        struct.setPrimaryKeysIsSet(true);
       }
     }
   }

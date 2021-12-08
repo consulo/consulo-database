@@ -16,7 +16,6 @@
 
 package consulo.database.datasource.jdbc.ui.tree;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
@@ -24,6 +23,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableColumState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
+import consulo.database.icon.DatabaseIconGroup;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -49,15 +49,16 @@ public class DatabaseJdbcColumnsNode extends AbstractTreeNode<JdbcTableState>
 		List<AbstractTreeNode> columns = new ArrayList<>();
 		for(JdbcTableColumState state : getValue().getColumns())
 		{
-			columns.add(new DatabaseJdbcColumnNode(myProject, state));
+			columns.add(new DatabaseJdbcColumnNode(myProject, state, getValue()));
 		}
 		return columns;
 	}
 
 	@Override
-	protected void update(PresentationData presentationData)
+	protected void update(PresentationData presentation)
 	{
-		presentationData.setIcon(AllIcons.Nodes.Folder);
-		presentationData.addText("Columns", SimpleTextAttributes.REGULAR_ATTRIBUTES);
+		presentation.setIcon(DatabaseIconGroup.nodesFolder());
+		presentation.addText("columns", SimpleTextAttributes.REGULAR_ATTRIBUTES);
+		presentation.addText(" " + getValue().getColumns().size(), SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES);
 	}
 }

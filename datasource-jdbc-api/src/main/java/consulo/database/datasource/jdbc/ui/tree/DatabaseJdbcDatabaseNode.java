@@ -21,20 +21,12 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
-import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
-import consulo.database.datasource.jdbc.provider.impl.JdbcState;
-import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
-import consulo.database.datasource.jdbc.provider.impl.JdbcTablesState;
 import consulo.database.datasource.model.DataSource;
-import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.icon.DatabaseIconGroup;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -56,66 +48,13 @@ public class DatabaseJdbcDatabaseNode extends AbstractTreeNode<JdbcDatabaseState
 	@Override
 	public Collection<? extends AbstractTreeNode> getChildren()
 	{
-		JdbcTablesState tablesState = getValue().getTablesState();
-
-		List<JdbcTableState> tables;
-
-		// database selected inside interface
-		if(tablesState == null)
-		{
-			JdbcState dataState = DataSourceTransportManager.getInstance(myProject).getDataState(myDataSource);
-			if(dataState == null)
-			{
-				return Collections.emptyList();
-			}
-
-			JdbcDatabaseState databaseState = dataState.getDatabases().get(getValue().getName());
-			if(databaseState == null || databaseState.getTablesState() == null)
-			{
-				return Collections.emptyList();
-			}
-
-			tables = databaseState.getTablesState().getTables();
-		}
-		else
-		{
-			tables = tablesState.getTables();
-		}
-
-		if(tables.isEmpty())
-		{
-			return Collections.emptyList();
-		}
-
-		List<AbstractTreeNode> nodes = new ArrayList<>();
-
-		for(JdbcTableState table : tables)
-		{
-			AbstractTreeNode tableNode = createTableNode(table);
-			if(tableNode == null)
-			{
-				continue;
-			}
-			nodes.add(tableNode);
-		}
-		return nodes;
-	}
-
-	@Nullable
-	protected AbstractTreeNode createTableNode(JdbcTableState table)
-	{
-		JdbcDataSourceProvider provider = (JdbcDataSourceProvider) myDataSource.getProvider();
-		if(!provider.isTableType(table.getType()))
-		{
-			return null;
-		}
-		return new DatabaseJdbcTableNode(myProject, myDataSource, getValue().getName(), table);
+		return List.of(new DatabaseJdbcTablesNode(myProject, getValue(), myDataSource));
 	}
 
 	@Override
 	protected void update(PresentationData presentationData)
 	{
-		presentationData.setIcon(DatabaseIconGroup.nodesDatabase());
+		presentationData.setIcon(DatabaseIconGroup.nodesSchema());
 		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 	}
 

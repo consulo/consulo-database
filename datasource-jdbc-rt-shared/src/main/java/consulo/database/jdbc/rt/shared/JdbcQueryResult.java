@@ -425,13 +425,13 @@ public class JdbcQueryResult implements org.apache.thrift.TBase<JdbcQueryResult,
           case 1: // COLUMNS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list8 = iprot.readListBegin();
-                struct.columns = new java.util.ArrayList<java.lang.String>(_list8.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _elem9;
-                for (int _i10 = 0; _i10 < _list8.size; ++_i10)
+                org.apache.thrift.protocol.TList _list16 = iprot.readListBegin();
+                struct.columns = new java.util.ArrayList<java.lang.String>(_list16.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem17;
+                for (int _i18 = 0; _i18 < _list16.size; ++_i18)
                 {
-                  _elem9 = iprot.readString();
-                  struct.columns.add(_elem9);
+                  _elem17 = iprot.readString();
+                  struct.columns.add(_elem17);
                 }
                 iprot.readListEnd();
               }
@@ -443,14 +443,14 @@ public class JdbcQueryResult implements org.apache.thrift.TBase<JdbcQueryResult,
           case 2: // ROWS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list11 = iprot.readListBegin();
-                struct.rows = new java.util.ArrayList<JdbcQueryRow>(_list11.size);
-                @org.apache.thrift.annotation.Nullable JdbcQueryRow _elem12;
-                for (int _i13 = 0; _i13 < _list11.size; ++_i13)
+                org.apache.thrift.protocol.TList _list19 = iprot.readListBegin();
+                struct.rows = new java.util.ArrayList<JdbcQueryRow>(_list19.size);
+                @org.apache.thrift.annotation.Nullable JdbcQueryRow _elem20;
+                for (int _i21 = 0; _i21 < _list19.size; ++_i21)
                 {
-                  _elem12 = new JdbcQueryRow();
-                  _elem12.read(iprot);
-                  struct.rows.add(_elem12);
+                  _elem20 = new JdbcQueryRow();
+                  _elem20.read(iprot);
+                  struct.rows.add(_elem20);
                 }
                 iprot.readListEnd();
               }
@@ -478,9 +478,9 @@ public class JdbcQueryResult implements org.apache.thrift.TBase<JdbcQueryResult,
         oprot.writeFieldBegin(COLUMNS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.columns.size()));
-          for (java.lang.String _iter14 : struct.columns)
+          for (java.lang.String _iter22 : struct.columns)
           {
-            oprot.writeString(_iter14);
+            oprot.writeString(_iter22);
           }
           oprot.writeListEnd();
         }
@@ -490,9 +490,9 @@ public class JdbcQueryResult implements org.apache.thrift.TBase<JdbcQueryResult,
         oprot.writeFieldBegin(ROWS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.rows.size()));
-          for (JdbcQueryRow _iter15 : struct.rows)
+          for (JdbcQueryRow _iter23 : struct.rows)
           {
-            _iter15.write(oprot);
+            _iter23.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -526,18 +526,18 @@ public class JdbcQueryResult implements org.apache.thrift.TBase<JdbcQueryResult,
       if (struct.isSetColumns()) {
         {
           oprot.writeI32(struct.columns.size());
-          for (java.lang.String _iter16 : struct.columns)
+          for (java.lang.String _iter24 : struct.columns)
           {
-            oprot.writeString(_iter16);
+            oprot.writeString(_iter24);
           }
         }
       }
       if (struct.isSetRows()) {
         {
           oprot.writeI32(struct.rows.size());
-          for (JdbcQueryRow _iter17 : struct.rows)
+          for (JdbcQueryRow _iter25 : struct.rows)
           {
-            _iter17.write(oprot);
+            _iter25.write(oprot);
           }
         }
       }
@@ -549,27 +549,27 @@ public class JdbcQueryResult implements org.apache.thrift.TBase<JdbcQueryResult,
       java.util.BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list18 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-          struct.columns = new java.util.ArrayList<java.lang.String>(_list18.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem19;
-          for (int _i20 = 0; _i20 < _list18.size; ++_i20)
+          org.apache.thrift.protocol.TList _list26 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.columns = new java.util.ArrayList<java.lang.String>(_list26.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem27;
+          for (int _i28 = 0; _i28 < _list26.size; ++_i28)
           {
-            _elem19 = iprot.readString();
-            struct.columns.add(_elem19);
+            _elem27 = iprot.readString();
+            struct.columns.add(_elem27);
           }
         }
         struct.setColumnsIsSet(true);
       }
       if (incoming.get(1)) {
         {
-          org.apache.thrift.protocol.TList _list21 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-          struct.rows = new java.util.ArrayList<JdbcQueryRow>(_list21.size);
-          @org.apache.thrift.annotation.Nullable JdbcQueryRow _elem22;
-          for (int _i23 = 0; _i23 < _list21.size; ++_i23)
+          org.apache.thrift.protocol.TList _list29 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.rows = new java.util.ArrayList<JdbcQueryRow>(_list29.size);
+          @org.apache.thrift.annotation.Nullable JdbcQueryRow _elem30;
+          for (int _i31 = 0; _i31 < _list29.size; ++_i31)
           {
-            _elem22 = new JdbcQueryRow();
-            _elem22.read(iprot);
-            struct.rows.add(_elem22);
+            _elem30 = new JdbcQueryRow();
+            _elem30.read(iprot);
+            struct.rows.add(_elem30);
           }
         }
         struct.setRowsIsSet(true);

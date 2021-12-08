@@ -21,12 +21,16 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.database.datasource.jdbc.provider.impl.JdbcPrimaryKeyState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableColumState;
+import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.icon.DatabaseIconGroup;
+import consulo.ui.image.ImageKey;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author VISTALL
@@ -34,9 +38,12 @@ import java.util.Collections;
  */
 public class DatabaseJdbcColumnNode extends AbstractTreeNode<JdbcTableColumState>
 {
-	public DatabaseJdbcColumnNode(Project project, @Nonnull JdbcTableColumState value)
+	private final JdbcTableState myJdbcTableState;
+
+	public DatabaseJdbcColumnNode(Project project, @Nonnull JdbcTableColumState value, JdbcTableState jdbcTableState)
 	{
 		super(project, value);
+		myJdbcTableState = jdbcTableState;
 	}
 
 	@RequiredReadAction
@@ -50,7 +57,18 @@ public class DatabaseJdbcColumnNode extends AbstractTreeNode<JdbcTableColumState
 	@Override
 	protected void update(PresentationData presentationData)
 	{
-		presentationData.setIcon(DatabaseIconGroup.nodesColumn());
+		ImageKey icon = DatabaseIconGroup.nodesColumn();
+		List<JdbcPrimaryKeyState> primaryKeys = myJdbcTableState.getPrimaryKeys();
+		for(JdbcPrimaryKeyState primaryKey : primaryKeys)
+		{
+			if(getValue().getName().equals(primaryKey.getColumnName()))
+			{
+				icon = DatabaseIconGroup.nodesPrimary_key();
+				break;
+			}
+		}
+
+		presentationData.setIcon(icon);
 		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 		presentationData.addText(" : " + getValue().getType(), SimpleTextAttributes.GRAY_ATTRIBUTES);
 	}

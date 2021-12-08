@@ -1432,15 +1432,15 @@ public class JdbcExecutor {
             case 2: // PROPERTIES
               if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
                 {
-                  org.apache.thrift.protocol.TMap _map32 = iprot.readMapBegin();
-                  struct.properties = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map32.size);
-                  @org.apache.thrift.annotation.Nullable java.lang.String _key33;
-                  @org.apache.thrift.annotation.Nullable java.lang.String _val34;
-                  for (int _i35 = 0; _i35 < _map32.size; ++_i35)
+                  org.apache.thrift.protocol.TMap _map40 = iprot.readMapBegin();
+                  struct.properties = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map40.size);
+                  @org.apache.thrift.annotation.Nullable java.lang.String _key41;
+                  @org.apache.thrift.annotation.Nullable java.lang.String _val42;
+                  for (int _i43 = 0; _i43 < _map40.size; ++_i43)
                   {
-                    _key33 = iprot.readString();
-                    _val34 = iprot.readString();
-                    struct.properties.put(_key33, _val34);
+                    _key41 = iprot.readString();
+                    _val42 = iprot.readString();
+                    struct.properties.put(_key41, _val42);
                   }
                   iprot.readMapEnd();
                 }
@@ -1473,10 +1473,10 @@ public class JdbcExecutor {
           oprot.writeFieldBegin(PROPERTIES_FIELD_DESC);
           {
             oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.properties.size()));
-            for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter36 : struct.properties.entrySet())
+            for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter44 : struct.properties.entrySet())
             {
-              oprot.writeString(_iter36.getKey());
-              oprot.writeString(_iter36.getValue());
+              oprot.writeString(_iter44.getKey());
+              oprot.writeString(_iter44.getValue());
             }
             oprot.writeMapEnd();
           }
@@ -1513,10 +1513,10 @@ public class JdbcExecutor {
         if (struct.isSetProperties()) {
           {
             oprot.writeI32(struct.properties.size());
-            for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter37 : struct.properties.entrySet())
+            for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter45 : struct.properties.entrySet())
             {
-              oprot.writeString(_iter37.getKey());
-              oprot.writeString(_iter37.getValue());
+              oprot.writeString(_iter45.getKey());
+              oprot.writeString(_iter45.getValue());
             }
           }
         }
@@ -1532,15 +1532,15 @@ public class JdbcExecutor {
         }
         if (incoming.get(1)) {
           {
-            org.apache.thrift.protocol.TMap _map38 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
-            struct.properties = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map38.size);
-            @org.apache.thrift.annotation.Nullable java.lang.String _key39;
-            @org.apache.thrift.annotation.Nullable java.lang.String _val40;
-            for (int _i41 = 0; _i41 < _map38.size; ++_i41)
+            org.apache.thrift.protocol.TMap _map46 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
+            struct.properties = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map46.size);
+            @org.apache.thrift.annotation.Nullable java.lang.String _key47;
+            @org.apache.thrift.annotation.Nullable java.lang.String _val48;
+            for (int _i49 = 0; _i49 < _map46.size; ++_i49)
             {
-              _key39 = iprot.readString();
-              _val40 = iprot.readString();
-              struct.properties.put(_key39, _val40);
+              _key47 = iprot.readString();
+              _val48 = iprot.readString();
+              struct.properties.put(_key47, _val48);
             }
           }
           struct.setPropertiesIsSet(true);
@@ -3290,13 +3290,13 @@ public class JdbcExecutor {
             case 0: // SUCCESS
               if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
                 {
-                  org.apache.thrift.protocol.TList _list42 = iprot.readListBegin();
-                  struct.success = new java.util.ArrayList<java.lang.String>(_list42.size);
-                  @org.apache.thrift.annotation.Nullable java.lang.String _elem43;
-                  for (int _i44 = 0; _i44 < _list42.size; ++_i44)
+                  org.apache.thrift.protocol.TList _list50 = iprot.readListBegin();
+                  struct.success = new java.util.ArrayList<java.lang.String>(_list50.size);
+                  @org.apache.thrift.annotation.Nullable java.lang.String _elem51;
+                  for (int _i52 = 0; _i52 < _list50.size; ++_i52)
                   {
-                    _elem43 = iprot.readString();
-                    struct.success.add(_elem43);
+                    _elem51 = iprot.readString();
+                    struct.success.add(_elem51);
                   }
                   iprot.readListEnd();
                 }
@@ -3333,9 +3333,9 @@ public class JdbcExecutor {
           oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.success.size()));
-            for (java.lang.String _iter45 : struct.success)
+            for (java.lang.String _iter53 : struct.success)
             {
-              oprot.writeString(_iter45);
+              oprot.writeString(_iter53);
             }
             oprot.writeListEnd();
           }
@@ -3374,9 +3374,9 @@ public class JdbcExecutor {
         if (struct.isSetSuccess()) {
           {
             oprot.writeI32(struct.success.size());
-            for (java.lang.String _iter46 : struct.success)
+            for (java.lang.String _iter54 : struct.success)
             {
-              oprot.writeString(_iter46);
+              oprot.writeString(_iter54);
             }
           }
         }
@@ -3391,13 +3391,13 @@ public class JdbcExecutor {
         java.util.BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
           {
-            org.apache.thrift.protocol.TList _list47 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-            struct.success = new java.util.ArrayList<java.lang.String>(_list47.size);
-            @org.apache.thrift.annotation.Nullable java.lang.String _elem48;
-            for (int _i49 = 0; _i49 < _list47.size; ++_i49)
+            org.apache.thrift.protocol.TList _list55 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+            struct.success = new java.util.ArrayList<java.lang.String>(_list55.size);
+            @org.apache.thrift.annotation.Nullable java.lang.String _elem56;
+            for (int _i57 = 0; _i57 < _list55.size; ++_i57)
             {
-              _elem48 = iprot.readString();
-              struct.success.add(_elem48);
+              _elem56 = iprot.readString();
+              struct.success.add(_elem56);
             }
           }
           struct.setSuccessIsSet(true);
@@ -4180,14 +4180,14 @@ public class JdbcExecutor {
             case 0: // SUCCESS
               if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
                 {
-                  org.apache.thrift.protocol.TList _list50 = iprot.readListBegin();
-                  struct.success = new java.util.ArrayList<JdbcTable>(_list50.size);
-                  @org.apache.thrift.annotation.Nullable JdbcTable _elem51;
-                  for (int _i52 = 0; _i52 < _list50.size; ++_i52)
+                  org.apache.thrift.protocol.TList _list58 = iprot.readListBegin();
+                  struct.success = new java.util.ArrayList<JdbcTable>(_list58.size);
+                  @org.apache.thrift.annotation.Nullable JdbcTable _elem59;
+                  for (int _i60 = 0; _i60 < _list58.size; ++_i60)
                   {
-                    _elem51 = new JdbcTable();
-                    _elem51.read(iprot);
-                    struct.success.add(_elem51);
+                    _elem59 = new JdbcTable();
+                    _elem59.read(iprot);
+                    struct.success.add(_elem59);
                   }
                   iprot.readListEnd();
                 }
@@ -4224,9 +4224,9 @@ public class JdbcExecutor {
           oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.success.size()));
-            for (JdbcTable _iter53 : struct.success)
+            for (JdbcTable _iter61 : struct.success)
             {
-              _iter53.write(oprot);
+              _iter61.write(oprot);
             }
             oprot.writeListEnd();
           }
@@ -4265,9 +4265,9 @@ public class JdbcExecutor {
         if (struct.isSetSuccess()) {
           {
             oprot.writeI32(struct.success.size());
-            for (JdbcTable _iter54 : struct.success)
+            for (JdbcTable _iter62 : struct.success)
             {
-              _iter54.write(oprot);
+              _iter62.write(oprot);
             }
           }
         }
@@ -4282,14 +4282,14 @@ public class JdbcExecutor {
         java.util.BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
           {
-            org.apache.thrift.protocol.TList _list55 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-            struct.success = new java.util.ArrayList<JdbcTable>(_list55.size);
-            @org.apache.thrift.annotation.Nullable JdbcTable _elem56;
-            for (int _i57 = 0; _i57 < _list55.size; ++_i57)
+            org.apache.thrift.protocol.TList _list63 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+            struct.success = new java.util.ArrayList<JdbcTable>(_list63.size);
+            @org.apache.thrift.annotation.Nullable JdbcTable _elem64;
+            for (int _i65 = 0; _i65 < _list63.size; ++_i65)
             {
-              _elem56 = new JdbcTable();
-              _elem56.read(iprot);
-              struct.success.add(_elem56);
+              _elem64 = new JdbcTable();
+              _elem64.read(iprot);
+              struct.success.add(_elem64);
             }
           }
           struct.setSuccessIsSet(true);
@@ -4715,14 +4715,14 @@ public class JdbcExecutor {
             case 2: // PARAMS
               if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
                 {
-                  org.apache.thrift.protocol.TList _list58 = iprot.readListBegin();
-                  struct.params = new java.util.ArrayList<JdbcValue>(_list58.size);
-                  @org.apache.thrift.annotation.Nullable JdbcValue _elem59;
-                  for (int _i60 = 0; _i60 < _list58.size; ++_i60)
+                  org.apache.thrift.protocol.TList _list66 = iprot.readListBegin();
+                  struct.params = new java.util.ArrayList<JdbcValue>(_list66.size);
+                  @org.apache.thrift.annotation.Nullable JdbcValue _elem67;
+                  for (int _i68 = 0; _i68 < _list66.size; ++_i68)
                   {
-                    _elem59 = new JdbcValue();
-                    _elem59.read(iprot);
-                    struct.params.add(_elem59);
+                    _elem67 = new JdbcValue();
+                    _elem67.read(iprot);
+                    struct.params.add(_elem67);
                   }
                   iprot.readListEnd();
                 }
@@ -4755,9 +4755,9 @@ public class JdbcExecutor {
           oprot.writeFieldBegin(PARAMS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.params.size()));
-            for (JdbcValue _iter61 : struct.params)
+            for (JdbcValue _iter69 : struct.params)
             {
-              _iter61.write(oprot);
+              _iter69.write(oprot);
             }
             oprot.writeListEnd();
           }
@@ -4794,9 +4794,9 @@ public class JdbcExecutor {
         if (struct.isSetParams()) {
           {
             oprot.writeI32(struct.params.size());
-            for (JdbcValue _iter62 : struct.params)
+            for (JdbcValue _iter70 : struct.params)
             {
-              _iter62.write(oprot);
+              _iter70.write(oprot);
             }
           }
         }
@@ -4812,14 +4812,14 @@ public class JdbcExecutor {
         }
         if (incoming.get(1)) {
           {
-            org.apache.thrift.protocol.TList _list63 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-            struct.params = new java.util.ArrayList<JdbcValue>(_list63.size);
-            @org.apache.thrift.annotation.Nullable JdbcValue _elem64;
-            for (int _i65 = 0; _i65 < _list63.size; ++_i65)
+            org.apache.thrift.protocol.TList _list71 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+            struct.params = new java.util.ArrayList<JdbcValue>(_list71.size);
+            @org.apache.thrift.annotation.Nullable JdbcValue _elem72;
+            for (int _i73 = 0; _i73 < _list71.size; ++_i73)
             {
-              _elem64 = new JdbcValue();
-              _elem64.read(iprot);
-              struct.params.add(_elem64);
+              _elem72 = new JdbcValue();
+              _elem72.read(iprot);
+              struct.params.add(_elem72);
             }
           }
           struct.setParamsIsSet(true);

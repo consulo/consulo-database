@@ -281,6 +281,11 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 			{
 				tableState.addColumn(new JdbcTableColumState(colum.getName(), colum.getType(), colum.getJdbcType()));
 			}
+
+			for(JdbcTablePrimaryKey key : jdbcTable.getPrimaryKeys())
+			{
+				tableState.addPrimaryKey(new JdbcPrimaryKeyState(key.getColumnName(), key.getKeySeq(), key.getPkName()));
+			}
 			state.addTable(tableState);
 		}
 		return state;

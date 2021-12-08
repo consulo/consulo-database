@@ -325,14 +325,14 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
           case 1: // VALUES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list24 = iprot.readListBegin();
-                struct.values = new java.util.ArrayList<JdbcValue>(_list24.size);
-                @org.apache.thrift.annotation.Nullable JdbcValue _elem25;
-                for (int _i26 = 0; _i26 < _list24.size; ++_i26)
+                org.apache.thrift.protocol.TList _list32 = iprot.readListBegin();
+                struct.values = new java.util.ArrayList<JdbcValue>(_list32.size);
+                @org.apache.thrift.annotation.Nullable JdbcValue _elem33;
+                for (int _i34 = 0; _i34 < _list32.size; ++_i34)
                 {
-                  _elem25 = new JdbcValue();
-                  _elem25.read(iprot);
-                  struct.values.add(_elem25);
+                  _elem33 = new JdbcValue();
+                  _elem33.read(iprot);
+                  struct.values.add(_elem33);
                 }
                 iprot.readListEnd();
               }
@@ -360,9 +360,9 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
         oprot.writeFieldBegin(VALUES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.values.size()));
-          for (JdbcValue _iter27 : struct.values)
+          for (JdbcValue _iter35 : struct.values)
           {
-            _iter27.write(oprot);
+            _iter35.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -393,9 +393,9 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
       if (struct.isSetValues()) {
         {
           oprot.writeI32(struct.values.size());
-          for (JdbcValue _iter28 : struct.values)
+          for (JdbcValue _iter36 : struct.values)
           {
-            _iter28.write(oprot);
+            _iter36.write(oprot);
           }
         }
       }
@@ -407,14 +407,14 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
       java.util.BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list29 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-          struct.values = new java.util.ArrayList<JdbcValue>(_list29.size);
-          @org.apache.thrift.annotation.Nullable JdbcValue _elem30;
-          for (int _i31 = 0; _i31 < _list29.size; ++_i31)
+          org.apache.thrift.protocol.TList _list37 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.values = new java.util.ArrayList<JdbcValue>(_list37.size);
+          @org.apache.thrift.annotation.Nullable JdbcValue _elem38;
+          for (int _i39 = 0; _i39 < _list37.size; ++_i39)
           {
-            _elem30 = new JdbcValue();
-            _elem30.read(iprot);
-            struct.values.add(_elem30);
+            _elem38 = new JdbcValue();
+            _elem38.read(iprot);
+            struct.values.add(_elem38);
           }
         }
         struct.setValuesIsSet(true);

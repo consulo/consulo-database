@@ -34,6 +34,8 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 
 	private List<JdbcTableColumState> myColumns = new ArrayList<>();
 
+	private List<JdbcPrimaryKeyState> myPrimaryKeys = new ArrayList<>();
+
 	private String myType;
 
 	private String myScheme;
@@ -66,6 +68,21 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 	public void setColumns(List<JdbcTableColumState> columns)
 	{
 		myColumns = columns;
+	}
+
+	public List<JdbcPrimaryKeyState> getPrimaryKeys()
+	{
+		return myPrimaryKeys;
+	}
+
+	public void addPrimaryKey(JdbcPrimaryKeyState primaryKeyState)
+	{
+		myPrimaryKeys.add(primaryKeyState);
+	}
+
+	public void setPrimaryKeys(List<JdbcPrimaryKeyState> primaryKeys)
+	{
+		myPrimaryKeys = primaryKeys;
 	}
 
 	@Nullable
