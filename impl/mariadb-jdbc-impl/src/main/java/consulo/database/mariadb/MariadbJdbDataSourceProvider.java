@@ -55,7 +55,7 @@ public class MariadbJdbDataSourceProvider extends JdbcDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return DatabaseIconGroup.mariadb();
+		return DatabaseIconGroup.providersMariadb();
 	}
 
 	@Nonnull

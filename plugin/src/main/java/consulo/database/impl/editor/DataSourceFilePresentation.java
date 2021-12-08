@@ -16,8 +16,8 @@
 
 package consulo.database.impl.editor;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.presentation.PresentationProvider;
+import consulo.database.icon.DatabaseIconGroup;
 import consulo.ui.image.Image;
 
 import javax.annotation.Nullable;
@@ -32,6 +32,6 @@ public class DataSourceFilePresentation extends PresentationProvider
 	@Override
 	public Image getIcon(Object o)
 	{
-		return AllIcons.Nodes.DataTables;
+		return DatabaseIconGroup.nodesTable();
 	}
 }

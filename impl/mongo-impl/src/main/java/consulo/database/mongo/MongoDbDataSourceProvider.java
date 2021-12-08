@@ -56,7 +56,7 @@ public class MongoDbDataSourceProvider implements JsonDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return DatabaseIconGroup.mongoDB();
+		return DatabaseIconGroup.providersMongoDB();
 	}
 
 	@Nonnull

@@ -114,7 +114,12 @@ public class PropertiesHolderImpl implements PropertiesHolder
 		{
 			return key.getDefautValue();
 		}
-		return value.get(key);
+		T getValue = value.get(key);
+		if(getValue == null)
+		{
+			return key.getDefautValue();
+		}
+		return getValue;
 	}
 
 	public void copyFrom(PropertiesHolderImpl other)

@@ -58,7 +58,7 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return DatabaseIconGroup.postgresql();
+		return DatabaseIconGroup.providersPostgresql();
 	}
 
 	@Nonnull

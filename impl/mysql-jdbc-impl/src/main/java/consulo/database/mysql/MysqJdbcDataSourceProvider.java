@@ -55,7 +55,7 @@ public class MysqJdbcDataSourceProvider extends JdbcDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return DatabaseIconGroup.mysql();
+		return DatabaseIconGroup.providersMysql();
 	}
 
 	@Nonnull

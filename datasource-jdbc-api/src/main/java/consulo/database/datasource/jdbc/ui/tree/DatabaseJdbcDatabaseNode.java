@@ -16,7 +16,6 @@
 
 package consulo.database.datasource.jdbc.ui.tree;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
@@ -29,6 +28,7 @@ import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTablesState;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
+import consulo.database.icon.DatabaseIconGroup;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -115,7 +115,7 @@ public class DatabaseJdbcDatabaseNode extends AbstractTreeNode<JdbcDatabaseState
 	@Override
 	protected void update(PresentationData presentationData)
 	{
-		presentationData.setIcon(AllIcons.Nodes.DataSource);
+		presentationData.setIcon(DatabaseIconGroup.nodesDatabase());
 		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 	}
 

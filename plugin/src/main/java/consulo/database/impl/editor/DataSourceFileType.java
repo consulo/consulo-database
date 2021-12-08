@@ -16,8 +16,8 @@
 
 package consulo.database.impl.editor;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.FileType;
+import consulo.database.icon.DatabaseIconGroup;
 import consulo.ui.image.Image;
 
 import javax.annotation.Nonnull;
@@ -55,7 +55,7 @@ public class DataSourceFileType implements FileType
 	@Override
 	public Image getIcon()
 	{
-		return AllIcons.Nodes.DataTables;
+		return DatabaseIconGroup.nodesTable();
 	}
 
 	@Override

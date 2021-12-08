@@ -16,13 +16,13 @@
 
 package consulo.database.datasource.jdbc.ui.tree;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableColumState;
+import consulo.database.icon.DatabaseIconGroup;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -50,7 +50,7 @@ public class DatabaseJdbcColumnNode extends AbstractTreeNode<JdbcTableColumState
 	@Override
 	protected void update(PresentationData presentationData)
 	{
-		presentationData.setIcon(AllIcons.Nodes.DataColumn);
+		presentationData.setIcon(DatabaseIconGroup.nodesColumn());
 		presentationData.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 		presentationData.addText(" : " + getValue().getType(), SimpleTextAttributes.GRAY_ATTRIBUTES);
 	}
