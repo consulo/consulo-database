@@ -42,6 +42,9 @@ import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -202,9 +205,33 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 			list.add(createColumn(index, col, max, tableState, parent));
 		}
 
-		TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(new ListTableModel<>(list.toArray(ColumnInfo[]::new), queryResult.getRows()));
+		ListTableModel<JdbcQueryRow> tableModel = new ListTableModel<>(list.toArray(ColumnInfo[]::new), queryResult.getRows());
+		TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(tableModel)
+		{
+			@Nonnull
+			@Override
+			protected JTableHeader createDefaultTableHeader()
+			{
+				JTableHeader header = super.createDefaultTableHeader();
+				header.setFont(BaseColumnInfo.getFont());
+				return header;
+			}
+		};
+		for(int i = 0; i < list.size(); i++)
+		{
+			ColumnInfo<JdbcQueryRow, ?> columnInfo = list.get(i);
+
+			TableColumn column = tableView.getColumnModel().getColumn(i);
+
+			DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+			renderer.setIcon(columnInfo.getIcon());
+			renderer.setFont(BaseColumnInfo.getFont());
+			
+			column.setHeaderRenderer(renderer);
+		}
 		tableView.setHorizontalScrollEnabled(true);
 		tableView.setRowHeight(JBUI.scale(20));
+		tableView.setFont(BaseColumnInfo.getFont());
 
 		return ScrollPaneFactory.createScrollPane(tableView, true);
 	}

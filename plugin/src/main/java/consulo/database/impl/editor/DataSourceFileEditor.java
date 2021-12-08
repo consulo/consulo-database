@@ -27,7 +27,9 @@ import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LoadingDecorator;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.ui.JBUI;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.ui.DataSourceTransportResultPresentation;
@@ -82,6 +84,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 		myLoadingDecorator = new LoadingDecorator(myTargetPanel, this, 0);
 
 		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
+		toolbar.getComponent().setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 1));
 		toolbar.setTargetComponent(myTargetPanel);
 
 		myTargetPanel.add(toolbar.getComponent(), BorderLayout.NORTH);

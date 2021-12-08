@@ -16,17 +16,23 @@
 
 package consulo.database.datasource.jdbc.transport.columnInfo;
 
-import com.intellij.openapi.fileTypes.PlainTextFileType;
-import com.intellij.ui.EditorTextFieldCellRenderer;
+import com.intellij.openapi.editor.ex.util.EditorUtil;
+import com.intellij.ui.CellRendererPanel;
+import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.util.ui.ColumnInfo;
+import com.intellij.util.ui.JBUI;
+import consulo.awt.TargetAWT;
 import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
+import consulo.database.icon.DatabaseIconGroup;
 import consulo.database.jdbc.rt.shared.JdbcQueryRow;
 import consulo.disposer.Disposable;
+import consulo.ui.image.Image;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import java.awt.*;
 
 /**
  * @author VISTALL
@@ -34,6 +40,33 @@ import javax.swing.table.TableCellRenderer;
  */
 public abstract class BaseColumnInfo<T> extends ColumnInfo<JdbcQueryRow, T>
 {
+	private static class MyCellRendererPanel extends CellRendererPanel implements TableCellRenderer
+	{
+		private SimpleColoredComponent mySimpleColoredComponent;
+
+		public MyCellRendererPanel(String text)
+		{
+			mySimpleColoredComponent = new SimpleColoredComponent();
+			mySimpleColoredComponent.append(text);
+			mySimpleColoredComponent.setFont(BaseColumnInfo.getFont());
+			mySimpleColoredComponent.setIpad(JBUI.insets(3, 2, 2, 2));
+			mySimpleColoredComponent.setOpaque(false);
+
+			add(mySimpleColoredComponent, BorderLayout.CENTER);
+		}
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+		{
+			return this;
+		}
+	}
+
+	public static Font getFont()
+	{
+		return EditorUtil.getEditorFont();
+	}
+
 	protected final int myIndex;
 	private String myPreferedSize;
 	private final Disposable myParent;
@@ -44,6 +77,13 @@ public abstract class BaseColumnInfo<T> extends ColumnInfo<JdbcQueryRow, T>
 		myIndex = index;
 		myPreferedSize = preferedSize;
 		myParent = parent;
+	}
+
+	@Nullable
+	@Override
+	public Icon getIcon()
+	{
+		return TargetAWT.to(DatabaseIconGroup.nodesColumn());
 	}
 
 	@Override
@@ -63,21 +103,14 @@ public abstract class BaseColumnInfo<T> extends ColumnInfo<JdbcQueryRow, T>
 	@Override
 	public TableCellRenderer getRenderer(JdbcQueryRow jdbcQueryRow)
 	{
-		return new EditorTextFieldCellRenderer(null, PlainTextFileType.INSTANCE, false, myParent)
-		{
-			@Override
-			protected String getText(JTable table, Object value, int row, int column)
-			{
-				return String.valueOf(DefaultJdbcDataSourceTransport.getValue(jdbcQueryRow, myIndex));
-			}
-		};
+		return new MyCellRendererPanel(String.valueOf(DefaultJdbcDataSourceTransport.getValue(jdbcQueryRow, myIndex)));
 	}
 
 	@Nullable
 	@Override
 	public String getPreferredStringValue()
 	{
-		// two chapters as border
-		return myPreferedSize + "ww";
+		// two chapters as border and image and offsets
+		return myPreferedSize + "ww" + Image.DEFAULT_ICON_SIZE * 2;
 	}
 }
