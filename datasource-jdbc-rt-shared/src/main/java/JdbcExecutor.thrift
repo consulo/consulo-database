@@ -58,6 +58,8 @@ struct JdbcQueryResult
 struct JdbcQueryRow
 {
 	1: list<JdbcValue> values;
+
+	2: i64 index;
 }
 
 enum JdbcValueType

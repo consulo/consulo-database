@@ -40,17 +40,21 @@ import java.awt.*;
  */
 public abstract class BaseColumnInfo<T> extends ColumnInfo<JdbcQueryRow, T>
 {
-	private static class MyCellRendererPanel extends CellRendererPanel implements TableCellRenderer
+	public static class MyCellRendererPanel extends CellRendererPanel implements TableCellRenderer
 	{
 		private SimpleColoredComponent mySimpleColoredComponent;
 
-		public MyCellRendererPanel(String text)
+		public MyCellRendererPanel(String text, boolean index)
 		{
 			mySimpleColoredComponent = new SimpleColoredComponent();
 			mySimpleColoredComponent.append(text);
 			mySimpleColoredComponent.setFont(BaseColumnInfo.getFont());
 			mySimpleColoredComponent.setIpad(JBUI.insets(3, 2, 2, 2));
-			mySimpleColoredComponent.setOpaque(false);
+			mySimpleColoredComponent.setOpaque(index);
+			if(index)
+			{
+				mySimpleColoredComponent.setTextAlign(SwingConstants.CENTER);
+			}
 
 			add(mySimpleColoredComponent, BorderLayout.CENTER);
 		}
@@ -103,7 +107,7 @@ public abstract class BaseColumnInfo<T> extends ColumnInfo<JdbcQueryRow, T>
 	@Override
 	public TableCellRenderer getRenderer(JdbcQueryRow jdbcQueryRow)
 	{
-		return new MyCellRendererPanel(String.valueOf(DefaultJdbcDataSourceTransport.getValue(jdbcQueryRow, myIndex)));
+		return new MyCellRendererPanel(String.valueOf(DefaultJdbcDataSourceTransport.getValue(jdbcQueryRow, myIndex)), false);
 	}
 
 	@Nullable

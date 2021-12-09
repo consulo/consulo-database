@@ -25,10 +25,12 @@ import com.intellij.util.ThrowableConsumer;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.ListTableModel;
+import com.intellij.util.ui.UIUtil;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.*;
 import consulo.database.datasource.jdbc.transport.columnInfo.BaseColumnInfo;
+import consulo.database.datasource.jdbc.transport.columnInfo.IndexColumnInfo;
 import consulo.database.datasource.jdbc.transport.columnInfo.IntColumnInfo;
 import consulo.database.datasource.jdbc.transport.columnInfo.StringColumnInfo;
 import consulo.database.datasource.model.DataSource;
@@ -187,6 +189,8 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 		}
 
 		List<ColumnInfo<JdbcQueryRow, ?>> list = new ArrayList<>();
+		list.add(new IndexColumnInfo(queryResult));
+
 		int o = 0;
 		for(String col : queryResult.getColumns())
 		{
@@ -218,6 +222,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 				return header;
 			}
 		};
+
 		for(int i = 0; i < list.size(); i++)
 		{
 			ColumnInfo<JdbcQueryRow, ?> columnInfo = list.get(i);
@@ -226,6 +231,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 
 			DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
 			renderer.setIcon(columnInfo.getIcon());
+			renderer.setBackground(UIUtil.getPanelBackground());
 			renderer.setFont(BaseColumnInfo.getFont());
 			
 			column.setHeaderRenderer(renderer);

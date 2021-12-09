@@ -11,15 +11,18 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("JdbcQueryRow");
 
   private static final org.apache.thrift.protocol.TField VALUES_FIELD_DESC = new org.apache.thrift.protocol.TField("values", org.apache.thrift.protocol.TType.LIST, (short)1);
+  private static final org.apache.thrift.protocol.TField INDEX_FIELD_DESC = new org.apache.thrift.protocol.TField("index", org.apache.thrift.protocol.TType.I64, (short)2);
 
   private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new JdbcQueryRowStandardSchemeFactory();
   private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new JdbcQueryRowTupleSchemeFactory();
 
   public @org.apache.thrift.annotation.Nullable java.util.List<JdbcValue> values; // required
+  public long index; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    VALUES((short)1, "values");
+    VALUES((short)1, "values"),
+    INDEX((short)2, "index");
 
     private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -37,6 +40,8 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
       switch(fieldId) {
         case 1: // VALUES
           return VALUES;
+        case 2: // INDEX
+          return INDEX;
         default:
           return null;
       }
@@ -78,12 +83,16 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
   }
 
   // isset id assignments
+  private static final int __INDEX_ISSET_ID = 0;
+  private byte __isset_bitfield = 0;
   public static final java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new java.util.EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.VALUES, new org.apache.thrift.meta_data.FieldMetaData("values", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT            , "JdbcValue"))));
+    tmpMap.put(_Fields.INDEX, new org.apache.thrift.meta_data.FieldMetaData("index", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(JdbcQueryRow.class, metaDataMap);
   }
@@ -92,16 +101,20 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
   }
 
   public JdbcQueryRow(
-    java.util.List<JdbcValue> values)
+    java.util.List<JdbcValue> values,
+    long index)
   {
     this();
     this.values = values;
+    this.index = index;
+    setIndexIsSet(true);
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
   public JdbcQueryRow(JdbcQueryRow other) {
+    __isset_bitfield = other.__isset_bitfield;
     if (other.isSetValues()) {
       java.util.List<JdbcValue> __this__values = new java.util.ArrayList<JdbcValue>(other.values.size());
       for (JdbcValue other_element : other.values) {
@@ -109,6 +122,7 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
       }
       this.values = __this__values;
     }
+    this.index = other.index;
   }
 
   public JdbcQueryRow deepCopy() {
@@ -118,6 +132,8 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
   @Override
   public void clear() {
     this.values = null;
+    setIndexIsSet(false);
+    this.index = 0;
   }
 
   public int getValuesSize() {
@@ -161,6 +177,29 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
     }
   }
 
+  public long getIndex() {
+    return this.index;
+  }
+
+  public JdbcQueryRow setIndex(long index) {
+    this.index = index;
+    setIndexIsSet(true);
+    return this;
+  }
+
+  public void unsetIndex() {
+    __isset_bitfield = org.apache.thrift.EncodingUtils.clearBit(__isset_bitfield, __INDEX_ISSET_ID);
+  }
+
+  /** Returns true if field index is set (has been assigned a value) and false otherwise */
+  public boolean isSetIndex() {
+    return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __INDEX_ISSET_ID);
+  }
+
+  public void setIndexIsSet(boolean value) {
+    __isset_bitfield = org.apache.thrift.EncodingUtils.setBit(__isset_bitfield, __INDEX_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, @org.apache.thrift.annotation.Nullable java.lang.Object value) {
     switch (field) {
     case VALUES:
@@ -168,6 +207,14 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
         unsetValues();
       } else {
         setValues((java.util.List<JdbcValue>)value);
+      }
+      break;
+
+    case INDEX:
+      if (value == null) {
+        unsetIndex();
+      } else {
+        setIndex((java.lang.Long)value);
       }
       break;
 
@@ -179,6 +226,9 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
     switch (field) {
     case VALUES:
       return getValues();
+
+    case INDEX:
+      return getIndex();
 
     }
     throw new java.lang.IllegalStateException();
@@ -193,6 +243,8 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
     switch (field) {
     case VALUES:
       return isSetValues();
+    case INDEX:
+      return isSetIndex();
     }
     throw new java.lang.IllegalStateException();
   }
@@ -219,6 +271,15 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
         return false;
     }
 
+    boolean this_present_index = true;
+    boolean that_present_index = true;
+    if (this_present_index || that_present_index) {
+      if (!(this_present_index && that_present_index))
+        return false;
+      if (this.index != that.index)
+        return false;
+    }
+
     return true;
   }
 
@@ -229,6 +290,8 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
     hashCode = hashCode * 8191 + ((isSetValues()) ? 131071 : 524287);
     if (isSetValues())
       hashCode = hashCode * 8191 + values.hashCode();
+
+    hashCode = hashCode * 8191 + org.apache.thrift.TBaseHelper.hashCode(index);
 
     return hashCode;
   }
@@ -247,6 +310,16 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
     }
     if (isSetValues()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.values, other.values);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = java.lang.Boolean.compare(isSetIndex(), other.isSetIndex());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetIndex()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.index, other.index);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -279,6 +352,10 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
       sb.append(this.values);
     }
     first = false;
+    if (!first) sb.append(", ");
+    sb.append("index:");
+    sb.append(this.index);
+    first = false;
     sb.append(")");
     return sb.toString();
   }
@@ -298,6 +375,8 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, java.lang.ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bitfield = 0;
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -341,6 +420,14 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 2: // INDEX
+            if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
+              struct.index = iprot.readI64();
+              struct.setIndexIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -368,6 +455,9 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
         }
         oprot.writeFieldEnd();
       }
+      oprot.writeFieldBegin(INDEX_FIELD_DESC);
+      oprot.writeI64(struct.index);
+      oprot.writeFieldEnd();
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -389,7 +479,10 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
       if (struct.isSetValues()) {
         optionals.set(0);
       }
-      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetIndex()) {
+        optionals.set(1);
+      }
+      oprot.writeBitSet(optionals, 2);
       if (struct.isSetValues()) {
         {
           oprot.writeI32(struct.values.size());
@@ -399,12 +492,15 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
           }
         }
       }
+      if (struct.isSetIndex()) {
+        oprot.writeI64(struct.index);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, JdbcQueryRow struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
-      java.util.BitSet incoming = iprot.readBitSet(1);
+      java.util.BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
         {
           org.apache.thrift.protocol.TList _list37 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
@@ -418,6 +514,10 @@ public class JdbcQueryRow implements org.apache.thrift.TBase<JdbcQueryRow, JdbcQ
           }
         }
         struct.setValuesIsSet(true);
+      }
+      if (incoming.get(1)) {
+        struct.index = iprot.readI64();
+        struct.setIndexIsSet(true);
       }
     }
   }
