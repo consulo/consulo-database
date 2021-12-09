@@ -32,7 +32,7 @@ public interface DataSourceTransportResultPresentation<R>
 {
 	ExtensionPointName<DataSourceTransportResultPresentation> EP_NAME = ExtensionPointName.create("consulo.database.transportResultPresentation");
 
-	boolean accept(@Nonnull Object result);
+	boolean accept(@Nonnull DataSource dataSource);
 
 	JComponent buildComponentForResult(@Nonnull R result, @Nonnull Project project, DataSource dataSource, String dbName, String childId, Disposable parent);
 }

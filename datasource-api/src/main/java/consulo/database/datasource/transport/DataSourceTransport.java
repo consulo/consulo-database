@@ -21,13 +21,9 @@ import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import consulo.database.datasource.model.DataSource;
-import consulo.disposer.Disposable;
-import consulo.ui.annotation.RequiredUIAccess;
 import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
-import javax.swing.*;
-import java.util.function.Consumer;
 
 /**
  * @author VISTALL
@@ -48,12 +44,12 @@ public interface DataSourceTransport<STATE extends PersistentStateComponent<?>>
 						   @Nonnull DataSource dataSource,
 						   @Nonnull String databaseName,
 						   @Nonnull String childId,
-						   @Nonnull AsyncResult<Object> result)
+						   @Nonnull AsyncResult<DataSourceTransportResult> result)
 	{
 		result.setDone();
 	}
 
-	default void runQuery(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String query, @Nonnull AsyncResult<Object> result)
+	default void runQuery(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String query, @Nonnull AsyncResult<DataSourceTransportResult> result)
 	{
 		result.reject("Unsupported");
 	}

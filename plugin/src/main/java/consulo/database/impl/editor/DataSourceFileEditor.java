@@ -20,6 +20,7 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.AnSeparator;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
@@ -32,7 +33,11 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
+import consulo.database.datasource.transport.DataSourceTransportResult;
 import consulo.database.datasource.transport.ui.DataSourceTransportResultPresentation;
+import consulo.database.impl.editor.actions.NextPageAction;
+import consulo.database.impl.editor.actions.PageAction;
+import consulo.database.impl.editor.actions.PrevPageAction;
 import consulo.database.impl.editor.actions.RefreshDataAction;
 import consulo.disposer.Disposable;
 import consulo.ui.UIAccess;
@@ -61,6 +66,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 	private final JPanel myTargetPanel;
 
 	private JComponent myLastResult;
+	private DataSourceTransportResult myLastTransportResult;
 
 	@RequiredUIAccess
 	public DataSourceFileEditor(Project project, DataSourceVirtualFile file)
@@ -79,6 +85,10 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 		});
 
 		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
+		builder.add(new PrevPageAction());
+		builder.add(new PageAction());
+		builder.add(new NextPageAction());
+		builder.add(new AnSeparator());
 		builder.add(new RefreshDataAction());
 
 		myLoadingDecorator = new LoadingDecorator(myTargetPanel, this, 0);
@@ -113,7 +123,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 
 				assert transport != null;
 
-				AsyncResult<Object> result = AsyncResult.undefined();
+				AsyncResult<DataSourceTransportResult> result = AsyncResult.undefined();
 
 				transport.fetchData(indicator, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), result);
 
@@ -121,6 +131,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 					myLoadingDecorator.stopLoading();
 					myLoading.set(false);
 
+					myLastTransportResult = o;
 					uiAccess.give(() -> {
 						if(myLastResult != null)
 						{
@@ -141,7 +152,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 		DataSourceTransportResultPresentation target = null;
 		for(DataSourceTransportResultPresentation presentation : DataSourceTransportResultPresentation.EP_NAME.getExtensionList())
 		{
-			if(presentation.accept(result))
+			if(presentation.accept(dataSource))
 			{
 				target = presentation;
 				break;
@@ -154,6 +165,11 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
 		}
 
 		return target.buildComponentForResult(result, project, dataSource, dbName, childId, parent);
+	}
+
+	public long getRowsCount()
+	{
+		return myLastTransportResult == null ? 0 : myLastTransportResult.getRowsCount();
 	}
 
 	@Nonnull

@@ -34,6 +34,7 @@ import consulo.database.datasource.jdbc.transport.columnInfo.StringColumnInfo;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.DataSourceTransportManager;
+import consulo.database.datasource.transport.DataSourceTransportResult;
 import consulo.database.impl.editor.ui.TableViewWithHScrolling;
 import consulo.database.jdbc.rt.shared.*;
 import consulo.disposer.Disposable;
@@ -141,7 +142,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 						  @Nonnull DataSource dataSource,
 						  @Nonnull String databaseName,
 						  @Nonnull String childId,
-						  @Nonnull AsyncResult<Object> result)
+						  @Nonnull AsyncResult<DataSourceTransportResult> result)
 	{
 		safeCall(indicator, dataSource, result, session ->
 		{
@@ -167,7 +168,7 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 
 			JdbcQueryResult queryResult = session.execute(client -> client.runQuery(query, Collections.emptyList()));
 
-			result.setDone(queryResult);
+			result.setDone(new JdbcQueryResultWrapper(queryResult, rowsCount));
 		});
 	}
 
@@ -237,13 +238,14 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
 	}
 
 	@Override
-	public void runQuery(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String query, @Nonnull AsyncResult<Object> result)
+	public void runQuery(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String query, @Nonnull AsyncResult<DataSourceTransportResult> result)
 	{
 		safeCall(indicator, dataSource, result, session ->
 		{
 			try
 			{
-				result.setDone(session.execute(client -> client.runQuery(query, List.of())));
+				JdbcQueryResult execute = session.execute(client -> client.runQuery(query, List.of()));
+				result.setDone(new JdbcQueryResultWrapper(execute, execute.getRowsSize()));
 			}
 			catch(TypeNotPresentException e)
 			{

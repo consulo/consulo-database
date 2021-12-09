@@ -17,10 +17,11 @@
 package consulo.database.datasource.jdbc.transport.ui;
 
 import com.intellij.openapi.project.Project;
+import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
+import consulo.database.datasource.jdbc.transport.JdbcQueryResultWrapper;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.ui.DataSourceTransportResultPresentation;
-import consulo.database.jdbc.rt.shared.JdbcQueryResult;
 import consulo.disposer.Disposable;
 
 import javax.annotation.Nonnull;
@@ -30,17 +31,17 @@ import javax.swing.*;
  * @author VISTALL
  * @since 21/10/2021
  */
-public class DefaultJdbcDataSourceTransportResultPresentation implements DataSourceTransportResultPresentation<JdbcQueryResult>
+public class DefaultJdbcDataSourceTransportResultPresentation implements DataSourceTransportResultPresentation<JdbcQueryResultWrapper>
 {
 	@Override
-	public boolean accept(@Nonnull Object result)
+	public boolean accept(@Nonnull DataSource dataSource)
 	{
-		return result instanceof JdbcQueryResult;
+		return dataSource.getProvider() instanceof JdbcDataSourceProvider;
 	}
 
 	@Override
-	public JComponent buildComponentForResult(@Nonnull JdbcQueryResult result, @Nonnull Project project, DataSource dataSource, String dbName, String childId, Disposable parent)
+	public JComponent buildComponentForResult(@Nonnull JdbcQueryResultWrapper result, @Nonnull Project project, DataSource dataSource, String dbName, String childId, Disposable parent)
 	{
-		return DefaultJdbcDataSourceTransport.buildResultUI(result, project, dataSource, dbName, childId, parent);
+		return DefaultJdbcDataSourceTransport.buildResultUI(result.getJdbcQueryResult(), project, dataSource, dbName, childId, parent);
 	}
 }
