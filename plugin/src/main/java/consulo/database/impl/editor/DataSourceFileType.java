@@ -18,6 +18,7 @@ package consulo.database.impl.editor;
 
 import com.intellij.openapi.fileTypes.FileType;
 import consulo.database.icon.DatabaseIconGroup;
+import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 
 import javax.annotation.Nonnull;
@@ -39,9 +40,9 @@ public class DataSourceFileType implements FileType
 
 	@Nonnull
 	@Override
-	public String getDescription()
+	public LocalizeValue getDescription()
 	{
-		return "";
+		return LocalizeValue.of();
 	}
 
 	@Nonnull
