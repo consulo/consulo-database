@@ -17,6 +17,7 @@
 package consulo.sql.lang.api;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import consulo.localize.LocalizeValue;
 import consulo.sql.lang.api.icon.SqlLangApiIconGroup;
 import consulo.ui.image.Image;
 
@@ -44,9 +45,9 @@ public class SqlFileType extends LanguageFileType
 
 	@Nonnull
 	@Override
-	public String getDescription()
+	public LocalizeValue getDescription()
 	{
-		return "SQL files";
+		return LocalizeValue.localizeTODO("SQL files");
 	}
 
 	@Nonnull
