@@ -31,9 +31,11 @@ import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.border.BorderPosition;
 import consulo.ui.border.BorderStyle;
+import consulo.ui.image.Image;
 import consulo.ui.layout.DockLayout;
 import consulo.util.concurrent.AsyncResult;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -128,6 +130,13 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		myDataSource.setName(name);
 	}
 
+	@Nullable
+	@Override
+	public Image getIcon()
+	{
+		return null;
+	}
+
 	@Override
 	public EditableDataSource getEditableObject()
 	{
@@ -140,6 +149,7 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 		return null;
 	}
 
+	@Nonnull
 	@Override
 	@RequiredUIAccess
 	public Component createOptionsPanel(Disposable parentUIDisposable)
