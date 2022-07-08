@@ -16,7 +16,7 @@
 
 package consulo.sql.lang.api;
 
-import com.intellij.openapi.fileTypes.LanguageFileType;
+import consulo.language.file.LanguageFileType;
 import consulo.localize.LocalizeValue;
 import consulo.sql.lang.api.icon.SqlLangApiIconGroup;
 import consulo.ui.image.Image;

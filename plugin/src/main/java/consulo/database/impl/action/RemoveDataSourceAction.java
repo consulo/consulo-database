@@ -16,15 +16,15 @@
 
 package consulo.database.impl.action;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
-import consulo.database.datasource.model.DataSource;
+import consulo.application.AllIcons;
 import consulo.database.datasource.DataSourceManager;
+import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSourceModel;
 import consulo.database.datasource.ui.DataSourceKeys;
+import consulo.project.Project;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.ex.action.AnActionEvent;
+import consulo.ui.ex.action.DumbAwareAction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,7 +48,7 @@ public class RemoveDataSourceAction extends DumbAwareAction
 	@Override
 	public void actionPerformed(@Nonnull AnActionEvent e)
 	{
-		Project project = e.getProject();
+		Project project = e.getData(Project.KEY);
 		if(project == null)
 		{
 			return;

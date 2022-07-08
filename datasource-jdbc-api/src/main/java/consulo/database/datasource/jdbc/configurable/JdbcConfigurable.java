@@ -16,6 +16,7 @@
 
 package consulo.database.datasource.jdbc.configurable;
 
+import consulo.configurable.SimpleConfigurableByProperties;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.configurable.SecureString;
@@ -23,7 +24,6 @@ import consulo.database.datasource.model.EditableDataSource;
 import consulo.disposer.Disposable;
 import consulo.localize.LocalizeValue;
 import consulo.logging.Logger;
-import consulo.options.SimpleConfigurableByProperties;
 import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.border.BorderStyle;

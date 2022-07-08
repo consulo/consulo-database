@@ -16,11 +16,11 @@
 
 package consulo.sql.lang.impl.parser;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.lang.PsiBuilder;
-import com.intellij.lang.PsiParser;
-import com.intellij.psi.tree.IElementType;
-import consulo.lang.LanguageVersion;
+import consulo.language.ast.ASTNode;
+import consulo.language.ast.IElementType;
+import consulo.language.parser.PsiBuilder;
+import consulo.language.parser.PsiParser;
+import consulo.language.version.LanguageVersion;
 
 import javax.annotation.Nonnull;
 

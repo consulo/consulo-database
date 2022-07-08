@@ -16,7 +16,7 @@
 
 package consulo.sql.lang.api.psi;
 
-import com.intellij.psi.PsiFile;
+import consulo.language.psi.PsiFile;
 
 /**
  * @author VISTALL

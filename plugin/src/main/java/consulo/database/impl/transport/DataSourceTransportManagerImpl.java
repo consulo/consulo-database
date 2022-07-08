@@ -16,15 +16,15 @@
 
 package consulo.database.impl.transport;
 
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.components.StoragePathMacros;
-import com.intellij.openapi.progress.PerformInBackgroundOption;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.Project;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.annotation.component.ServiceImpl;
+import consulo.application.progress.PerformInBackgroundOption;
+import consulo.application.progress.ProgressIndicator;
+import consulo.application.progress.Task;
+import consulo.component.persist.PersistentStateComponent;
+import consulo.component.persist.State;
+import consulo.component.persist.Storage;
+import consulo.component.persist.StoragePathMacros;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.DataSourceEvent;
@@ -32,6 +32,7 @@ import consulo.database.datasource.model.DataSourceListener;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.DataSourceTransportListener;
 import consulo.database.datasource.transport.DataSourceTransportManager;
+import consulo.project.Project;
 import consulo.util.concurrent.AsyncResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -50,6 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Singleton
 @State(name = "DataSourceTransportManagerImpl", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
+@ServiceImpl
 public class DataSourceTransportManagerImpl implements DataSourceTransportManager, PersistentStateComponent<Element>
 {
 	private final Project myProject;
@@ -64,7 +66,7 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 		myProject = project;
 		myDataSourceManager = dataSourceManager;
 
-		myProject.getMessageBus().connect().subscribe(DataSourceManager.TOPIC, new DataSourceListener()
+		myProject.getMessageBus().connect().subscribe(DataSourceListener.class, new DataSourceListener()
 		{
 			@Override
 			public void dataSourceEvent(DataSourceEvent event)
@@ -91,7 +93,7 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 			@Override
 			public void run(@Nonnull ProgressIndicator indicator)
 			{
-				finalDataSourceTransport.testConnection(indicator, myProject, dataSource, result);
+				finalDataSourceTransport.testConnection(indicator, (Project) myProject, dataSource, result);
 
 				result.waitFor(-1);
 			}
@@ -106,7 +108,7 @@ public class DataSourceTransportManagerImpl implements DataSourceTransportManage
 	{
 		List<? extends DataSource> dataSources = myDataSourceManager.getDataSources();
 
-		DataSourceTransportListener publisher = myProject.getMessageBus().syncPublisher(TOPIC);
+		DataSourceTransportListener publisher = myProject.getMessageBus().syncPublisher(DataSourceTransportListener.class);
 
 		Task.Backgroundable.queue(myProject, "Refreshing data sources...", true, indicator ->
 		{

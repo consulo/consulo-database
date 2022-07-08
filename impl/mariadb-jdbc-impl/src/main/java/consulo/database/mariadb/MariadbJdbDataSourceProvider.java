@@ -16,7 +16,8 @@
 
 package consulo.database.mariadb;
 
-import com.intellij.openapi.options.UnnamedConfigurable;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.configurable.SecureString;
@@ -35,6 +36,7 @@ import java.util.Map;
  * @author VISTALL
  * @since 2020-08-16
  */
+@ExtensionImpl
 public class MariadbJdbDataSourceProvider extends JdbcDataSourceProvider
 {
 	@Nonnull

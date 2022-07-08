@@ -16,11 +16,13 @@
 
 package consulo.database.datasource.ui;
 
-import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ExtensionAPI;
+import consulo.application.Application;
+import consulo.component.extension.ExtensionList;
 import consulo.database.datasource.model.DataSource;
-import consulo.extensions.StrictExtensionPointName;
+import consulo.project.Project;
+import consulo.project.ui.view.tree.AbstractTreeNode;
 
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;
@@ -29,9 +31,10 @@ import java.util.function.Consumer;
  * @author VISTALL
  * @since 2020-08-18
  */
+@ExtensionAPI(ComponentScope.APPLICATION)
 public interface DataSourceTreeNodeProvider
 {
-	StrictExtensionPointName<Application, DataSourceTreeNodeProvider> EP_NAME = StrictExtensionPointName.forApplication("consulo.database.treeNodeProvider");
+	ExtensionList<DataSourceTreeNodeProvider, Application> EP_NAME = ExtensionList.of(DataSourceTreeNodeProvider.class);
 
 	boolean accept(@Nonnull DataSource dataSource);
 

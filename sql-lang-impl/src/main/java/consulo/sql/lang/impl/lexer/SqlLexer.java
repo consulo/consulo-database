@@ -16,9 +16,9 @@
 
 package consulo.sql.lang.impl.lexer;
 
-import com.intellij.lexer.Lexer;
-import com.intellij.lexer.LookAheadLexer;
-import com.intellij.psi.tree.IElementType;
+import consulo.language.ast.IElementType;
+import consulo.language.lexer.Lexer;
+import consulo.language.lexer.LookAheadLexer;
 import consulo.sql.lang.impl.BaseSqlLanguageVersion;
 import consulo.sql.lang.impl.psi.SqlKeywordElementType;
 import consulo.sql.lang.impl.psi.SqlTokenType;

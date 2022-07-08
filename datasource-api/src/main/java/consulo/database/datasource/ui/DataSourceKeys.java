@@ -16,9 +16,8 @@
 
 package consulo.database.datasource.ui;
 
-import com.intellij.openapi.options.Configurable;
-import com.intellij.ui.treeStructure.Tree;
 import consulo.database.datasource.model.DataSource;
+import consulo.ui.ex.awt.tree.Tree;
 import consulo.util.dataholder.Key;
 
 /**

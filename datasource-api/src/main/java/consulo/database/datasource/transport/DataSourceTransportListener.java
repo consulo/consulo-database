@@ -16,6 +16,8 @@
 
 package consulo.database.datasource.transport;
 
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.TopicAPI;
 import consulo.database.datasource.model.DataSource;
 
 import javax.annotation.Nonnull;
@@ -24,6 +26,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-18
  */
+@TopicAPI(ComponentScope.PROJECT)
 public interface DataSourceTransportListener
 {
 	void dataUpdated(@Nonnull DataSource dataSource, @Nonnull Object value);

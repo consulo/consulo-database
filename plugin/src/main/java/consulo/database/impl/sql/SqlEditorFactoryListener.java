@@ -16,13 +16,14 @@
 
 package consulo.database.impl.sql;
 
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.event.EditorFactoryListener;
-import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiFile;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.codeEditor.Editor;
+import consulo.codeEditor.EditorEx;
+import consulo.codeEditor.event.EditorFactoryEvent;
+import consulo.codeEditor.event.EditorFactoryListener;
+import consulo.language.psi.PsiDocumentManager;
+import consulo.language.psi.PsiFile;
+import consulo.project.Project;
 import consulo.sql.lang.api.SqlFileType;
 
 import javax.annotation.Nonnull;
@@ -31,6 +32,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-10-31
  */
+@ExtensionImpl
 public class SqlEditorFactoryListener implements EditorFactoryListener
 {
 	@Override

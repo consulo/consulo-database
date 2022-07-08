@@ -16,12 +16,13 @@
 
 package consulo.database.postgresql;
 
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ExtensionImpl;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
 import consulo.database.datasource.jdbc.ui.JdbcDataSourceTreeNodeProvider;
 import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcDatabaseNode;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.postgresql.node.PostgresqlDatabaseNode;
+import consulo.project.Project;
 
 import javax.annotation.Nonnull;
 
@@ -29,6 +30,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-30
  */
+@ExtensionImpl(order = "before jdbc")
 public class PostgresqlDataSourceTreeNodeProvider extends JdbcDataSourceTreeNodeProvider
 {
 	@Override

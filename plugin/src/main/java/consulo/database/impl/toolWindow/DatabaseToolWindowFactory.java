@@ -16,22 +16,27 @@
 
 package consulo.database.impl.toolWindow;
 
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.content.ContentManager;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.application.dumb.DumbAware;
+import consulo.database.icon.DatabaseIconGroup;
 import consulo.database.impl.action.AddDataSourceAction;
 import consulo.database.impl.action.EditDataSourceAction;
 import consulo.database.impl.action.RefreshDataSourcesAction;
 import consulo.database.impl.action.RemoveDataSourceAction;
+import consulo.localize.LocalizeValue;
+import consulo.project.Project;
+import consulo.project.ui.wm.ToolWindowFactory;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.ex.action.ActionGroup;
+import consulo.ui.ex.action.ActionManager;
+import consulo.ui.ex.action.ActionToolbar;
+import consulo.ui.ex.awt.SimpleToolWindowPanel;
+import consulo.ui.ex.content.Content;
+import consulo.ui.ex.content.ContentFactory;
+import consulo.ui.ex.content.ContentManager;
+import consulo.ui.ex.toolWindow.ToolWindow;
+import consulo.ui.ex.toolWindow.ToolWindowAnchor;
+import consulo.ui.image.Image;
 
 import javax.annotation.Nonnull;
 
@@ -39,9 +44,39 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-06-01
  */
+@ExtensionImpl
 public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware
 {
 	public static final String ID = "Database";
+
+	@Nonnull
+	@Override
+	public ToolWindowAnchor getAnchor()
+	{
+		return ToolWindowAnchor.RIGHT;
+	}
+
+	@Nonnull
+	@Override
+	public Image getIcon()
+	{
+		return DatabaseIconGroup.toolwindowdatabase();
+	}
+
+	@Nonnull
+	@Override
+	public LocalizeValue getDisplayName()
+	{
+		return LocalizeValue.localizeTODO("Database");
+	}
+
+
+	@Nonnull
+	@Override
+	public String getId()
+	{
+		return ID;
+	}
 
 	@RequiredUIAccess
 	@Override

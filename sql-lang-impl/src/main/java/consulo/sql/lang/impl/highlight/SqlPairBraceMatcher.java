@@ -16,19 +16,20 @@
 
 package consulo.sql.lang.impl.highlight;
 
-import com.intellij.lang.BracePair;
-import com.intellij.lang.PairedBraceMatcher;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.tree.IElementType;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.language.BracePair;
+import consulo.language.Language;
+import consulo.language.PairedBraceMatcher;
+import consulo.sql.lang.api.SqlLanguage;
 import consulo.sql.lang.impl.psi.SqlTokenType;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author VISTALL
  * @since 02/12/2021
  */
+@ExtensionImpl
 public class SqlPairBraceMatcher implements PairedBraceMatcher
 {
 	private final BracePair[] myPairBraces = {
@@ -41,15 +42,10 @@ public class SqlPairBraceMatcher implements PairedBraceMatcher
 		return myPairBraces;
 	}
 
+	@Nonnull
 	@Override
-	public boolean isPairedBracesAllowedBeforeType(@Nonnull IElementType lbraceType, @Nullable IElementType contextType)
+	public Language getLanguage()
 	{
-		return false;
-	}
-
-	@Override
-	public int getCodeConstructStart(PsiFile file, int openingBraceOffset)
-	{
-		return openingBraceOffset;
+		return SqlLanguage.INSTANCE;
 	}
 }

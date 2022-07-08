@@ -16,7 +16,8 @@
 
 package consulo.database.datasource.model;
 
-import consulo.database.datasource.model.DataSourceEvent;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.TopicAPI;
 
 import java.util.EventListener;
 
@@ -24,6 +25,7 @@ import java.util.EventListener;
  * @author VISTALL
  * @since 2020-08-14
  */
+@TopicAPI(ComponentScope.PROJECT)
 public interface DataSourceListener extends EventListener
 {
 	void dataSourceEvent(DataSourceEvent event);

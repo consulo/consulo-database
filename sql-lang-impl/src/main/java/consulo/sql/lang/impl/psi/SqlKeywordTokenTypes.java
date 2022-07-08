@@ -16,7 +16,7 @@
 
 package consulo.sql.lang.impl.psi;
 
-import com.intellij.psi.tree.IElementType;
+import consulo.language.ast.IElementType;
 import consulo.sql.lang.api.SqlLanguage;
 
 /**

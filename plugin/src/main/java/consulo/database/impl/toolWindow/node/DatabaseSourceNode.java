@@ -16,16 +16,16 @@
 
 package consulo.database.impl.toolWindow.node;
 
-import com.intellij.ide.projectView.PresentationData;
-import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.project.Project;
-import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.application.Application;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.ui.DataSourceTreeNodeProvider;
 import consulo.platform.base.icon.PlatformIconGroup;
+import consulo.project.Project;
+import consulo.project.ui.view.tree.AbstractTreeNode;
+import consulo.ui.ex.SimpleTextAttributes;
+import consulo.ui.ex.tree.PresentationData;
 import consulo.ui.image.Image;
 import consulo.ui.image.ImageEffects;
 

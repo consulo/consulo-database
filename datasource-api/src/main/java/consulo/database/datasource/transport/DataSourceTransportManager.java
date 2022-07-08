@@ -16,12 +16,12 @@
 
 package consulo.database.datasource.transport;
 
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.util.messages.Topic;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ServiceAPI;
+import consulo.component.persist.PersistentStateComponent;
 import consulo.database.datasource.model.DataSource;
+import consulo.project.Project;
 import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
@@ -31,14 +31,13 @@ import javax.annotation.Nullable;
  * @author VISTALL
  * @since 2020-08-14
  */
+@ServiceAPI(ComponentScope.PROJECT)
 public interface DataSourceTransportManager
 {
-	Topic<DataSourceTransportListener> TOPIC = Topic.create("DataSourceTransportListener", DataSourceTransportListener.class);
-
 	@Nonnull
 	static DataSourceTransportManager getInstance(@Nonnull Project project)
 	{
-		return ServiceManager.getService(project, DataSourceTransportManager.class);
+		return project.getInstance(DataSourceTransportManager.class);
 	}
 
 	@Nonnull

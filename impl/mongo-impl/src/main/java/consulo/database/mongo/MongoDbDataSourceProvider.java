@@ -16,8 +16,9 @@
 
 package consulo.database.mongo;
 
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.options.UnnamedConfigurable;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.configurable.ConfigurationException;
+import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.json.JsonDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.icon.DatabaseIconGroup;
@@ -36,6 +37,7 @@ import javax.annotation.Nullable;
  * @author VISTALL
  * @since 2020-08-14
  */
+@ExtensionImpl
 public class MongoDbDataSourceProvider implements JsonDataSourceProvider
 {
 	@Nonnull
@@ -56,7 +58,7 @@ public class MongoDbDataSourceProvider implements JsonDataSourceProvider
 	@Override
 	public Image getIcon()
 	{
-		return DatabaseIconGroup.providersMongoDB();
+		return DatabaseIconGroup.providersMongodb();
 	}
 
 	@Nonnull

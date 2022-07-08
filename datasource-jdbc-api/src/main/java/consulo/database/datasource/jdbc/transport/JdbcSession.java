@@ -16,17 +16,9 @@
 
 package consulo.database.datasource.jdbc.transport;
 
-import com.intellij.execution.configurations.SimpleJavaParameters;
-import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessAdapter;
-import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.openapi.progress.ProcessCanceledException;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.util.PathUtil;
-import com.intellij.util.concurrency.AppExecutorUtil;
-import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.io.DownloadUtil;
+import consulo.application.progress.ProgressIndicator;
+import consulo.application.util.concurrent.AppExecutorUtil;
+import consulo.component.ProcessCanceledException;
 import consulo.container.boot.ContainerPathManager;
 import consulo.container.plugin.PluginManager;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
@@ -34,9 +26,16 @@ import consulo.database.datasource.configurable.SecureString;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
-import consulo.net.util.NetUtil;
+import consulo.ide.util.DownloadUtil;
 import consulo.platform.Platform;
+import consulo.process.ProcessHandler;
+import consulo.process.cmd.SimpleJavaParameters;
+import consulo.process.event.ProcessAdapter;
+import consulo.process.event.ProcessEvent;
+import consulo.util.collection.ContainerUtil;
 import consulo.util.dataholder.Key;
+import consulo.util.io.ClassPathUtil;
+import consulo.util.io.NetUtil;
 import consulo.util.lang.ref.SimpleReference;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -110,15 +109,15 @@ public class JdbcSession implements AutoCloseable
 
 		SimpleJavaParameters simpleJavaParameters = new SimpleJavaParameters();
 		simpleJavaParameters.getClassPath().add(new File(PluginManager.getPluginPath(DefaultJdbcDataSourceTransport.class), "rt/consulo.database-datasource.jdbc.rt.jar"));
-		simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(JdbcExecutor.class));
-		simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(TServer.class));
-		simpleJavaParameters.getClassPath().add(PathUtil.getJarPathForClass(org.slf4j.Logger.class));
+		simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(JdbcExecutor.class));
+		simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(TServer.class));
+		simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(org.slf4j.Logger.class));
 		simpleJavaParameters.getClassPath().add(driverPath.toFile());
 		simpleJavaParameters.setMainClass("consulo.database.jdbc.rt.Main");
-		simpleJavaParameters.setJdk(new FakeSdk(java_home));
+		simpleJavaParameters.setJdkHome(java_home);
 		simpleJavaParameters.getProgramParametersList().add(String.valueOf(myPort));
 
-		OSProcessHandler processHandler = simpleJavaParameters.createOSProcessHandler();
+		ProcessHandler processHandler = simpleJavaParameters.createProcessHandler();
 		myProcessHandler = processHandler;
 
 		processHandler.addProcessListener(new ProcessAdapter()

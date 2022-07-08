@@ -16,10 +16,9 @@
 
 package consulo.database.impl.model;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.options.UnnamedConfigurable;
-import com.intellij.openapi.util.text.StringUtil;
+import consulo.application.AllIcons;
+import consulo.configurable.ConfigurationException;
+import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.localize.LocalizeValue;
@@ -28,9 +27,9 @@ import consulo.ui.Label;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.image.Image;
 import consulo.ui.layout.DockLayout;
+import consulo.util.lang.StringUtil;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author VISTALL

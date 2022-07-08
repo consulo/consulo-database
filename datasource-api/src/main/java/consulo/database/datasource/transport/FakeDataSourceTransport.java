@@ -16,9 +16,10 @@
 
 package consulo.database.datasource.transport;
 
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.application.progress.ProgressIndicator;
 import consulo.database.datasource.model.DataSource;
+import consulo.project.Project;
 import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
@@ -27,6 +28,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-16
  */
+@ExtensionImpl(id = "fake", order = "last")
 public class FakeDataSourceTransport implements DataSourceTransport<FakeResult>
 {
 	@Override

@@ -16,16 +16,16 @@
 
 package consulo.database.impl.sql;
 
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
-import com.intellij.openapi.project.DumbAwareAction;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
 import consulo.localize.LocalizeValue;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.ex.action.ActionGroup;
+import consulo.ui.ex.action.AnActionEvent;
+import consulo.ui.ex.action.DumbAwareAction;
+import consulo.ui.ex.action.Presentation;
+import consulo.ui.ex.awt.action.ComboBoxAction;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;

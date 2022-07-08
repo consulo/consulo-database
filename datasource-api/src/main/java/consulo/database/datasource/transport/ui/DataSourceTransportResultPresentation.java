@@ -16,10 +16,12 @@
 
 package consulo.database.datasource.transport.ui;
 
-import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ExtensionAPI;
+import consulo.component.extension.ExtensionPointName;
 import consulo.database.datasource.model.DataSource;
 import consulo.disposer.Disposable;
+import consulo.project.Project;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -28,9 +30,10 @@ import javax.swing.*;
  * @author VISTALL
  * @since 21/10/2021
  */
+@ExtensionAPI(ComponentScope.APPLICATION)
 public interface DataSourceTransportResultPresentation<R>
 {
-	ExtensionPointName<DataSourceTransportResultPresentation> EP_NAME = ExtensionPointName.create("consulo.database.transportResultPresentation");
+	ExtensionPointName<DataSourceTransportResultPresentation> EP_NAME = ExtensionPointName.create(DataSourceTransportResultPresentation.class);
 
 	boolean accept(@Nonnull DataSource dataSource);
 

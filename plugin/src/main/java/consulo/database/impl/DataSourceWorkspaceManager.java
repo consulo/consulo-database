@@ -1,8 +1,15 @@
 package consulo.database.impl;
 
-import com.intellij.ide.util.treeView.TreeState;
-import com.intellij.openapi.components.*;
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ServiceAPI;
+import consulo.annotation.component.ServiceImpl;
+import consulo.component.persist.PersistentStateComponent;
+import consulo.component.persist.State;
+import consulo.component.persist.Storage;
+import consulo.component.persist.StoragePathMacros;
+import consulo.ide.ServiceManager;
+import consulo.project.Project;
+import consulo.ui.ex.awt.tree.TreeState;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.jdom.Element;
@@ -16,6 +23,8 @@ import javax.annotation.Nullable;
  */
 @Singleton
 @State(name = "DataSourceWorkspaceManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
+@ServiceAPI(ComponentScope.PROJECT)
+@ServiceImpl
 public class DataSourceWorkspaceManager implements PersistentStateComponent<Element>
 {
 	public static DataSourceWorkspaceManager getInstance(@Nonnull Project project)

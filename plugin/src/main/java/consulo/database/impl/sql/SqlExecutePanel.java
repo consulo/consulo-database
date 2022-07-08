@@ -16,31 +16,27 @@
 
 package consulo.database.impl.sql;
 
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.wm.ToolWindowId;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentManager;
-import com.intellij.ui.content.MessageView;
-import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.codeEditor.Editor;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.impl.editor.DataSourceFileEditor;
 import consulo.disposer.Disposable;
 import consulo.platform.base.icon.PlatformIconGroup;
+import consulo.project.Project;
+import consulo.project.ui.view.MessageView;
+import consulo.project.ui.wm.ToolWindowId;
+import consulo.project.ui.wm.ToolWindowManager;
+import consulo.ui.NotificationType;
 import consulo.ui.UIAccess;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.ex.action.*;
+import consulo.ui.ex.awt.JBUI;
+import consulo.ui.ex.awt.UIUtil;
+import consulo.ui.ex.content.Content;
+import consulo.ui.ex.content.ContentManager;
+import consulo.util.collection.ContainerUtil;
 import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
@@ -97,7 +93,7 @@ public class SqlExecutePanel
 
 						messageView.runWhenInitialized(() ->
 						{
-							ToolWindowManager.getInstance(project).notifyByBalloon(ToolWindowId.MESSAGES_WINDOW, MessageType.ERROR, e.getMessage());
+							ToolWindowManager.getInstance(project).notifyByBalloon(ToolWindowId.MESSAGES_WINDOW, NotificationType.ERROR, e.getMessage());
 						});
 					});
 				});

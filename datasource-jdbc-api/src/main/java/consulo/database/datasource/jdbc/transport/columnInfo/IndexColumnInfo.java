@@ -16,9 +16,9 @@
 
 package consulo.database.datasource.jdbc.transport.columnInfo;
 
-import com.intellij.util.ui.ColumnInfo;
 import consulo.database.jdbc.rt.shared.JdbcQueryResult;
 import consulo.database.jdbc.rt.shared.JdbcQueryRow;
+import consulo.ui.ex.awt.ColumnInfo;
 
 import javax.annotation.Nullable;
 import javax.swing.table.TableCellRenderer;

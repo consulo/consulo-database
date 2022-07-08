@@ -16,13 +16,13 @@
 
 package consulo.database.impl.configurable.editor.node;
 
-import com.intellij.ide.projectView.PresentationData;
-import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.project.Project;
-import com.intellij.util.ObjectUtil;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.impl.toolWindow.node.DatabaseProviderNode;
+import consulo.project.Project;
+import consulo.project.ui.view.tree.AbstractTreeNode;
+import consulo.ui.ex.tree.PresentationData;
+import consulo.util.lang.ObjectUtil;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;

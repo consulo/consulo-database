@@ -16,14 +16,14 @@
 
 package consulo.database.impl.action;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
+import consulo.application.AllIcons;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.database.impl.configurable.editor.DataSourcesDialog;
+import consulo.project.Project;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.ex.action.AnActionEvent;
+import consulo.ui.ex.action.DumbAwareAction;
 
 import javax.annotation.Nonnull;
 
@@ -43,7 +43,7 @@ public class EditDataSourceAction extends DumbAwareAction
 	public void actionPerformed(@Nonnull AnActionEvent e)
 	{
 		DataSource dataSource = e.getData(DataSourceKeys.DATASOURCE);
-		Project project = e.getProject();
+		Project project = e.getData(Project.KEY);
 		if(project == null || dataSource == null)
 		{
 			return;

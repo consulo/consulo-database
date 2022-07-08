@@ -16,13 +16,14 @@
 
 package consulo.database.datasource.jdbc.transport.ui;
 
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ExtensionImpl;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
 import consulo.database.datasource.jdbc.transport.JdbcQueryResultWrapper;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.ui.DataSourceTransportResultPresentation;
 import consulo.disposer.Disposable;
+import consulo.project.Project;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -31,6 +32,7 @@ import javax.swing.*;
  * @author VISTALL
  * @since 21/10/2021
  */
+@ExtensionImpl(order = "last")
 public class DefaultJdbcDataSourceTransportResultPresentation implements DataSourceTransportResultPresentation<JdbcQueryResultWrapper>
 {
 	@Override

@@ -16,7 +16,7 @@
 
 package consulo.sql.lang.impl.version.sql92;
 
-import com.intellij.psi.tree.TokenSet;
+import consulo.language.ast.TokenSet;
 import consulo.sql.lang.impl.psi.SqlKeywordTokenTypes;
 
 /**

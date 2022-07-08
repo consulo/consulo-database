@@ -16,8 +16,7 @@
 
 package consulo.database.datasource.jdbc.ui;
 
-import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ExtensionImpl;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
@@ -26,6 +25,8 @@ import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcDatabaseNode;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.datasource.ui.DataSourceTreeNodeProvider;
+import consulo.project.Project;
+import consulo.project.ui.view.tree.AbstractTreeNode;
 import consulo.util.lang.StringUtil;
 
 import javax.annotation.Nonnull;
@@ -35,6 +36,7 @@ import java.util.function.Consumer;
  * @author VISTALL
  * @since 2020-08-18
  */
+@ExtensionImpl(id = "jdbc")
 public class JdbcDataSourceTreeNodeProvider implements DataSourceTreeNodeProvider
 {
 	@Override

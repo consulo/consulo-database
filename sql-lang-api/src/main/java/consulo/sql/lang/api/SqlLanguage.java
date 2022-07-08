@@ -16,9 +16,9 @@
 
 package consulo.sql.lang.api;
 
-import com.intellij.lang.Language;
-import com.intellij.openapi.fileTypes.LanguageFileType;
-import com.intellij.openapi.fileTypes.PlainTextLanguage;
+import consulo.language.Language;
+import consulo.language.file.LanguageFileType;
+import consulo.language.plain.PlainTextLanguage;
 
 import javax.annotation.Nullable;
 
