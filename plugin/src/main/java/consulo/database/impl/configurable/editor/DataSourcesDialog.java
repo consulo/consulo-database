@@ -26,7 +26,6 @@ import consulo.database.impl.action.CopyDataSourceAction;
 import consulo.database.impl.action.RemoveDataSourceAction;
 import consulo.database.impl.configurable.editor.action.AddDataSourcePopupAction;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
-import consulo.ide.setting.ConfigurableUIMigrationUtil;
 import consulo.project.Project;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.action.ActionGroup;
@@ -37,6 +36,7 @@ import consulo.ui.ex.awt.JBUI;
 import consulo.ui.ex.awt.WholeWestDialogWrapper;
 import consulo.ui.ex.awt.tree.*;
 import consulo.ui.ex.awt.update.UiNotifyConnector;
+import consulo.ui.ex.awtUnsafe.TargetAWT;
 import consulo.util.lang.Couple;
 
 import javax.annotation.Nonnull;
@@ -265,7 +265,9 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 			{
 				DataSourceConfigurable c = new DataSourceConfigurable(myProject, dataSource, treeUpdater);
 
-				JComponent component = ConfigurableUIMigrationUtil.createComponent(c, getDisposable());
+				JComponent component = (JComponent) TargetAWT.to(c.createUIComponent(getDisposable()));
+
+				c.initialize();
 
 				c.reset();
 
