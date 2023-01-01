@@ -16,8 +16,8 @@
 
 package consulo.database.datasource.jdbc.provider.impl;
 
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.util.xmlb.XmlSerializerUtil;
+import consulo.component.persist.PersistentStateComponent;
+import consulo.util.xml.serializer.XmlSerializerUtil;
 
 import javax.annotation.Nullable;
 

@@ -16,10 +16,10 @@
 
 package consulo.sql.lang.impl;
 
-import com.intellij.lang.PsiParser;
-import com.intellij.lexer.Lexer;
-import com.intellij.psi.tree.TokenSet;
-import consulo.lang.LanguageVersionWithParsing;
+import consulo.language.ast.TokenSet;
+import consulo.language.lexer.Lexer;
+import consulo.language.parser.PsiParser;
+import consulo.language.version.LanguageVersionWithParsing;
 import consulo.sql.lang.api.SqlLanguageVersion;
 import consulo.sql.lang.impl.lexer.SqlLexer;
 import consulo.sql.lang.impl.parser.SqlParser;

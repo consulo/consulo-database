@@ -16,7 +16,7 @@
 
 package consulo.database.datasource.jdbc.transport.columnInfo;
 
-import com.intellij.ui.EditorTextField;
+import consulo.language.editor.ui.awt.EditorTextField;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;

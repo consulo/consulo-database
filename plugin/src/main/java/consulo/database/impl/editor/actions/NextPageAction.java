@@ -16,10 +16,10 @@
 
 package consulo.database.impl.editor.actions;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import consulo.platform.base.icon.PlatformIconGroup;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.ex.action.AnActionEvent;
+import consulo.ui.ex.action.DumbAwareAction;
 
 import javax.annotation.Nonnull;
 
@@ -31,7 +31,7 @@ public class NextPageAction extends DumbAwareAction
 {
 	public NextPageAction()
 	{
-		super(PlatformIconGroup.generalComboArrowRight());
+		super(PlatformIconGroup.generalComboarrowright());
 	}
 
 	@RequiredUIAccess

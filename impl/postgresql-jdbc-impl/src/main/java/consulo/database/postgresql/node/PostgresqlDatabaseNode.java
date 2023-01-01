@@ -16,10 +16,10 @@
 
 package consulo.database.postgresql.node;
 
-import com.intellij.openapi.project.Project;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
 import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcDatabaseNode;
 import consulo.database.datasource.model.DataSource;
+import consulo.project.Project;
 
 /**
  * @author VISTALL

@@ -16,11 +16,12 @@
 
 package consulo.database.impl.editor;
 
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
+import consulo.annotation.component.ServiceImpl;
 import consulo.database.datasource.editor.DataSourceEditorManager;
 import consulo.database.datasource.model.DataSource;
+import consulo.fileEditor.FileEditorManager;
+import consulo.project.Project;
+import consulo.virtualFileSystem.VirtualFile;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -31,6 +32,7 @@ import javax.annotation.Nonnull;
  * @since 2020-08-19
  */
 @Singleton
+@ServiceImpl
 public class DataSourceEditorManagerImpl implements DataSourceEditorManager
 {
 	private final Project myProject;

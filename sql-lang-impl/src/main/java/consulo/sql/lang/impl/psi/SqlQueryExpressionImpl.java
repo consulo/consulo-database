@@ -16,8 +16,8 @@
 
 package consulo.sql.lang.impl.psi;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.intellij.lang.ASTNode;
+import consulo.language.ast.ASTNode;
+import consulo.language.impl.psi.ASTWrapperPsiElement;
 import consulo.sql.lang.api.psi.SqlQueryExpression;
 
 import javax.annotation.Nonnull;

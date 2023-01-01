@@ -16,10 +16,10 @@
 
 package consulo.database.impl.editor;
 
-import com.intellij.openapi.fileTypes.FileType;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
+import consulo.virtualFileSystem.fileType.FileType;
 
 import javax.annotation.Nonnull;
 

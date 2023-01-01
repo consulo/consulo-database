@@ -16,35 +16,62 @@
 
 package consulo.database.impl.configurable.editor;
 
-import com.intellij.ide.projectView.TreeStructureProvider;
-import com.intellij.ide.util.treeView.AbstractTreeStructureBase;
-import com.intellij.openapi.project.Project;
 import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.impl.configurable.editor.node.DataSourceEditorRootNode;
+import consulo.project.Project;
+import consulo.project.ui.view.tree.AbstractTreeNode;
+import consulo.ui.ex.awt.tree.TreeNode;
+import consulo.ui.ex.tree.AbstractTreeStructure;
+import consulo.ui.ex.tree.NodeDescriptor;
+import consulo.util.collection.ArrayUtil;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author VISTALL
  * @since 2020-08-13
  */
-public class DataSourceTreeStructure extends AbstractTreeStructureBase
+public class DataSourceTreeStructure extends AbstractTreeStructure
 {
 	private final DataSourceEditorRootNode myRoot;
 
 	public DataSourceTreeStructure(Project project, DataSourceModel dataSourceModel)
 	{
-		super(project);
-		myRoot = new DataSourceEditorRootNode(myProject, dataSourceModel);
+		myRoot = new DataSourceEditorRootNode(project, dataSourceModel);
 	}
 
-	@Nullable
+	@Nonnull
 	@Override
-	public List<TreeStructureProvider> getProviders()
+	public Object[] getChildElements(@Nonnull Object element)
 	{
+		TreeNode<?> treeNode = (TreeNode) element;
+		Collection<? extends TreeNode> elements = treeNode.getChildren();
+		elements.forEach(node -> node.setParent(treeNode));
+		return ArrayUtil.toObjectArray(elements);
+	}
+
+	@Override
+	public boolean isValid(@Nonnull Object element)
+	{
+		return element instanceof AbstractTreeNode;
+	}
+
+	@Override
+	public Object getParentElement(@Nonnull Object element)
+	{
+		if(element instanceof TreeNode)
+		{
+			return ((TreeNode) element).getParent();
+		}
 		return null;
+	}
+
+	@Override
+	@Nonnull
+	public NodeDescriptor createDescriptor(@Nonnull final Object element, final NodeDescriptor parentDescriptor)
+	{
+		return (NodeDescriptor) element;
 	}
 
 	@Nonnull

@@ -16,7 +16,7 @@
 
 package consulo.sql.lang.api;
 
-import consulo.lang.LanguageVersion;
+import consulo.language.version.LanguageVersion;
 
 import javax.annotation.Nonnull;
 

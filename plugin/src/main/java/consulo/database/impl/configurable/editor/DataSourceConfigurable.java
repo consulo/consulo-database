@@ -16,17 +16,17 @@
 
 package consulo.database.impl.configurable.editor;
 
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.options.UnnamedConfigurable;
-import com.intellij.openapi.progress.ProcessCanceledException;
-import com.intellij.openapi.project.Project;
+import consulo.component.ProcessCanceledException;
+import consulo.configurable.ConfigurationException;
+import consulo.configurable.NamedConfigurable;
+import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.provider.DataSourceConfigurationException;
 import consulo.database.datasource.transport.DataSourceTransportManager;
-import consulo.database.localize.DatabaseLocalize;
+import consulo.database.impl.localize.DatabaseLocalize;
 import consulo.disposer.Disposable;
 import consulo.localize.LocalizeValue;
-import consulo.preferences.NamedConfigurable;
+import consulo.project.Project;
 import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.border.BorderPosition;

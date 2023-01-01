@@ -16,10 +16,10 @@
 
 package consulo.database.impl.configurable;
 
-import com.intellij.util.ObjectUtil;
 import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.configurable.SecureString;
+import consulo.util.lang.ObjectUtil;
 import org.jdom.Element;
 
 import javax.annotation.Nonnull;

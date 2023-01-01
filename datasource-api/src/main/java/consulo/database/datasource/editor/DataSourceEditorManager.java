@@ -16,9 +16,11 @@
 
 package consulo.database.datasource.editor;
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ServiceAPI;
 import consulo.database.datasource.model.DataSource;
+import consulo.ide.ServiceManager;
+import consulo.project.Project;
 
 import javax.annotation.Nonnull;
 
@@ -26,6 +28,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-19
  */
+@ServiceAPI(ComponentScope.PROJECT)
 public interface DataSourceEditorManager
 {
 	@Nonnull

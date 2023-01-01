@@ -16,11 +16,11 @@
 
 package consulo.database.impl.model;
 
-import com.intellij.util.EventDispatcher;
 import consulo.database.datasource.model.*;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.database.impl.DataSourceManagerImpl;
 import consulo.database.impl.configurable.PropertiesHolderImpl;
+import consulo.proxy.EventDispatcher;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

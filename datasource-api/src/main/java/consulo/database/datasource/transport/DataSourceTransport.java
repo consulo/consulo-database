@@ -16,11 +16,13 @@
 
 package consulo.database.datasource.transport;
 
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ExtensionAPI;
+import consulo.application.progress.ProgressIndicator;
+import consulo.component.extension.ExtensionPointName;
+import consulo.component.persist.PersistentStateComponent;
 import consulo.database.datasource.model.DataSource;
+import consulo.project.Project;
 import consulo.util.concurrent.AsyncResult;
 
 import javax.annotation.Nonnull;
@@ -29,9 +31,10 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-16
  */
+@ExtensionAPI(ComponentScope.APPLICATION)
 public interface DataSourceTransport<STATE extends PersistentStateComponent<?>>
 {
-	ExtensionPointName<DataSourceTransport> EP_NAME = ExtensionPointName.create("consulo.database.transport");
+	ExtensionPointName<DataSourceTransport> EP_NAME = ExtensionPointName.create(DataSourceTransport.class);
 
 	boolean accept(@Nonnull DataSource dataSource);
 

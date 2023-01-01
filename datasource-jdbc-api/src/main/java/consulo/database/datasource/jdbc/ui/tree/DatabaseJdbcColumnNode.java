@@ -16,15 +16,15 @@
 
 package consulo.database.datasource.jdbc.ui.tree;
 
-import com.intellij.ide.projectView.PresentationData;
-import com.intellij.ide.util.treeView.AbstractTreeNode;
-import com.intellij.openapi.project.Project;
-import com.intellij.ui.SimpleTextAttributes;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.jdbc.provider.impl.JdbcPrimaryKeyState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableColumState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.icon.DatabaseIconGroup;
+import consulo.project.Project;
+import consulo.project.ui.view.tree.AbstractTreeNode;
+import consulo.ui.ex.SimpleTextAttributes;
+import consulo.ui.ex.tree.PresentationData;
 import consulo.ui.image.ImageKey;
 import consulo.util.lang.StringUtil;
 

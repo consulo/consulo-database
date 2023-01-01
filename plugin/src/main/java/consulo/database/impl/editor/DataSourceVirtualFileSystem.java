@@ -16,17 +16,18 @@
 
 package consulo.database.impl.editor;
 
-import com.intellij.openapi.application.ReadAction;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.DeprecatedVirtualFileSystem;
-import com.intellij.openapi.vfs.NonPhysicalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.application.ReadAction;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
-import consulo.vfs.ArchiveFileSystem;
+import consulo.project.Project;
+import consulo.project.ProjectManager;
+import consulo.util.lang.StringUtil;
+import consulo.virtualFileSystem.BaseVirtualFileSystem;
+import consulo.virtualFileSystem.NonPhysicalFileSystem;
+import consulo.virtualFileSystem.VirtualFile;
+import consulo.virtualFileSystem.VirtualFileManager;
+import consulo.virtualFileSystem.archive.ArchiveFileSystem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,7 +38,8 @@ import java.util.UUID;
  * @author VISTALL
  * @since 2020-08-19
  */
-public class DataSourceVirtualFileSystem extends DeprecatedVirtualFileSystem implements NonPhysicalFileSystem
+@ExtensionImpl
+public class DataSourceVirtualFileSystem extends BaseVirtualFileSystem implements NonPhysicalFileSystem
 {
 	public static final String PROTOCOL = "db";
 

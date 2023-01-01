@@ -16,21 +16,19 @@
 
 package consulo.database.impl;
 
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.project.Project;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.annotation.component.ServiceImpl;
+import consulo.component.persist.State;
+import consulo.component.persist.Storage;
 import consulo.database.datasource.DataSourceManager;
-import consulo.database.datasource.model.DataSource;
-import consulo.database.datasource.model.DataSourceEvent;
-import consulo.database.datasource.model.DataSourceModel;
-import consulo.database.datasource.model.EditableDataSourceModel;
+import consulo.database.datasource.model.*;
 import consulo.database.impl.model.DataSourceImpl;
 import consulo.database.impl.model.DataSourceModelImpl;
 import consulo.database.impl.model.EditableDataSourceModelImpl;
 import consulo.database.impl.store.ApplicationDataSourceStoreImpl;
 import consulo.database.impl.store.ProjectDataSourceStoreImpl;
 import consulo.disposer.Disposable;
+import consulo.project.Project;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -44,6 +42,7 @@ import java.util.List;
  */
 @Singleton
 @State(name = "DataSourceManagerImpl", storages = @Storage("datasource.xml"))
+@ServiceImpl
 public class DataSourceManagerImpl implements DataSourceManager, Disposable
 {
 	private final Project myProject;
@@ -82,7 +81,7 @@ public class DataSourceManagerImpl implements DataSourceManager, Disposable
 	{
 		for(DataSourceEvent event : events)
 		{
-			myProject.getMessageBus().syncPublisher(TOPIC).dataSourceEvent(event);
+			myProject.getMessageBus().syncPublisher(DataSourceListener.class).dataSourceEvent(event);
 		}
 	}
 

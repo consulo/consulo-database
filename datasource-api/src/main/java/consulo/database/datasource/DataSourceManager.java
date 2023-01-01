@@ -16,17 +16,15 @@
 
 package consulo.database.datasource;
 
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.util.messages.Topic;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ServiceAPI;
 import consulo.database.datasource.model.DataSource;
-import consulo.database.datasource.model.DataSourceListener;
 import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.model.EditableDataSourceModel;
+import consulo.project.Project;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,24 +32,20 @@ import java.util.UUID;
  * @author VISTALL
  * @since 2020-08-13
  */
+@ServiceAPI(ComponentScope.PROJECT)
 public interface DataSourceManager
 {
-	Topic<DataSourceListener> TOPIC = Topic.create("datasource change listener", DataSourceListener.class);
-
-	@Nonnull
 	public static DataSourceManager getInstance(@Nonnull Project project)
 	{
-		return ServiceManager.getService(project, DataSourceManager.class);
+		return project.getInstance(DataSourceManager.class);
 	}
 
-	@Nonnull
 	@RequiredReadAction
 	default List<? extends DataSource> getDataSources()
 	{
 		 return getModel().getDataSources();
 	}
 
-	@Nullable
 	@RequiredReadAction
 	default DataSource findDataSource(@Nonnull UUID uuid)
 	{
@@ -61,10 +55,8 @@ public interface DataSourceManager
 	/**
 	 * @return readonly datasource model
 	 */
-	@Nonnull
 	@RequiredReadAction
 	DataSourceModel getModel();
 
-	@Nonnull
 	EditableDataSourceModel createEditableModel();
 }

@@ -1,7 +1,7 @@
-package consulo.database.impl.editor.ui;
+package consulo.database.datasource.ui;
 
-import com.intellij.ui.table.TableView;
-import com.intellij.util.ui.ListTableModel;
+import consulo.ui.ex.awt.table.ListTableModel;
+import consulo.ui.ex.awt.table.TableView;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableColumn;

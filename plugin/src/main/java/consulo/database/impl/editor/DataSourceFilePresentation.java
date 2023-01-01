@@ -16,22 +16,37 @@
 
 package consulo.database.impl.editor;
 
-import com.intellij.ide.presentation.PresentationProvider;
+import consulo.application.presentation.TypePresentationProvider;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.ui.image.Image;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * @author VISTALL
  * @since 2020-08-19
  */
-public class DataSourceFilePresentation extends PresentationProvider
+public class DataSourceFilePresentation extends TypePresentationProvider<DataSourceVirtualFile>
 {
+	@Nonnull
+	@Override
+	public Class<DataSourceVirtualFile> getItemClass()
+	{
+		return DataSourceVirtualFile.class;
+	}
+
 	@Nullable
 	@Override
-	public Image getIcon(Object o)
+	public Image getIcon(DataSourceVirtualFile f)
 	{
 		return DatabaseIconGroup.nodesTable();
+	}
+
+	@Nullable
+	@Override
+	public String getName(DataSourceVirtualFile file)
+	{
+		return file.getName();
 	}
 }

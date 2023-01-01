@@ -16,8 +16,9 @@
 
 package consulo.sql.lang.api;
 
-import com.intellij.openapi.fileTypes.FileTypeConsumer;
-import com.intellij.openapi.fileTypes.FileTypeFactory;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.virtualFileSystem.fileType.FileTypeConsumer;
+import consulo.virtualFileSystem.fileType.FileTypeFactory;
 
 import javax.annotation.Nonnull;
 
@@ -25,6 +26,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-10-31
  */
+@ExtensionImpl
 public class SqlFileTypeFactory extends FileTypeFactory
 {
 	@Override

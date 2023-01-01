@@ -16,8 +16,10 @@
 
 package consulo.database.datasource.provider;
 
-import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.openapi.options.UnnamedConfigurable;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ExtensionAPI;
+import consulo.component.extension.ExtensionPointName;
+import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.model.DataSource;
@@ -30,9 +32,10 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-12
  */
+@ExtensionAPI(ComponentScope.APPLICATION)
 public interface DataSourceProvider
 {
-	ExtensionPointName<DataSourceProvider> EP_NAME = ExtensionPointName.create("consulo.database.provider");
+	ExtensionPointName<DataSourceProvider> EP_NAME = ExtensionPointName.create(DataSourceProvider.class);
 
 	@Nonnull
 	String getId();

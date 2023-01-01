@@ -1,8 +1,8 @@
 package consulo.sql.lang.impl.lexer;
 
-import com.intellij.lexer.LexerBase;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.TokenType;
+import consulo.language.lexer.LexerBase;
+import consulo.language.ast.IElementType;
+import consulo.language.ast.TokenType;
 import consulo.sql.lang.impl.psi.SqlTokenType;
 
 @SuppressWarnings({"ALL"})

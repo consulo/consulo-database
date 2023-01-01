@@ -16,18 +16,8 @@
 
 package consulo.database.impl.toolWindow;
 
-import com.intellij.ide.DataManager;
-import com.intellij.ide.util.treeView.NodeDescriptor;
-import com.intellij.ide.util.treeView.TreeState;
-import com.intellij.openapi.project.Project;
-import com.intellij.ui.DoubleClickListener;
-import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.ui.tree.AsyncTreeModel;
-import com.intellij.ui.tree.StructureTreeModel;
-import com.intellij.ui.treeStructure.Tree;
-import com.intellij.util.messages.MessageBusConnection;
-import com.intellij.util.ui.tree.TreeUtil;
-import consulo.database.datasource.DataSourceManager;
+import consulo.component.messagebus.MessageBusConnection;
+import consulo.dataContext.DataManager;
 import consulo.database.datasource.editor.DataSourceEditorManager;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcTableNode;
@@ -35,12 +25,16 @@ import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.DataSourceEvent;
 import consulo.database.datasource.model.DataSourceListener;
 import consulo.database.datasource.transport.DataSourceTransportListener;
-import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.database.impl.DataSourceWorkspaceManager;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.disposer.Disposable;
 import consulo.logging.Logger;
+import consulo.project.Project;
+import consulo.ui.ex.awt.ScrollPaneFactory;
+import consulo.ui.ex.awt.event.DoubleClickListener;
+import consulo.ui.ex.awt.tree.*;
+import consulo.ui.ex.tree.NodeDescriptor;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -126,7 +120,7 @@ public class DatabaseTreePanel implements Disposable
 		}.installOn(tree);
 
 		MessageBusConnection connection = project.getMessageBus().connect(this);
-		connection.subscribe(DataSourceManager.TOPIC, new DataSourceListener()
+		connection.subscribe(DataSourceListener.class, new DataSourceListener()
 		{
 			@Override
 			public void dataSourceEvent(DataSourceEvent event)
@@ -135,7 +129,7 @@ public class DatabaseTreePanel implements Disposable
 			}
 		});
 
-		connection.subscribe(DataSourceTransportManager.TOPIC, new DataSourceTransportListener()
+		connection.subscribe(DataSourceTransportListener.class, new DataSourceTransportListener()
 		{
 			@Override
 			public void dataUpdated(@Nonnull DataSource dataSource, @Nonnull Object value)

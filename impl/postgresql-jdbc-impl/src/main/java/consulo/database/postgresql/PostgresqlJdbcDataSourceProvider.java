@@ -16,7 +16,8 @@
 
 package consulo.database.postgresql;
 
-import com.intellij.openapi.options.UnnamedConfigurable;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.configurable.PropertiesHolder;
@@ -32,12 +33,14 @@ import consulo.ui.image.Image;
 import consulo.util.lang.StringUtil;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
  * @author VISTALL
  * @since 2020-08-19
  */
+@ExtensionImpl
 public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider
 {
 	@Nonnull
@@ -90,5 +93,11 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider
 	public void fillDrivers(Map<String, String> map)
 	{
 		map.put("postgresql-42.2.15.jar", "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.15/postgresql-42.2.15.jar");
+	}
+
+	@Override
+	public boolean isTableType(@Nullable String type)
+	{
+		return super.isTableType(type) || "SYSTEM TABLE".equals(type);
 	}
 }

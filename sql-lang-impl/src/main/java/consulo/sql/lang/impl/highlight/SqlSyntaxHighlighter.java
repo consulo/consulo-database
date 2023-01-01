@@ -16,12 +16,12 @@
 
 package consulo.sql.lang.impl.highlight;
 
-import com.intellij.lexer.Lexer;
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.psi.tree.IElementType;
-import consulo.fileTypes.LanguageVersionableSyntaxHighlighter;
-import consulo.lang.LanguageVersion;
+import consulo.codeEditor.DefaultLanguageHighlighterColors;
+import consulo.colorScheme.TextAttributesKey;
+import consulo.language.ast.IElementType;
+import consulo.language.editor.highlight.LanguageVersionableSyntaxHighlighter;
+import consulo.language.lexer.Lexer;
+import consulo.language.version.LanguageVersion;
 import consulo.sql.lang.impl.BaseSqlLanguageVersion;
 import consulo.sql.lang.impl.psi.SqlKeywordElementType;
 import consulo.sql.lang.impl.psi.SqlTokenType;

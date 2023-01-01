@@ -16,9 +16,9 @@
 
 package consulo.sql.lang.impl.psi;
 
-import com.intellij.lang.Language;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.util.text.CharSequenceHashingStrategy;
+import consulo.language.Language;
+import consulo.language.ast.IElementType;
+import consulo.util.collection.CharSequenceHashingStrategy;
 import consulo.util.collection.Maps;
 
 import javax.annotation.Nonnull;

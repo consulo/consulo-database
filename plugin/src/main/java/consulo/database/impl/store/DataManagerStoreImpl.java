@@ -16,14 +16,14 @@
 
 package consulo.database.impl.store;
 
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.util.EventDispatcher;
+import consulo.component.persist.PersistentStateComponent;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.database.impl.configurable.PropertiesHolderImpl;
 import consulo.database.impl.model.DataSourceImpl;
 import consulo.database.impl.model.UnknownDataSourceProvider;
 import consulo.disposer.Disposable;
+import consulo.proxy.EventDispatcher;
 import org.jdom.Element;
 
 import javax.annotation.Nonnull;

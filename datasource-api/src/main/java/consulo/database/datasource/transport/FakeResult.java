@@ -16,7 +16,7 @@
 
 package consulo.database.datasource.transport;
 
-import com.intellij.openapi.components.PersistentStateComponent;
+import consulo.component.persist.PersistentStateComponent;
 import org.jdom.Element;
 
 import javax.annotation.Nullable;

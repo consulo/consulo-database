@@ -16,23 +16,9 @@
 
 package consulo.database.impl.configurable.editor;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Couple;
-import com.intellij.ui.tree.AsyncTreeModel;
-import com.intellij.ui.tree.StructureTreeModel;
-import com.intellij.ui.tree.TreeVisitor;
-import com.intellij.ui.treeStructure.Tree;
-import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.components.BorderLayoutPanel;
-import com.intellij.util.ui.tree.TreeUtil;
-import com.intellij.util.ui.update.UiNotifyConnector;
-import consulo.application.ui.WholeWestDialogWrapper;
+import consulo.configurable.Configurable;
+import consulo.configurable.ConfigurationException;
+import consulo.dataContext.DataManager;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.*;
 import consulo.database.datasource.ui.DataSourceKeys;
@@ -40,9 +26,19 @@ import consulo.database.impl.action.CopyDataSourceAction;
 import consulo.database.impl.action.RemoveDataSourceAction;
 import consulo.database.impl.configurable.editor.action.AddDataSourcePopupAction;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
-import consulo.options.ConfigurableUIMigrationUtil;
+import consulo.project.Project;
+import consulo.ui.Size;
 import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.decorator.SwingUIDecorator;
+import consulo.ui.ex.action.ActionGroup;
+import consulo.ui.ex.action.ActionManager;
+import consulo.ui.ex.action.ActionToolbar;
+import consulo.ui.ex.awt.BorderLayoutPanel;
+import consulo.ui.ex.awt.JBUI;
+import consulo.ui.ex.awt.WholeWestDialogWrapper;
+import consulo.ui.ex.awt.tree.*;
+import consulo.ui.ex.awt.update.UiNotifyConnector;
+import consulo.ui.ex.awtUnsafe.TargetAWT;
+import consulo.util.lang.Couple;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -95,9 +91,9 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 	}
 
 	@Override
-	public Dimension getDefaultSize()
+	public Size getDefaultSize()
 	{
-		return new Dimension(700, 500);
+		return new Size(700, 500);
 	}
 
 	@RequiredUIAccess
@@ -174,11 +170,11 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 		toolbar.setTargetComponent(tree);
 
 		BorderLayoutPanel panel = new BorderLayoutPanel();
-		panel.setBackground(SwingUIDecorator.get(SwingUIDecorator::getSidebarColor));
+		//panel.setBackground(SwingUIDecorator.get(SwingUIDecorator::getSidebarColor));
 
 		JComponent component = toolbar.getComponent();
 		component.setOpaque(false);
-		component.setBackground(SwingUIDecorator.get(SwingUIDecorator::getSidebarColor));
+		//component.setBackground(SwingUIDecorator.get(SwingUIDecorator::getSidebarColor));
 		panel.addToTop(component);
 		panel.addToCenter(tree);
 
@@ -270,7 +266,9 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 			{
 				DataSourceConfigurable c = new DataSourceConfigurable(myProject, dataSource, treeUpdater);
 
-				JComponent component = ConfigurableUIMigrationUtil.createComponent(c, getDisposable());
+				JComponent component = (JComponent) TargetAWT.to(c.createUIComponent(getDisposable()));
+
+				c.initialize();
 
 				c.reset();
 

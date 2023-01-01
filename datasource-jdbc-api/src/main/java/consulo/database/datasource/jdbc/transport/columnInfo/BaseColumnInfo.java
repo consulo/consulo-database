@@ -16,16 +16,16 @@
 
 package consulo.database.datasource.jdbc.transport.columnInfo;
 
-import com.intellij.openapi.editor.ex.util.EditorUtil;
-import com.intellij.ui.CellRendererPanel;
-import com.intellij.ui.SimpleColoredComponent;
-import com.intellij.util.ui.ColumnInfo;
-import com.intellij.util.ui.JBUI;
-import consulo.awt.TargetAWT;
 import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.database.jdbc.rt.shared.JdbcQueryRow;
 import consulo.disposer.Disposable;
+import consulo.language.editor.ui.awt.EditorAWTUtil;
+import consulo.ui.ex.awt.CellRendererPanel;
+import consulo.ui.ex.awt.ColumnInfo;
+import consulo.ui.ex.awt.JBUI;
+import consulo.ui.ex.awt.SimpleColoredComponent;
+import consulo.ui.ex.awtUnsafe.TargetAWT;
 import consulo.ui.image.Image;
 
 import javax.annotation.Nullable;
@@ -68,7 +68,7 @@ public abstract class BaseColumnInfo<T> extends ColumnInfo<JdbcQueryRow, T>
 
 	public static Font getFont()
 	{
-		return EditorUtil.getEditorFont();
+		return EditorAWTUtil.getEditorFont();
 	}
 
 	protected final int myIndex;

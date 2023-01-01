@@ -16,16 +16,9 @@
 
 package consulo.database.datasource.jdbc.transport;
 
-import com.intellij.openapi.progress.ProcessCanceledException;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.util.ThrowableConsumer;
-import com.intellij.util.ui.ColumnInfo;
-import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.ListTableModel;
-import com.intellij.util.ui.UIUtil;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.application.progress.ProgressIndicator;
+import consulo.component.ProcessCanceledException;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.*;
@@ -37,11 +30,19 @@ import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.datasource.transport.DataSourceTransportResult;
-import consulo.database.impl.editor.ui.TableViewWithHScrolling;
+import consulo.database.datasource.ui.TableViewWithHScrolling;
 import consulo.database.jdbc.rt.shared.*;
 import consulo.disposer.Disposable;
 import consulo.logging.Logger;
+import consulo.project.Project;
+import consulo.ui.ex.awt.ColumnInfo;
+import consulo.ui.ex.awt.JBUI;
+import consulo.ui.ex.awt.ScrollPaneFactory;
+import consulo.ui.ex.awt.UIUtil;
+import consulo.ui.ex.awt.table.ListTableModel;
 import consulo.util.concurrent.AsyncResult;
+import consulo.util.lang.StringUtil;
+import consulo.util.lang.function.ThrowableConsumer;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -57,6 +58,7 @@ import java.util.List;
  * @author VISTALL
  * @since 2020-08-16
  */
+@ExtensionImpl(id = "default", order = "before fake")
 public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcState>
 {
 	private static final Logger LOG = Logger.getInstance(DefaultJdbcDataSourceTransport.class);

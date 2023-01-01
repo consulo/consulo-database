@@ -16,10 +16,12 @@
 
 package consulo.sql.lang.impl.highlight;
 
-import com.intellij.openapi.fileTypes.PlainSyntaxHighlighter;
-import com.intellij.openapi.fileTypes.SyntaxHighlighter;
-import consulo.fileTypes.LanguageVersionableSyntaxHighlighterFactory;
-import consulo.lang.LanguageVersion;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.language.Language;
+import consulo.language.editor.highlight.DefaultSyntaxHighlighter;
+import consulo.language.editor.highlight.LanguageVersionableSyntaxHighlighterFactory;
+import consulo.language.editor.highlight.SyntaxHighlighter;
+import consulo.language.version.LanguageVersion;
 import consulo.sql.lang.api.SqlLanguage;
 import consulo.sql.lang.impl.BaseSqlLanguageVersion;
 
@@ -29,13 +31,9 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 22/10/2021
  */
+@ExtensionImpl
 public class SqlSyntaxHighlighterFactory extends LanguageVersionableSyntaxHighlighterFactory
 {
-	public SqlSyntaxHighlighterFactory()
-	{
-		super(SqlLanguage.INSTANCE);
-	}
-
 	@Nonnull
 	@Override
 	public SyntaxHighlighter getSyntaxHighlighter(@Nonnull LanguageVersion languageVersion)
@@ -44,6 +42,13 @@ public class SqlSyntaxHighlighterFactory extends LanguageVersionableSyntaxHighli
 		{
 			return new SqlSyntaxHighlighter(baseSqlLanguageVersion);
 		}
-		return new PlainSyntaxHighlighter();
+		return new DefaultSyntaxHighlighter();
+	}
+
+	@Nonnull
+	@Override
+	public Language getLanguage()
+	{
+		return SqlLanguage.INSTANCE;
 	}
 }

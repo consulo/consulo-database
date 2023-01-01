@@ -16,8 +16,8 @@
 
 package consulo.sql.lang.impl.psi;
 
-import com.intellij.extapi.psi.PsiFileBase;
-import com.intellij.psi.FileViewProvider;
+import consulo.language.file.FileViewProvider;
+import consulo.language.impl.psi.PsiFileBase;
 import consulo.sql.lang.api.SqlLanguage;
 import consulo.sql.lang.api.psi.SqlFile;
 

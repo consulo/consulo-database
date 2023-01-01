@@ -16,11 +16,10 @@
 
 package consulo.database.impl.editor;
 
-import com.intellij.ide.presentation.Presentation;
-import com.intellij.openapi.vfs.VirtualFileSystem;
-import com.intellij.testFramework.LightVirtualFile;
 import consulo.database.datasource.model.DataSource;
-import consulo.vfs.ArchiveFileSystem;
+import consulo.language.file.light.LightVirtualFile;
+import consulo.virtualFileSystem.VirtualFileSystem;
+import consulo.virtualFileSystem.archive.ArchiveFileSystem;
 
 import javax.annotation.Nonnull;
 
@@ -28,7 +27,6 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-19
  */
-@Presentation(provider = DataSourceFilePresentation.class)
 public class DataSourceVirtualFile extends LightVirtualFile
 {
 	private final DataSource myDataSource;

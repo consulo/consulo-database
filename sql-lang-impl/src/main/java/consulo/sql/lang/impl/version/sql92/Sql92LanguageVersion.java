@@ -16,12 +16,14 @@
 
 package consulo.sql.lang.impl.version.sql92;
 
+import consulo.annotation.component.ExtensionImpl;
 import consulo.sql.lang.impl.BaseSqlLanguageVersion;
 
 /**
  * @author VISTALL
  * @since 22/10/2021
  */
+@ExtensionImpl
 public class Sql92LanguageVersion extends BaseSqlLanguageVersion
 {
 	public Sql92LanguageVersion()

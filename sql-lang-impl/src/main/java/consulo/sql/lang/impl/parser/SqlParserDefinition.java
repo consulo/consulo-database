@@ -16,10 +16,12 @@
 
 package consulo.sql.lang.impl.parser;
 
-import com.intellij.psi.FileViewProvider;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.tree.IFileElementType;
-import consulo.lang.LanguageVersionableParserDefinition;
+import consulo.annotation.component.ExtensionImpl;
+import consulo.language.Language;
+import consulo.language.ast.IFileElementType;
+import consulo.language.file.FileViewProvider;
+import consulo.language.psi.PsiFile;
+import consulo.language.version.LanguageVersionableParserDefinition;
 import consulo.sql.lang.api.SqlLanguage;
 import consulo.sql.lang.impl.psi.SqlFileImpl;
 import consulo.sql.lang.impl.psi.SqlKeywordTokenTypes;
@@ -30,6 +32,7 @@ import javax.annotation.Nonnull;
  * @author VISTALL
  * @since 22/10/2021
  */
+@ExtensionImpl
 public class SqlParserDefinition extends LanguageVersionableParserDefinition
 {
 	private static final IFileElementType FILE_ELEMENT_TYPE = new IFileElementType("SQL_FILE", SqlLanguage.INSTANCE);
@@ -37,6 +40,13 @@ public class SqlParserDefinition extends LanguageVersionableParserDefinition
 	static
 	{
 		SqlKeywordTokenTypes.init();
+	}
+
+	@Nonnull
+	@Override
+	public Language getLanguage()
+	{
+		return SqlLanguage.INSTANCE;
 	}
 
 	@Nonnull

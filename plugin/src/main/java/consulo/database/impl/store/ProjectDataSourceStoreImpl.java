@@ -16,9 +16,12 @@
 
 package consulo.database.impl.store;
 
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.project.Project;
+import consulo.annotation.component.ComponentScope;
+import consulo.annotation.component.ServiceAPI;
+import consulo.annotation.component.ServiceImpl;
+import consulo.component.persist.State;
+import consulo.component.persist.Storage;
+import consulo.project.Project;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -28,6 +31,8 @@ import jakarta.inject.Singleton;
  */
 @Singleton
 @State(name = "DataSourceManager", storages = @Storage("datasource.xml"))
+@ServiceAPI(ComponentScope.APPLICATION)
+@ServiceImpl
 public class ProjectDataSourceStoreImpl extends DataManagerStoreImpl
 {
 	@Inject
