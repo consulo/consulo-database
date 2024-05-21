@@ -31,7 +31,7 @@ import jakarta.inject.Singleton;
  */
 @Singleton
 @State(name = "DataSourceManager", storages = @Storage("datasource.xml"))
-@ServiceAPI(ComponentScope.APPLICATION)
+@ServiceAPI(ComponentScope.PROJECT)
 @ServiceImpl
 public class ProjectDataSourceStoreImpl extends DataManagerStoreImpl
 {
