@@ -31,7 +31,7 @@ public class NextPageAction extends DumbAwareAction
 {
 	public NextPageAction()
 	{
-		super(PlatformIconGroup.generalComboarrowright());
+		super(PlatformIconGroup.actionsForward());
 	}
 
 	@RequiredUIAccess

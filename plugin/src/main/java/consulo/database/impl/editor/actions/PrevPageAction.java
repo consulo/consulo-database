@@ -31,7 +31,7 @@ public class PrevPageAction extends DumbAwareAction
 {
 	public PrevPageAction()
 	{
-		super(PlatformIconGroup.generalComboarrowleft());
+		super(PlatformIconGroup.actionsBack());
 	}
 
 	@RequiredUIAccess
