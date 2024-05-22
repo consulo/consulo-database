@@ -18,9 +18,8 @@ package consulo.database.datasource.jdbc.provider.impl;
 
 import consulo.component.persist.PersistentStateComponent;
 import consulo.util.xml.serializer.XmlSerializerUtil;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * @author VISTALL

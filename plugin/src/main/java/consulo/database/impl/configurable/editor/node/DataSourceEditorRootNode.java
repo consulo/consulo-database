@@ -23,8 +23,8 @@ import consulo.project.Project;
 import consulo.project.ui.view.tree.AbstractTreeNode;
 import consulo.ui.ex.tree.PresentationData;
 import consulo.util.lang.ObjectUtil;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 
 /**

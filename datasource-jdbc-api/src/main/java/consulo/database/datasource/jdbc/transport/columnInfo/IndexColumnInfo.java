@@ -20,7 +20,7 @@ import consulo.database.jdbc.rt.shared.JdbcQueryResult;
 import consulo.database.jdbc.rt.shared.JdbcQueryRow;
 import consulo.ui.ex.awt.ColumnInfo;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.swing.table.TableCellRenderer;
 
 /**

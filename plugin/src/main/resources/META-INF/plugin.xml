@@ -21,7 +21,6 @@
 	<version>SNAPSHOT</version>
 	<vendor>consulo.io</vendor>
 	<localize>consulo.database.DatabaseLocalize</localize>
-	<experimental>true</experimental>
 
 	<tags>
 		<tag>database</tag>

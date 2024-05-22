@@ -30,19 +30,19 @@ import consulo.ide.util.DownloadUtil;
 import consulo.platform.Platform;
 import consulo.process.ProcessHandler;
 import consulo.process.cmd.SimpleJavaParameters;
-import consulo.process.event.ProcessAdapter;
 import consulo.process.event.ProcessEvent;
+import consulo.process.event.ProcessListener;
 import consulo.util.collection.ContainerUtil;
 import consulo.util.dataholder.Key;
 import consulo.util.io.ClassPathUtil;
 import consulo.util.io.NetUtil;
 import consulo.util.lang.ref.SimpleReference;
+import jakarta.annotation.Nonnull;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.transport.TSocket;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -99,7 +99,7 @@ public class JdbcSession implements AutoCloseable
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put("user", login);
-		properties.put("password", password.get());
+		properties.put("password", password.getValue(dataSource));
 
 		SimpleReference<Integer> exitCodeRef = SimpleReference.create();
 
@@ -120,7 +120,7 @@ public class JdbcSession implements AutoCloseable
 		ProcessHandler processHandler = simpleJavaParameters.createProcessHandler();
 		myProcessHandler = processHandler;
 
-		processHandler.addProcessListener(new ProcessAdapter()
+		processHandler.addProcessListener(new ProcessListener()
 		{
 			@Override
 			public void onTextAvailable(ProcessEvent event, Key outputType)

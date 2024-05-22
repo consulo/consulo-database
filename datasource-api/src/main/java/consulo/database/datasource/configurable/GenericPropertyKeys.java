@@ -28,7 +28,7 @@ public interface GenericPropertyKeys
 
 	GenericPropertyKey<String> LOGIN = GenericPropertyKey.create("login", String.class);
 
-	GenericPropertyKey<SecureString> PASSWORD = GenericPropertyKey.create("password", SecureString.class, SecureString.of());
+	GenericPropertyKey<SecureString> PASSWORD = GenericPropertyKey.create("password", SecureString.class, SecureString.EMPTY);
 
 	GenericPropertyKey<String> DATABASE_NAME = GenericPropertyKey.create("database-name", String.class);
 }

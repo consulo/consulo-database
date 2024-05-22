@@ -21,7 +21,7 @@ import consulo.language.file.light.LightVirtualFile;
 import consulo.virtualFileSystem.VirtualFileSystem;
 import consulo.virtualFileSystem.archive.ArchiveFileSystem;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

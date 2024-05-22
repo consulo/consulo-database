@@ -20,8 +20,8 @@ import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.database.impl.configurable.PropertiesHolderImpl;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**

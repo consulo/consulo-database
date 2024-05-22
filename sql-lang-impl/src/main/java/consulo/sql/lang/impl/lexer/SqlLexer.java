@@ -22,8 +22,7 @@ import consulo.language.lexer.LookAheadLexer;
 import consulo.sql.lang.impl.BaseSqlLanguageVersion;
 import consulo.sql.lang.impl.psi.SqlKeywordElementType;
 import consulo.sql.lang.impl.psi.SqlTokenType;
-
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

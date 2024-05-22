@@ -22,7 +22,7 @@ import consulo.database.datasource.model.DataSource;
 import consulo.ide.ServiceManager;
 import consulo.project.Project;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

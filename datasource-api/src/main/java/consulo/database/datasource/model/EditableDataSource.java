@@ -17,8 +17,7 @@
 package consulo.database.datasource.model;
 
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
-
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

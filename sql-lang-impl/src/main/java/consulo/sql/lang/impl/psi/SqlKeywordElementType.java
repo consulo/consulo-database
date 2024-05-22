@@ -20,9 +20,9 @@ import consulo.language.Language;
 import consulo.language.ast.IElementType;
 import consulo.util.collection.CharSequenceHashingStrategy;
 import consulo.util.collection.Maps;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Locale;
 import java.util.Map;
 

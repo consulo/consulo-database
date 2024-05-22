@@ -24,7 +24,7 @@ import consulo.database.datasource.model.DataSourceModel;
 import consulo.database.datasource.model.EditableDataSourceModel;
 import consulo.project.Project;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.List;
 import java.util.UUID;
 

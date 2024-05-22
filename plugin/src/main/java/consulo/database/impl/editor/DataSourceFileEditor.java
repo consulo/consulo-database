@@ -44,10 +44,11 @@ import consulo.ui.ex.awt.JBUI;
 import consulo.ui.ex.awt.LoadingDecorator;
 import consulo.util.concurrent.AsyncResult;
 import consulo.util.dataholder.UserDataHolderBase;
+import jakarta.annotation.Nullable;
 import kava.beans.PropertyChangeListener;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;

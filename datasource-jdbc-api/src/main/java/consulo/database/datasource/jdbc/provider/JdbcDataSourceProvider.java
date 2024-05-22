@@ -20,9 +20,9 @@ import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.util.lang.StringUtil;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Map;
 
 /**

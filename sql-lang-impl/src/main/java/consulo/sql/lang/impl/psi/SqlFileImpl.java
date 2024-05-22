@@ -21,7 +21,7 @@ import consulo.language.impl.psi.PsiFileBase;
 import consulo.sql.lang.api.SqlLanguage;
 import consulo.sql.lang.api.psi.SqlFile;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

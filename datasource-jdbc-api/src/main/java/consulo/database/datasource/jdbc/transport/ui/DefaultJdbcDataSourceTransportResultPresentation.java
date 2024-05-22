@@ -25,7 +25,7 @@ import consulo.database.datasource.transport.ui.DataSourceTransportResultPresent
 import consulo.disposer.Disposable;
 import consulo.project.Project;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import javax.swing.*;
 
 /**

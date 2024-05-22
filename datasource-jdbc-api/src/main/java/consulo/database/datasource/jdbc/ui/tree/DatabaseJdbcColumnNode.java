@@ -27,8 +27,8 @@ import consulo.ui.ex.SimpleTextAttributes;
 import consulo.ui.ex.tree.PresentationData;
 import consulo.ui.image.ImageKey;
 import consulo.util.lang.StringUtil;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

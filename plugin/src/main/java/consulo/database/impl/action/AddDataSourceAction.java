@@ -32,7 +32,7 @@ import consulo.ui.ex.popup.ListPopup;
 import consulo.ui.ex.popup.PopupStep;
 import consulo.ui.image.Image;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

@@ -27,7 +27,7 @@ import consulo.ui.ex.action.DumbAwareAction;
 import consulo.ui.ex.action.Presentation;
 import consulo.ui.ex.awt.action.ComboBoxAction;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import javax.swing.*;
 import java.util.UUID;
 import java.util.function.Consumer;

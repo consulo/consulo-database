@@ -34,9 +34,9 @@ import consulo.ui.border.BorderStyle;
 import consulo.ui.image.Image;
 import consulo.ui.layout.DockLayout;
 import consulo.util.concurrent.AsyncResult;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * @author VISTALL

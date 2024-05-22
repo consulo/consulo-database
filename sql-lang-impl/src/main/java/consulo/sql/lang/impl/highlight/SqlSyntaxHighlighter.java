@@ -25,8 +25,8 @@ import consulo.language.version.LanguageVersion;
 import consulo.sql.lang.impl.BaseSqlLanguageVersion;
 import consulo.sql.lang.impl.psi.SqlKeywordElementType;
 import consulo.sql.lang.impl.psi.SqlTokenType;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 

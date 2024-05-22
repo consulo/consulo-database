@@ -24,10 +24,10 @@ import consulo.database.impl.model.DataSourceImpl;
 import consulo.database.impl.model.UnknownDataSourceProvider;
 import consulo.disposer.Disposable;
 import consulo.proxy.EventDispatcher;
+import jakarta.annotation.Nonnull;
 import org.jdom.Element;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

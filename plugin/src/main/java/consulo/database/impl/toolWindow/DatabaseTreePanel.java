@@ -36,7 +36,7 @@ import consulo.ui.ex.awt.event.DoubleClickListener;
 import consulo.ui.ex.awt.tree.*;
 import consulo.ui.ex.tree.NodeDescriptor;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;

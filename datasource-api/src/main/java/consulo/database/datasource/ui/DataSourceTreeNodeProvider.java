@@ -24,7 +24,7 @@ import consulo.database.datasource.model.DataSource;
 import consulo.project.Project;
 import consulo.project.ui.view.tree.AbstractTreeNode;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.function.Consumer;
 
 /**

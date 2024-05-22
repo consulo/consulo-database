@@ -29,7 +29,7 @@ import consulo.ui.ex.tree.PresentationData;
 import consulo.ui.image.Image;
 import consulo.ui.image.ImageEffects;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

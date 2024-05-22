@@ -23,7 +23,7 @@ import consulo.database.datasource.model.DataSource;
 import consulo.disposer.Disposable;
 import consulo.project.Project;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import javax.swing.*;
 
 /**

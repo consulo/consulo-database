@@ -25,7 +25,7 @@ import consulo.sql.lang.impl.lexer.SqlLexer;
 import consulo.sql.lang.impl.parser.SqlParser;
 import consulo.sql.lang.impl.psi.SqlTokenType;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

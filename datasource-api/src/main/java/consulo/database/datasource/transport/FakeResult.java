@@ -17,9 +17,8 @@
 package consulo.database.datasource.transport;
 
 import consulo.component.persist.PersistentStateComponent;
+import jakarta.annotation.Nullable;
 import org.jdom.Element;
-
-import javax.annotation.Nullable;
 
 /**
  * @author VISTALL

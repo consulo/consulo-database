@@ -39,7 +39,7 @@ import consulo.ui.ex.content.ContentManager;
 import consulo.util.collection.ContainerUtil;
 import consulo.util.concurrent.AsyncResult;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;

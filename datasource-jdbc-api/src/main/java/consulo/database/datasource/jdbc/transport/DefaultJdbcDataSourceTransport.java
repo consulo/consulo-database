@@ -44,7 +44,7 @@ import consulo.util.concurrent.AsyncResult;
 import consulo.util.lang.StringUtil;
 import consulo.util.lang.function.ThrowableConsumer;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;

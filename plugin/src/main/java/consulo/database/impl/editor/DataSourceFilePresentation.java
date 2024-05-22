@@ -20,8 +20,8 @@ import consulo.application.presentation.TypePresentationProvider;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.ui.image.Image;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * @author VISTALL

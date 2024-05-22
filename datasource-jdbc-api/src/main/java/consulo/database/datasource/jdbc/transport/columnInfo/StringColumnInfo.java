@@ -19,8 +19,7 @@ package consulo.database.datasource.jdbc.transport.columnInfo;
 import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport;
 import consulo.database.jdbc.rt.shared.JdbcQueryRow;
 import consulo.disposer.Disposable;
-
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * @author VISTALL

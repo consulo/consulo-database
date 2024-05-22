@@ -32,8 +32,8 @@ import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
 import consulo.util.lang.StringUtil;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -76,7 +76,7 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider
 	{
 		propertiesHolder.set(GenericPropertyKeys.PORT, 5432);
 		propertiesHolder.set(GenericPropertyKeys.LOGIN, "postgres");
-		propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.of());
+		propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
 	}
 
 	@Override

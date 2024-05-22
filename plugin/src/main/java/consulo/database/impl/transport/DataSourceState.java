@@ -3,10 +3,9 @@ package consulo.database.impl.transport;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.util.xml.serializer.XmlSerializer;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.jdom.Element;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author VISTALL

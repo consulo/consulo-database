@@ -16,45 +16,57 @@
 
 package consulo.database.datasource.configurable;
 
-import javax.annotation.Nonnull;
-import java.util.function.Supplier;
+import consulo.database.datasource.model.DataSource;
+import jakarta.annotation.Nonnull;
+
+import java.util.Objects;
 
 /**
  * @author VISTALL
  * @since 05/04/2021
  */
-public class SecureString implements Supplier<String>
+public interface SecureString
 {
-	private static final SecureString EMPTY = of("");
+	SecureString EMPTY = dataSource -> null;
+
+	class RawSecureString implements SecureString
+	{
+		private final String myRawValue;
+
+		public RawSecureString(String rawValue)
+		{
+			myRawValue = rawValue;
+		}
+
+		@Override
+		public String getValue(@Nonnull DataSource dataSource)
+		{
+			return Objects.toString(myRawValue, "");
+		}
+
+		@Override
+		public String toString()
+		{
+			return myRawValue;
+		}
+
+		public String getRawValue()
+		{
+			return myRawValue;
+		}
+
+		@Nonnull
+		public String getStoreValue(String key)
+		{
+			return key;
+		}
+	}
+
+	String getValue(@Nonnull DataSource dataSource);
 
 	@Nonnull
-	public static SecureString of()
+	public static SecureString raw(@Nonnull String rawValue)
 	{
-		return EMPTY;
-	}
-
-	@Nonnull
-	public static SecureString of(@Nonnull String value)
-	{
-		return new SecureString(value);
-	}
-
-	private final String myValue;
-
-	private SecureString(@Nonnull String value)
-	{
-		myValue = value;
-	}
-
-	@Override
-	public String get()
-	{
-		return myValue;
-	}
-
-	@Override
-	public String toString()
-	{
-		return get();
+		return new RawSecureString(rawValue);
 	}
 }

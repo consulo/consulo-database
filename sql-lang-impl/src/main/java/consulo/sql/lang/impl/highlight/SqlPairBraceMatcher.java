@@ -23,7 +23,7 @@ import consulo.language.PairedBraceMatcher;
 import consulo.sql.lang.api.SqlLanguage;
 import consulo.sql.lang.impl.psi.SqlTokenType;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

@@ -19,7 +19,7 @@ package consulo.database.datasource.model;
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.provider.DataSourceProvider;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.UUID;
 
 /**

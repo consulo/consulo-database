@@ -16,14 +16,16 @@
 
 package consulo.database.impl.configurable;
 
+import consulo.credentialStorage.PasswordSafe;
+import consulo.credentialStorage.PasswordSafeException;
 import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.configurable.SecureString;
 import consulo.util.lang.ObjectUtil;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.jdom.Element;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +43,21 @@ public class PropertiesHolderImpl implements PropertiesHolder
 
 		public String xmlValue;
 
-		public UnstableValue(Object value)
+		public UnstableValue(String key, Object value)
 		{
 			this.value = value;
+
+			if(value instanceof SecureString.RawSecureString rawSecureString)
+			{
+				try
+				{
+					PasswordSafe.getInstance().storePassword(null, StoreSecureStringImpl.class, key, rawSecureString.getRawValue(), true);
+				}
+				catch(PasswordSafeException ignored)
+				{
+					// log?
+				}
+			}
 		}
 
 		@SuppressWarnings("unchecked")
@@ -73,7 +87,7 @@ public class PropertiesHolderImpl implements PropertiesHolder
 
 				if(key.getTypeClass() == SecureString.class)
 				{
-					value = SecureString.of(xmlValue);
+					value = new StoreSecureStringImpl(xmlValue);
 					xmlValue = null;
 					return (T) value;
 				}
@@ -84,8 +98,13 @@ public class PropertiesHolderImpl implements PropertiesHolder
 			return key.getDefautValue();
 		}
 
-		public String getRawStringValue()
+		public String getRawStringValue(String key)
 		{
+			if(value instanceof SecureString.RawSecureString rawStringValue)
+			{
+				return rawStringValue.getStoreValue(key);
+			}
+
 			if(value != ObjectUtil.NULL)
 			{
 				return String.valueOf(value);
@@ -137,8 +156,9 @@ public class PropertiesHolderImpl implements PropertiesHolder
 		for(Map.Entry<String, UnstableValue> entry : myValues.entrySet())
 		{
 			Element propertyElement = new Element("property");
-			propertyElement.setAttribute("name", entry.getKey());
-			propertyElement.setAttribute("value", String.valueOf(entry.getValue().getRawStringValue()));
+			String key = entry.getKey();
+			propertyElement.setAttribute("name", key);
+			propertyElement.setAttribute("value", String.valueOf(entry.getValue().getRawStringValue(key)));
 
 			root.addContent(propertyElement);
 		}
@@ -154,7 +174,7 @@ public class PropertiesHolderImpl implements PropertiesHolder
 
 			String value = propertyElement.getAttributeValue("value");
 
-			UnstableValue unstableValue = new UnstableValue(ObjectUtil.NULL);
+			UnstableValue unstableValue = new UnstableValue(name, ObjectUtil.NULL);
 			unstableValue.xmlValue = value;
 			myValues.put(name, unstableValue);
 		}

@@ -34,12 +34,12 @@ import consulo.database.datasource.transport.DataSourceTransportListener;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.project.Project;
 import consulo.util.concurrent.AsyncResult;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.jdom.Element;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

@@ -28,8 +28,8 @@ import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -72,7 +72,7 @@ public class MariadbJdbDataSourceProvider extends JdbcDataSourceProvider
 	{
 		propertiesHolder.set(GenericPropertyKeys.PORT, 3306);
 		propertiesHolder.set(GenericPropertyKeys.LOGIN, "root");
-		propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.of());
+		propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
 	}
 
 	@Override

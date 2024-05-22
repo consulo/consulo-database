@@ -19,8 +19,8 @@ package consulo.database.impl.configurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.GenericPropertyKey;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * @author VISTALL
@@ -42,7 +42,7 @@ public class EditablePropertiesHolderImpl extends PropertiesHolderImpl implement
 		}
 		else
 		{
-			myValues.put(key.toString(), new UnstableValue(value));
+			myValues.put(key.toString(), new UnstableValue(key.toString(), value));
 		}
 	}
 }

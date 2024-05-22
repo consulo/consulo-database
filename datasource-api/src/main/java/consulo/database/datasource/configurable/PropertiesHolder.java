@@ -16,7 +16,7 @@
 
 package consulo.database.datasource.configurable;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

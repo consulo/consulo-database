@@ -19,8 +19,7 @@ package consulo.sql.lang.impl.psi;
 import consulo.language.ast.ASTNode;
 import consulo.language.impl.psi.ASTWrapperPsiElement;
 import consulo.sql.lang.api.psi.SqlQueryExpression;
-
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

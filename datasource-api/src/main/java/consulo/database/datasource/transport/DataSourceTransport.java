@@ -25,7 +25,7 @@ import consulo.database.datasource.model.DataSource;
 import consulo.project.Project;
 import consulo.util.concurrent.AsyncResult;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL

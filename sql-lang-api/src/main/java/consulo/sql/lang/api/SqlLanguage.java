@@ -19,8 +19,7 @@ package consulo.sql.lang.api;
 import consulo.language.Language;
 import consulo.language.file.LanguageFileType;
 import consulo.language.plain.PlainTextLanguage;
-
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * @author VISTALL

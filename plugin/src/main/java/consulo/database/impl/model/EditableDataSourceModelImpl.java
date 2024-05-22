@@ -22,7 +22,7 @@ import consulo.database.impl.DataSourceManagerImpl;
 import consulo.database.impl.configurable.PropertiesHolderImpl;
 import consulo.proxy.EventDispatcher;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
