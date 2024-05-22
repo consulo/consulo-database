@@ -14,7 +14,7 @@
   - limitations under the License.
   -->
 
-<consulo-plugin url="https://github.com/consulo/incubating-consulo-database">
+<consulo-plugin url="https://github.com/consulo/consulo-database">
 	<id>consulo.database</id>
 	<name>Database (SQL/NoSQL)</name>
 	<category>Database/Custom Languages</category>
