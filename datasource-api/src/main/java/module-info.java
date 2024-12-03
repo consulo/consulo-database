@@ -8,6 +8,8 @@ module consulo.database.datasource.api {
 
 	requires transitive consulo.ide.api;
 
+	requires transitive jakarta.annotation;
+
 	exports consulo.database.datasource;
 	exports consulo.database.datasource.configurable;
 	exports consulo.database.datasource.editor;
