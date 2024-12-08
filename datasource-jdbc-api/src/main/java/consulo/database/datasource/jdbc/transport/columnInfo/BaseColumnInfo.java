@@ -20,15 +20,15 @@ import consulo.database.datasource.jdbc.transport.DefaultJdbcDataSourceTransport
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.database.jdbc.rt.shared.JdbcQueryRow;
 import consulo.disposer.Disposable;
-import consulo.language.editor.ui.awt.EditorAWTUtil;
+import consulo.language.editor.ui.awt.AWTLanguageEditorUtil;
 import consulo.ui.ex.awt.CellRendererPanel;
 import consulo.ui.ex.awt.ColumnInfo;
 import consulo.ui.ex.awt.JBUI;
 import consulo.ui.ex.awt.SimpleColoredComponent;
 import consulo.ui.ex.awtUnsafe.TargetAWT;
 import consulo.ui.image.Image;
-
 import jakarta.annotation.Nullable;
+
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -68,7 +68,7 @@ public abstract class BaseColumnInfo<T> extends ColumnInfo<JdbcQueryRow, T>
 
 	public static Font getFont()
 	{
-		return EditorAWTUtil.getEditorFont();
+		return AWTLanguageEditorUtil.getEditorFont();
 	}
 
 	protected final int myIndex;
