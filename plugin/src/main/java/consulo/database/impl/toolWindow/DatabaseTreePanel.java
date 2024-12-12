@@ -17,7 +17,7 @@
 package consulo.database.impl.toolWindow;
 
 import consulo.component.messagebus.MessageBusConnection;
-import consulo.dataContext.DataManager;
+import consulo.dataContext.DataProvider;
 import consulo.database.datasource.editor.DataSourceEditorManager;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcTableNode;
@@ -35,8 +35,10 @@ import consulo.ui.ex.awt.ScrollPaneFactory;
 import consulo.ui.ex.awt.event.DoubleClickListener;
 import consulo.ui.ex.awt.tree.*;
 import consulo.ui.ex.tree.NodeDescriptor;
-
+import consulo.util.dataholder.Key;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
@@ -48,11 +50,12 @@ import java.awt.event.MouseEvent;
  * @author VISTALL
  * @since 2020-08-12
  */
-public class DatabaseTreePanel implements Disposable
+public class DatabaseTreePanel extends JPanel implements Disposable, DataProvider
 {
 	private static final Logger LOG = Logger.getInstance(DatabaseTreePanel.class);
 
 	private JPanel myRootPanel;
+	private final Tree myTree;
 
 	public DatabaseTreePanel(@Nonnull Project project)
 	{
@@ -61,7 +64,7 @@ public class DatabaseTreePanel implements Disposable
 
 		DatabaseTreeStructure structure = new DatabaseTreeStructure(project);
 		StructureTreeModel<DatabaseTreeStructure> treeModel = new StructureTreeModel<>(structure, this);
-		Tree tree = new Tree(new AsyncTreeModel(treeModel, this))
+		myTree = new Tree(new AsyncTreeModel(treeModel, this))
 		{
 			@Override
 			public final int getToggleClickCount()
@@ -81,27 +84,27 @@ public class DatabaseTreePanel implements Disposable
 			}
 		};
 
-		tree.addTreeExpansionListener(new TreeExpansionListener()
+		myTree.addTreeExpansionListener(new TreeExpansionListener()
 		{
 			@Override
 			public void treeExpanded(TreeExpansionEvent treeExpansionEvent)
 			{
-				workspaceManager.setTreeState(TreeState.createOn(tree));
+				workspaceManager.setTreeState(TreeState.createOn(myTree));
 			}
 
 			@Override
 			public void treeCollapsed(TreeExpansionEvent treeExpansionEvent)
 			{
-				workspaceManager.setTreeState(TreeState.createOn(tree));
+				workspaceManager.setTreeState(TreeState.createOn(myTree));
 			}
 		});
-		tree.setRootVisible(false);
+		myTree.setRootVisible(false);
 		new DoubleClickListener()
 		{
 			@Override
 			protected boolean onDoubleClick(MouseEvent event)
 			{
-				TreePath path = TreeUtil.getSelectedPathIfOne(tree);
+				TreePath path = TreeUtil.getSelectedPathIfOne(myTree);
 				if(path != null)
 				{
 					Object node = TreeUtil.getLastUserObject(path);
@@ -117,7 +120,7 @@ public class DatabaseTreePanel implements Disposable
 
 				return false;
 			}
-		}.installOn(tree);
+		}.installOn(myTree);
 
 		MessageBusConnection connection = project.getMessageBus().connect(this);
 		connection.subscribe(DataSourceListener.class, new DataSourceListener()
@@ -138,43 +141,45 @@ public class DatabaseTreePanel implements Disposable
 			}
 		});
 
-		DataManager.registerDataProvider(myRootPanel, key ->
-		{
-			if(key == DataSourceKeys.TREE)
-			{
-				return tree;
-			}
-			else if(key == DataSourceKeys.DATASOURCE)
-			{
-				TreePath path = TreeUtil.getSelectedPathIfOne(tree);
-				if(path != null)
-				{
-					Object lastUserObject = TreeUtil.getLastUserObject(path);
-					if(lastUserObject instanceof DatabaseSourceNode)
-					{
-						return ((DatabaseSourceNode) lastUserObject).getValue();
-					}
-				}
-			}
-			return null;
-		});
-
 		TreeState treeState = workspaceManager.getTreeState();
 		if(treeState != null)
 		{
-			treeState.applyTo(tree);
+			treeState.applyTo(myTree);
 		}
 		else
 		{
-			TreeUtil.expand(tree, 2);
+			TreeUtil.expand(myTree, 2);
 		}
 
-		myRootPanel.add(ScrollPaneFactory.createScrollPane(tree, true));
+		myRootPanel.add(ScrollPaneFactory.createScrollPane(myTree, true));
 	}
 
 	public JPanel getRootPanel()
 	{
 		return myRootPanel;
+	}
+
+	@Nullable
+	@Override
+	public Object getData(@Nonnull Key<?> key)
+	{
+		if(key == DataSourceKeys.TREE)
+		{
+			return myTree;
+		}
+		else if(key == DataSourceKeys.DATASOURCE)
+		{
+			TreePath path = TreeUtil.getSelectedPathIfOne(myTree);
+			if(path != null)
+			{
+				Object lastUserObject = TreeUtil.getLastUserObject(path);
+				if(lastUserObject instanceof DatabaseSourceNode)
+				{
+					return ((DatabaseSourceNode) lastUserObject).getValue();
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override

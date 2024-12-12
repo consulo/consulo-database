@@ -27,18 +27,17 @@ import consulo.localize.LocalizeValue;
 import consulo.project.Project;
 import consulo.project.ui.wm.ToolWindowFactory;
 import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.ex.action.ActionGroup;
-import consulo.ui.ex.action.ActionManager;
-import consulo.ui.ex.action.ActionToolbar;
-import consulo.ui.ex.awt.SimpleToolWindowPanel;
+import consulo.ui.ex.action.AnAction;
 import consulo.ui.ex.content.Content;
 import consulo.ui.ex.content.ContentFactory;
 import consulo.ui.ex.content.ContentManager;
 import consulo.ui.ex.toolWindow.ToolWindow;
 import consulo.ui.ex.toolWindow.ToolWindowAnchor;
 import consulo.ui.image.Image;
-
 import jakarta.annotation.Nonnull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author VISTALL
@@ -70,7 +69,6 @@ public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware
 		return LocalizeValue.localizeTODO("Database");
 	}
 
-
 	@Nonnull
 	@Override
 	public String getId()
@@ -86,26 +84,22 @@ public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware
 
 		ContentFactory factory = contentManager.getFactory();
 
-		SimpleToolWindowPanel toolWindowPanel = new SimpleToolWindowPanel(true, true);
-
 		DatabaseTreePanel panel = new DatabaseTreePanel(project);
-		toolWindowPanel.setContent(panel.getRootPanel());
 
-		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
-		builder.add(new AddDataSourceAction());
-		builder.add(new RemoveDataSourceAction(null));
-		builder.add(new EditDataSourceAction());
-		builder.addSeparator();
-		builder.add(new RefreshDataSourcesAction());
+		List<AnAction> actions = new ArrayList<>();
+		actions.add(new AddDataSourceAction());
+		actions.add(new RemoveDataSourceAction(null));
+		actions.add(new EditDataSourceAction());
+		actions.add(new RefreshDataSourcesAction());
 
-		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DatabaseToolWindow", builder.build(), true);
-		toolbar.setTargetComponent(panel.getRootPanel());
-		toolWindowPanel.setToolbar(toolbar.getComponent());
+		toolWindow.setTitleActions(actions.toArray(AnAction.EMPTY_ARRAY));
 
-		Content content = factory.createContent(toolWindowPanel, null, false);
+		Content content = factory.createContent(panel.getRootPanel(), null, false);
 
 		content.setDisposer(panel);
 
 		contentManager.addContent(content);
+		
+		contentManager.addDataProvider(panel);
 	}
 }
