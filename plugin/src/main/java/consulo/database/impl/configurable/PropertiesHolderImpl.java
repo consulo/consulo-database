@@ -17,7 +17,6 @@
 package consulo.database.impl.configurable;
 
 import consulo.credentialStorage.PasswordSafe;
-import consulo.credentialStorage.PasswordSafeException;
 import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.configurable.SecureString;
@@ -49,14 +48,7 @@ public class PropertiesHolderImpl implements PropertiesHolder
 
 			if(value instanceof SecureString.RawSecureString rawSecureString)
 			{
-				try
-				{
-					PasswordSafe.getInstance().storePassword(null, StoreSecureStringImpl.class, key, rawSecureString.getRawValue(), true);
-				}
-				catch(PasswordSafeException ignored)
-				{
-					// log?
-				}
+				PasswordSafe.getInstance().storePassword(null, StoreSecureStringImpl.class, key, rawSecureString.getRawValue());
 			}
 		}
 

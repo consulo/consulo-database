@@ -17,7 +17,6 @@
 package consulo.database.impl.configurable;
 
 import consulo.credentialStorage.PasswordSafe;
-import consulo.credentialStorage.PasswordSafeException;
 import consulo.database.datasource.configurable.SecureString;
 import consulo.database.datasource.model.DataSource;
 import jakarta.annotation.Nonnull;
@@ -26,31 +25,20 @@ import jakarta.annotation.Nonnull;
  * @author VISTALL
  * @since 21.05.2024
  */
-public class StoreSecureStringImpl implements SecureString
-{
-	private final String myXmlValue;
+public class StoreSecureStringImpl implements SecureString {
+    private final String myXmlValue;
 
-	public StoreSecureStringImpl(String xmlValue)
-	{
-		myXmlValue = xmlValue;
-	}
+    public StoreSecureStringImpl(String xmlValue) {
+        myXmlValue = xmlValue;
+    }
 
-	@Override
-	public String getValue(@Nonnull DataSource dataSource)
-	{
-		try
-		{
-			return PasswordSafe.getInstance().getPassword(null, StoreSecureStringImpl.class, myXmlValue);
-		}
-		catch(PasswordSafeException ignored)
-		{
-		}
-		return "";
-	}
+    @Override
+    public String getValue(@Nonnull DataSource dataSource) {
+        return PasswordSafe.getInstance().getPassword(null, StoreSecureStringImpl.class, myXmlValue);
+    }
 
-	@Override
-	public String toString()
-	{
-		return myXmlValue;
-	}
+    @Override
+    public String toString() {
+        return myXmlValue;
+    }
 }
