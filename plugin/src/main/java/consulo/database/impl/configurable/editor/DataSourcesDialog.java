@@ -27,7 +27,7 @@ import consulo.database.impl.action.RemoveDataSourceAction;
 import consulo.database.impl.configurable.editor.action.AddDataSourcePopupAction;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.project.Project;
-import consulo.ui.Size;
+import consulo.ui.Size2D;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.action.ActionGroup;
 import consulo.ui.ex.action.ActionManager;
@@ -91,9 +91,9 @@ public class DataSourcesDialog extends WholeWestDialogWrapper
 	}
 
 	@Override
-	public Size getDefaultSize()
+	public Size2D getDefaultSize()
 	{
-		return new Size(700, 500);
+		return new Size2D(700, 500);
 	}
 
 	@RequiredUIAccess
