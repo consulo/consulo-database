@@ -19,12 +19,12 @@ package consulo.database.impl.toolWindow;
 import consulo.database.impl.toolWindow.node.DatabaseRootNode;
 import consulo.project.Project;
 import consulo.project.ui.view.tree.AbstractTreeNode;
-import consulo.ui.ex.awt.tree.TreeNode;
 import consulo.ui.ex.tree.AbstractTreeStructure;
 import consulo.ui.ex.tree.NodeDescriptor;
+import consulo.ui.ex.tree.TreeNode;
 import consulo.util.collection.ArrayUtil;
-
 import jakarta.annotation.Nonnull;
+
 import java.util.Collection;
 
 /**
