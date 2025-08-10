@@ -119,9 +119,9 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 	}
 
 	@Override
-	public String getDisplayName()
+	public LocalizeValue getDisplayName()
 	{
-		return myDataSource.getName();
+		return LocalizeValue.ofNullable(myDataSource.getName());
 	}
 
 	@Override
