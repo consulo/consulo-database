@@ -11,5 +11,6 @@ module consulo.database.sql.lang.impl {
     exports consulo.sql.lang.impl;
     exports consulo.sql.lang.impl.psi;
     exports consulo.sql.lang.impl.lexer;
+    exports consulo.sql.lang.impl.parser;
     exports consulo.sql.lang.impl.version.sql92;
 }

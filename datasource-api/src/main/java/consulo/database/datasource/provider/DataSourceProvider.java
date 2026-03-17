@@ -23,37 +23,40 @@ import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.model.DataSource;
+import consulo.language.version.LanguageVersion;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
-
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * @author VISTALL
  * @since 2020-08-12
  */
 @ExtensionAPI(ComponentScope.APPLICATION)
-public interface DataSourceProvider
-{
-	ExtensionPointName<DataSourceProvider> EP_NAME = ExtensionPointName.create(DataSourceProvider.class);
+public interface DataSourceProvider {
+    ExtensionPointName<DataSourceProvider> EP_NAME = ExtensionPointName.create(DataSourceProvider.class);
 
-	@Nonnull
-	String getId();
+    @Nonnull
+    String getId();
 
-	@Nonnull
-	LocalizeValue getName();
+    @Nonnull
+    LocalizeValue getName();
 
-	@Nonnull
-	Image getIcon();
+    @Nonnull
+    Image getIcon();
 
-	@Nonnull
-	UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource);
+    @Nullable
+    default Class<? extends LanguageVersion> getSqlDialect() {
+        return null;
+    }
 
-	default void validateConfiguration(@Nonnull PropertiesHolder propertiesHolder) throws DataSourceConfigurationException
-	{
-	}
+    @Nonnull
+    UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource);
 
-	default void fillDefaultProperties(@Nonnull EditablePropertiesHolder propertiesHolder)
-	{
-	}
+    default void validateConfiguration(@Nonnull PropertiesHolder propertiesHolder) throws DataSourceConfigurationException {
+    }
+
+    default void fillDefaultProperties(@Nonnull EditablePropertiesHolder propertiesHolder) {
+    }
 }

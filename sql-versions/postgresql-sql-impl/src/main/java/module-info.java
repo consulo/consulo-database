@@ -6,4 +6,6 @@ module consulo.database.sql.postgresql.impl {
     requires consulo.database.sql.lang.api;
     requires consulo.database.sql.lang.impl;
     requires consulo.language.impl;
+
+    exports consulo.sql.lang.impl.postgresql;
 }

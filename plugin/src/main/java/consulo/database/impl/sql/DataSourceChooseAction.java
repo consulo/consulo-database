@@ -17,18 +17,29 @@
 package consulo.database.impl.sql;
 
 import consulo.annotation.access.RequiredReadAction;
+import consulo.application.ReadAction;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
+import consulo.fileEditor.util.FileContentUtil;
+import consulo.language.psi.PsiFile;
+import consulo.language.psi.PsiManager;
+import consulo.language.version.LanguageVersion;
 import consulo.localize.LocalizeValue;
+import consulo.project.Project;
+import consulo.sql.lang.api.SqlFileType;
+import consulo.sql.lang.api.SqlLanguage;
+import consulo.sql.lang.api.psi.SqlFile;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.action.ActionGroup;
 import consulo.ui.ex.action.AnActionEvent;
 import consulo.ui.ex.action.DumbAwareAction;
 import consulo.ui.ex.action.Presentation;
 import consulo.ui.ex.awt.action.ComboBoxAction;
-
+import consulo.virtualFileSystem.VirtualFile;
 import jakarta.annotation.Nonnull;
+
 import javax.swing.*;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -37,66 +48,73 @@ import java.util.function.Supplier;
  * @author VISTALL
  * @since 31/01/2021
  */
-public class DataSourceChooseAction extends ComboBoxAction
-{
-	private final DataSourceManager myDataSourceManager;
-	private final Supplier<UUID> myGetter;
-	private final Consumer<UUID> mySetter;
+public class DataSourceChooseAction extends ComboBoxAction {
+    private final DataSourceManager myDataSourceManager;
+    private final Supplier<UUID> myGetter;
+    private final Consumer<UUID> mySetter;
 
-	public DataSourceChooseAction(DataSourceManager dataSourceManager, Supplier<UUID> getter, Consumer<UUID> setter)
-	{
-		myDataSourceManager = dataSourceManager;
-		myGetter = getter;
-		mySetter = setter;
-	}
+    public DataSourceChooseAction(DataSourceManager dataSourceManager, Supplier<UUID> getter, Consumer<UUID> setter) {
+        myDataSourceManager = dataSourceManager;
+        myGetter = getter;
+        mySetter = setter;
+    }
 
-	@Nonnull
-	@Override
-	@RequiredReadAction
-	protected ActionGroup createPopupActionGroup(JComponent button)
-	{
-		ActionGroup.Builder itemBuild = ActionGroup.newImmutableBuilder();
-		for(DataSource dataSource : myDataSourceManager.getDataSources())
-		{
-			itemBuild.add(new DumbAwareAction(dataSource.getName(), "", dataSource.getProvider().getIcon())
-			{
-				@RequiredUIAccess
-				@Override
-				public void actionPerformed(@Nonnull AnActionEvent anActionEvent)
-				{
-					mySetter.accept(dataSource.getId());
+    @Nonnull
+    @Override
+    @RequiredReadAction
+    protected ActionGroup createPopupActionGroup(JComponent button) {
+        ActionGroup.Builder itemBuild = ActionGroup.newImmutableBuilder();
+        for (DataSource dataSource : myDataSourceManager.getDataSources()) {
+            itemBuild.add(new DumbAwareAction(dataSource.getName(), "", dataSource.getProvider().getIcon()) {
+                @RequiredUIAccess
+                @Override
+                public void actionPerformed(@Nonnull AnActionEvent e) {
+                    mySetter.accept(dataSource.getId());
 
-					updatePresentation(DataSourceChooseAction.this.getTemplatePresentation());
-				}
-			});
-		}
-		return itemBuild.build();
-	}
+                    updatePresentation(DataSourceChooseAction.this.getTemplatePresentation());
+
+                    VirtualFile file = e.getData(VirtualFile.KEY);
+                    Project project = e.getRequiredData(Project.KEY);
+                    Class<? extends LanguageVersion> sqlDialect = dataSource.getProvider().getSqlDialect();
+
+                    if (file != null && sqlDialect != null && file.getFileType() == SqlFileType.INSTANCE) {
+                        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+                        if (psiFile instanceof SqlFile sqlFile) {
+                            LanguageVersion version = SqlLanguage.INSTANCE.findVersionByClass(sqlDialect);
+
+                            sqlFile.putUserData(LanguageVersion.KEY, version);
+
+                            file.putUserData(LanguageVersion.KEY, version);
+
+                            FileContentUtil.reparseFiles(project, List.of(file), true);
+                        }
+                    }
+                }
+            });
+        }
+        return itemBuild.build();
+    }
 
 
-	@RequiredUIAccess
-	@Override
-	public void update(@Nonnull AnActionEvent e)
-	{
-		Presentation presentation = e.getPresentation();
-		updatePresentation(presentation);
-	}
+    @RequiredUIAccess
+    @Override
+    public void update(@Nonnull AnActionEvent e) {
+        Presentation presentation = e.getPresentation();
+        updatePresentation(presentation);
+    }
 
-	@RequiredUIAccess
-	protected void updatePresentation(Presentation presentation)
-	{
-		UUID dataSourceId = myGetter.get();
+    @RequiredUIAccess
+    protected void updatePresentation(Presentation presentation) {
+        UUID dataSourceId = myGetter.get();
 
-		DataSource source = dataSourceId == null ? null : myDataSourceManager.findDataSource(dataSourceId);
-		if(source == null)
-		{
-			presentation.setIcon(null);
-			presentation.setTextValue(LocalizeValue.of("<Select DataSource>"));
-		}
-		else
-		{
-			presentation.setTextValue(LocalizeValue.of(source.getName()));
-			presentation.setIcon(source.getProvider().getIcon());
-		}
-	}
+        DataSource source = dataSourceId == null ? null : ReadAction.compute(() -> myDataSourceManager.findDataSource(dataSourceId));
+        if (source == null) {
+            presentation.setIcon(null);
+            presentation.setTextValue(LocalizeValue.of("<Select DataSource>"));
+        }
+        else {
+            presentation.setTextValue(LocalizeValue.of(source.getName()));
+            presentation.setIcon(source.getProvider().getIcon());
+        }
+    }
 }

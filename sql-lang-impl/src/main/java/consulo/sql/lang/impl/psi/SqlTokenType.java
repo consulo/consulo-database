@@ -44,6 +44,8 @@ public interface SqlTokenType extends TokenType {
 
     IElementType BRACKET_QUOTED_IDENTIFIER = new IElementType("SQL_BRACKET_QUOTED_IDENTIFIER", SqlLanguage.INSTANCE);
 
+    IElementType DOLLAR_QUOTED_STRING = new IElementType("SQL_DOLLAR_QUOTED_STRING", SqlLanguage.INSTANCE);
+
     IElementType C_STYLE_COMMENT = new IElementType("SQL_C_STYLE_COMMENT", SqlLanguage.INSTANCE);
 
     IElementType END_OF_LINE_COMMENT = new IElementType("SQL_END_OF_LINE_COMMENT", SqlLanguage.INSTANCE);

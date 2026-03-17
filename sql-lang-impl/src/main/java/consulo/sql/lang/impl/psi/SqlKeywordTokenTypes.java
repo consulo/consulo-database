@@ -340,78 +340,19 @@ public interface SqlKeywordTokenTypes {
     SqlKeywordElementType VARBINARY_KEYWORD = new SqlKeywordElementType("VARBINARY", SqlLanguage.INSTANCE);
     SqlKeywordElementType ZEROFILL_KEYWORD = new SqlKeywordElementType("ZEROFILL", SqlLanguage.INSTANCE);
 
-    // PostgreSQL-specific keywords
+    // Shared cross-dialect keywords
     SqlKeywordElementType ABORT_KEYWORD = new SqlKeywordElementType("ABORT", SqlLanguage.INSTANCE);
-    SqlKeywordElementType ANALYSE_KEYWORD = new SqlKeywordElementType("ANALYSE", SqlLanguage.INSTANCE);
     SqlKeywordElementType ANALYZE_KEYWORD = new SqlKeywordElementType("ANALYZE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType ARRAY_KEYWORD = new SqlKeywordElementType("ARRAY", SqlLanguage.INSTANCE);
-    SqlKeywordElementType BYTEA_KEYWORD = new SqlKeywordElementType("BYTEA", SqlLanguage.INSTANCE);
     SqlKeywordElementType CACHE_KEYWORD = new SqlKeywordElementType("CACHE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType CHECKPOINT_KEYWORD = new SqlKeywordElementType("CHECKPOINT", SqlLanguage.INSTANCE);
-    SqlKeywordElementType CLUSTER_KEYWORD = new SqlKeywordElementType("CLUSTER", SqlLanguage.INSTANCE);
-    SqlKeywordElementType COMMENT_KEYWORD = new SqlKeywordElementType("COMMENT", SqlLanguage.INSTANCE);
-    SqlKeywordElementType CONCURRENTLY_KEYWORD = new SqlKeywordElementType("CONCURRENTLY", SqlLanguage.INSTANCE);
-    SqlKeywordElementType COPY_KEYWORD = new SqlKeywordElementType("COPY", SqlLanguage.INSTANCE);
-    SqlKeywordElementType DISABLE_KEYWORD = new SqlKeywordElementType("DISABLE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType ENABLE_KEYWORD = new SqlKeywordElementType("ENABLE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType ENCODING_KEYWORD = new SqlKeywordElementType("ENCODING", SqlLanguage.INSTANCE);
-    SqlKeywordElementType EXCLUDE_KEYWORD = new SqlKeywordElementType("EXCLUDE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType EXTENSION_KEYWORD = new SqlKeywordElementType("EXTENSION", SqlLanguage.INSTANCE);
-    SqlKeywordElementType FREEZE_KEYWORD = new SqlKeywordElementType("FREEZE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType GREATEST_KEYWORD = new SqlKeywordElementType("GREATEST", SqlLanguage.INSTANCE);
-    SqlKeywordElementType ILIKE_KEYWORD = new SqlKeywordElementType("ILIKE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType IMMUTABLE_KEYWORD = new SqlKeywordElementType("IMMUTABLE", SqlLanguage.INSTANCE);
     SqlKeywordElementType INCREMENT_KEYWORD = new SqlKeywordElementType("INCREMENT", SqlLanguage.INSTANCE);
-    SqlKeywordElementType INHERIT_KEYWORD = new SqlKeywordElementType("INHERIT", SqlLanguage.INSTANCE);
-    SqlKeywordElementType INHERITS_KEYWORD = new SqlKeywordElementType("INHERITS", SqlLanguage.INSTANCE);
     SqlKeywordElementType ISNULL_KEYWORD = new SqlKeywordElementType("ISNULL", SqlLanguage.INSTANCE);
-    SqlKeywordElementType LATERAL_KEYWORD = new SqlKeywordElementType("LATERAL", SqlLanguage.INSTANCE);
-    SqlKeywordElementType LEAST_KEYWORD = new SqlKeywordElementType("LEAST", SqlLanguage.INSTANCE);
-    SqlKeywordElementType LISTEN_KEYWORD = new SqlKeywordElementType("LISTEN", SqlLanguage.INSTANCE);
     SqlKeywordElementType MATERIALIZED_KEYWORD = new SqlKeywordElementType("MATERIALIZED", SqlLanguage.INSTANCE);
-    SqlKeywordElementType MOVE_KEYWORD = new SqlKeywordElementType("MOVE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType NOTHING_KEYWORD = new SqlKeywordElementType("NOTHING", SqlLanguage.INSTANCE);
-    SqlKeywordElementType NOTIFY_KEYWORD = new SqlKeywordElementType("NOTIFY", SqlLanguage.INSTANCE);
     SqlKeywordElementType NOTNULL_KEYWORD = new SqlKeywordElementType("NOTNULL", SqlLanguage.INSTANCE);
-    SqlKeywordElementType NOWAIT_KEYWORD = new SqlKeywordElementType("NOWAIT", SqlLanguage.INSTANCE);
-    SqlKeywordElementType OPERATOR_KEYWORD = new SqlKeywordElementType("OPERATOR", SqlLanguage.INSTANCE);
-    SqlKeywordElementType OWNED_KEYWORD = new SqlKeywordElementType("OWNED", SqlLanguage.INSTANCE);
-    SqlKeywordElementType OWNER_KEYWORD = new SqlKeywordElementType("OWNER", SqlLanguage.INSTANCE);
-    SqlKeywordElementType PARALLEL_KEYWORD = new SqlKeywordElementType("PARALLEL", SqlLanguage.INSTANCE);
     SqlKeywordElementType PARTITION_KEYWORD = new SqlKeywordElementType("PARTITION", SqlLanguage.INSTANCE);
-    SqlKeywordElementType PLACING_KEYWORD = new SqlKeywordElementType("PLACING", SqlLanguage.INSTANCE);
-    SqlKeywordElementType POLICY_KEYWORD = new SqlKeywordElementType("POLICY", SqlLanguage.INSTANCE);
-    SqlKeywordElementType REASSIGN_KEYWORD = new SqlKeywordElementType("REASSIGN", SqlLanguage.INSTANCE);
     SqlKeywordElementType REINDEX_KEYWORD = new SqlKeywordElementType("REINDEX", SqlLanguage.INSTANCE);
-    SqlKeywordElementType REPLICA_KEYWORD = new SqlKeywordElementType("REPLICA", SqlLanguage.INSTANCE);
-    SqlKeywordElementType RESET_KEYWORD = new SqlKeywordElementType("RESET", SqlLanguage.INSTANCE);
-    SqlKeywordElementType RETURNING_KEYWORD = new SqlKeywordElementType("RETURNING", SqlLanguage.INSTANCE);
-    SqlKeywordElementType RULE_KEYWORD = new SqlKeywordElementType("RULE", SqlLanguage.INSTANCE);
     SqlKeywordElementType SEQUENCE_KEYWORD = new SqlKeywordElementType("SEQUENCE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType SERIAL_KEYWORD = new SqlKeywordElementType("SERIAL", SqlLanguage.INSTANCE);
-    SqlKeywordElementType SHARE_KEYWORD = new SqlKeywordElementType("SHARE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType SNAPSHOT_KEYWORD = new SqlKeywordElementType("SNAPSHOT", SqlLanguage.INSTANCE);
-    SqlKeywordElementType STABLE_KEYWORD = new SqlKeywordElementType("STABLE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType STATISTICS_KEYWORD = new SqlKeywordElementType("STATISTICS", SqlLanguage.INSTANCE);
-    SqlKeywordElementType STORAGE_KEYWORD = new SqlKeywordElementType("STORAGE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType STRICT_KEYWORD = new SqlKeywordElementType("STRICT", SqlLanguage.INSTANCE);
     SqlKeywordElementType TABLESPACE_KEYWORD = new SqlKeywordElementType("TABLESPACE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType TEMP_KEYWORD = new SqlKeywordElementType("TEMP", SqlLanguage.INSTANCE);
-    SqlKeywordElementType UNLOGGED_KEYWORD = new SqlKeywordElementType("UNLOGGED", SqlLanguage.INSTANCE);
     SqlKeywordElementType VACUUM_KEYWORD = new SqlKeywordElementType("VACUUM", SqlLanguage.INSTANCE);
-    SqlKeywordElementType VALIDATE_KEYWORD = new SqlKeywordElementType("VALIDATE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType VARIADIC_KEYWORD = new SqlKeywordElementType("VARIADIC", SqlLanguage.INSTANCE);
-    SqlKeywordElementType VERBOSE_KEYWORD = new SqlKeywordElementType("VERBOSE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType VOLATILE_KEYWORD = new SqlKeywordElementType("VOLATILE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType WINDOW_KEYWORD = new SqlKeywordElementType("WINDOW", SqlLanguage.INSTANCE);
-
-    // PostgreSQL procedural keywords
-    SqlKeywordElementType PERFORM_KEYWORD = new SqlKeywordElementType("PERFORM", SqlLanguage.INSTANCE);
-    SqlKeywordElementType RAISE_KEYWORD = new SqlKeywordElementType("RAISE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType NOTICE_KEYWORD = new SqlKeywordElementType("NOTICE", SqlLanguage.INSTANCE);
-    SqlKeywordElementType RECORD_KEYWORD = new SqlKeywordElementType("RECORD", SqlLanguage.INSTANCE);
-    SqlKeywordElementType SETOF_KEYWORD = new SqlKeywordElementType("SETOF", SqlLanguage.INSTANCE);
-    SqlKeywordElementType ELSIF_KEYWORD = new SqlKeywordElementType("ELSIF", SqlLanguage.INSTANCE);
 
     // Oracle-specific keywords
     SqlKeywordElementType ACCESS_KEYWORD = new SqlKeywordElementType("ACCESS", SqlLanguage.INSTANCE);

@@ -29,10 +29,8 @@ import jakarta.annotation.Nonnull;
  * @since 2026-03-17
  */
 @ExtensionImpl
-public class MySqlLanguageVersion extends BaseSqlLanguageVersion
-{
-    public MySqlLanguageVersion()
-    {
+public class MySqlLanguageVersion extends BaseSqlLanguageVersion {
+    public MySqlLanguageVersion() {
         super("MySQL", "MySQL");
 
         registerKeywords(Sql92TokenTypes.RESERVED_KEYWORDS);
@@ -41,8 +39,7 @@ public class MySqlLanguageVersion extends BaseSqlLanguageVersion
 
     @Nonnull
     @Override
-    public Lexer createLexer()
-    {
+    public Lexer createLexer() {
         return new SqlLexer(this, new _MySqlLexer());
     }
 }

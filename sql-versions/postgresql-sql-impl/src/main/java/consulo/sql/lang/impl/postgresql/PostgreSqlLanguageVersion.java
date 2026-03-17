@@ -18,9 +18,11 @@ package consulo.sql.lang.impl.postgresql;
 
 import consulo.annotation.component.ExtensionImpl;
 import consulo.language.lexer.Lexer;
+import consulo.language.parser.PsiParser;
 import consulo.sql.lang.impl.BaseSqlLanguageVersion;
 import consulo.sql.lang.impl.lexer.SqlLexer;
 import consulo.sql.lang.impl.postgresql.lexer._PostgreSqlLexer;
+import consulo.sql.lang.impl.postgresql.parser.PostgreSqlParser;
 import consulo.sql.lang.impl.version.sql92.Sql92TokenTypes;
 import jakarta.annotation.Nonnull;
 
@@ -41,5 +43,11 @@ public class PostgreSqlLanguageVersion extends BaseSqlLanguageVersion {
     @Override
     public Lexer createLexer() {
         return new SqlLexer(this, new _PostgreSqlLexer());
+    }
+
+    @Nonnull
+    @Override
+    public PsiParser createParser() {
+        return new PostgreSqlParser();
     }
 }

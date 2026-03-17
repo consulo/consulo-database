@@ -26,9 +26,12 @@ import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.icon.DatabaseIconGroup;
+import consulo.language.version.LanguageVersion;
 import consulo.localize.LocalizeValue;
+import consulo.sql.lang.impl.mysql.MySqlLanguageVersion;
 import consulo.ui.image.Image;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 import java.util.Map;
 
@@ -37,47 +40,46 @@ import java.util.Map;
  * @since 2020-08-13
  */
 @ExtensionImpl
-public class MysqJdbcDataSourceProvider extends JdbcDataSourceProvider
-{
-	@Nonnull
-	@Override
-	public String getId()
-	{
-		return "mysql";
-	}
+public class MysqJdbcDataSourceProvider extends JdbcDataSourceProvider {
+    @Nonnull
+    @Override
+    public String getId() {
+        return "mysql";
+    }
 
-	@Nonnull
-	@Override
-	public LocalizeValue getName()
-	{
-		return LocalizeValue.of("MySQL");
-	}
+    @Nonnull
+    @Override
+    public LocalizeValue getName() {
+        return LocalizeValue.of("MySQL");
+    }
 
-	@Nonnull
-	@Override
-	public Image getIcon()
-	{
-		return DatabaseIconGroup.providersMysql();
-	}
+    @Nonnull
+    @Override
+    public Image getIcon() {
+        return DatabaseIconGroup.providersMysql();
+    }
 
-	@Nonnull
-	@Override
-	public UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource)
-	{
-		return new JdbcConfigurable((EditableDataSource) dataSource);
-	}
+    @Nullable
+    @Override
+    public Class<? extends LanguageVersion> getSqlDialect() {
+        return MySqlLanguageVersion.class;
+    }
 
-	@Override
-	public void fillDefaultProperties(@Nonnull EditablePropertiesHolder propertiesHolder)
-	{
-		propertiesHolder.set(GenericPropertyKeys.PORT, 3306);
-		propertiesHolder.set(GenericPropertyKeys.LOGIN, "root");
-		propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
-	}
+    @Nonnull
+    @Override
+    public UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource) {
+        return new JdbcConfigurable((EditableDataSource) dataSource);
+    }
 
-	@Override
-	public void fillDrivers(Map<String, String> map)
-	{
-		map.put("mysql-connector-java-8.0.21.jar", "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar");
-	}
+    @Override
+    public void fillDefaultProperties(@Nonnull EditablePropertiesHolder propertiesHolder) {
+        propertiesHolder.set(GenericPropertyKeys.PORT, 3306);
+        propertiesHolder.set(GenericPropertyKeys.LOGIN, "root");
+        propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
+    }
+
+    @Override
+    public void fillDrivers(Map<String, String> map) {
+        map.put("mysql-connector-java-8.0.21.jar", "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar");
+    }
 }

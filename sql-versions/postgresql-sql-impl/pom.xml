@@ -79,5 +79,12 @@
             <artifactId>consulo.database-sql.lang.impl</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>consulo</groupId>
+            <artifactId>consulo-test-junit-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

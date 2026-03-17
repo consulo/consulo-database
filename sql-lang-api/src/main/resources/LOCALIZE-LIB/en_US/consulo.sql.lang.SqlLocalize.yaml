@@ -92,3 +92,31 @@ parser.end.expected:
   text: "'END' expected"
 parser.cast.expected:
   text: "'CAST' expected"
+parser.function.expected:
+  text: "'FUNCTION' expected"
+parser.procedure.expected:
+  text: "'PROCEDURE' expected"
+parser.language.expected:
+  text: "'LANGUAGE' expected"
+parser.returns.expected:
+  text: "'RETURNS' expected"
+parser.begin.expected:
+  text: "'BEGIN' expected"
+parser.dollar.quote.expected:
+  text: Dollar-quoted string expected
+parser.declare.or.begin.expected:
+  text: "'DECLARE' or 'BEGIN' expected"
+parser.semicolon.expected:
+  text: "';' expected"
+parser.then.keyword.expected:
+  text: "'THEN' expected"
+parser.end.if.expected:
+  text: "'END IF' expected"
+parser.end.loop.expected:
+  text: "'END LOOP' expected"
+parser.loop.expected:
+  text: "'LOOP' expected"
+parser.in.expected:
+  text: "'IN' expected"
+parser.or.replace.expected:
+  text: "'OR REPLACE' expected"

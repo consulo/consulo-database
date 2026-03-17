@@ -54,7 +54,7 @@ public class SqlParser implements PsiParser {
         return builder.getTreeBuilt();
     }
 
-    private void parseStatement(PsiBuilder builder) {
+    protected void parseStatement(PsiBuilder builder) {
         IElementType token = builder.getTokenType();
         if (token == null) {
             return;
@@ -100,7 +100,7 @@ public class SqlParser implements PsiParser {
         mark.done(SqlCompositeElementTypes.SELECT_STATEMENT);
     }
 
-    private void parseQueryExpression(PsiBuilder builder) {
+    protected void parseQueryExpression(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         parseSelectClause(builder);
@@ -515,7 +515,7 @@ public class SqlParser implements PsiParser {
 
     // =================== CREATE ===================
 
-    private void parseCreateStatement(PsiBuilder builder) {
+    protected void parseCreateStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.CREATE_KEYWORD, SqlLocalize.parserCreateExpected());
 
@@ -615,7 +615,7 @@ public class SqlParser implements PsiParser {
         mark.done(SqlCompositeElementTypes.COLUMN_DEFINITION);
     }
 
-    private void parseDataType(PsiBuilder builder) {
+    protected void parseDataType(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         IElementType token = builder.getTokenType();
@@ -801,7 +801,7 @@ public class SqlParser implements PsiParser {
 
     // =================== DROP ===================
 
-    private void parseDropStatement(PsiBuilder builder) {
+    protected void parseDropStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.DROP_KEYWORD, SqlLocalize.parserDropExpected());
 
@@ -926,7 +926,7 @@ public class SqlParser implements PsiParser {
 
     // =================== EXPRESSIONS ===================
 
-    private void parseExpression(PsiBuilder builder) {
+    protected void parseExpression(PsiBuilder builder) {
         parseOrExpression(builder);
     }
 
@@ -1317,7 +1317,7 @@ public class SqlParser implements PsiParser {
 
     // =================== HELPERS ===================
 
-    private void parseQualifiedName(PsiBuilder builder) {
+    protected void parseQualifiedName(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         if (isIdentifier(builder)) {
@@ -1356,7 +1356,7 @@ public class SqlParser implements PsiParser {
         }
     }
 
-    private void parseExpressionList(PsiBuilder builder) {
+    protected void parseExpressionList(PsiBuilder builder) {
         parseExpression(builder);
         while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
@@ -1364,15 +1364,15 @@ public class SqlParser implements PsiParser {
         }
     }
 
-    private boolean isToken(PsiBuilder builder, IElementType type) {
+    protected boolean isToken(PsiBuilder builder, IElementType type) {
         return builder.getTokenType() == type;
     }
 
-    private boolean isIdentifier(PsiBuilder builder) {
+    protected boolean isIdentifier(PsiBuilder builder) {
         return SqlTokenType.IDENTIFIERS.contains(builder.getTokenType());
     }
 
-    private void expectIdentifier(PsiBuilder builder, LocalizeValue errorMessage) {
+    protected void expectIdentifier(PsiBuilder builder, LocalizeValue errorMessage) {
         if (SqlTokenType.IDENTIFIERS.contains(builder.getTokenType())) {
             builder.advanceLexer();
         }
@@ -1381,12 +1381,12 @@ public class SqlParser implements PsiParser {
         }
     }
 
-    private boolean isTokenIdentifierText(PsiBuilder builder, String text) {
+    protected boolean isTokenIdentifierText(PsiBuilder builder, String text) {
         return SqlTokenType.IDENTIFIERS.contains(builder.getTokenType())
             && text.equalsIgnoreCase(builder.getTokenText());
     }
 
-    private void expectToken(PsiBuilder builder, IElementType type, LocalizeValue errorMessage) {
+    protected void expectToken(PsiBuilder builder, IElementType type, LocalizeValue errorMessage) {
         if (builder.getTokenType() == type) {
             builder.advanceLexer();
         }
@@ -1395,7 +1395,7 @@ public class SqlParser implements PsiParser {
         }
     }
 
-    private void expectKeyword(PsiBuilder builder, IElementType keyword, LocalizeValue errorMessage) {
+    protected void expectKeyword(PsiBuilder builder, IElementType keyword, LocalizeValue errorMessage) {
         if (builder.getTokenType() == keyword) {
             builder.advanceLexer();
         }
@@ -1434,7 +1434,7 @@ public class SqlParser implements PsiParser {
         return builder.lookAhead(1) == expected;
     }
 
-    private boolean lookAheadTokenIs(PsiBuilder builder, IElementType expected) {
+    protected boolean lookAheadTokenIs(PsiBuilder builder, IElementType expected) {
         return builder.lookAhead(1) == expected;
     }
 }

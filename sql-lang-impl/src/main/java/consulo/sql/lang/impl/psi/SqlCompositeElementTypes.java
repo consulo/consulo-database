@@ -92,4 +92,25 @@ public interface SqlCompositeElementTypes {
 
     // ORDER BY item
     IElementType ORDER_ITEM = new IElementType("SQL_ORDER_ITEM", SqlLanguage.INSTANCE);
+
+    // Function/Procedure statements
+    IElementType CREATE_FUNCTION_STATEMENT = new IElementType("SQL_CREATE_FUNCTION_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType CREATE_PROCEDURE_STATEMENT = new IElementType("SQL_CREATE_PROCEDURE_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType DROP_FUNCTION_STATEMENT = new IElementType("SQL_DROP_FUNCTION_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType DROP_PROCEDURE_STATEMENT = new IElementType("SQL_DROP_PROCEDURE_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType PARAMETER_DEFINITION = new IElementType("SQL_PARAMETER_DEFINITION", SqlLanguage.INSTANCE);
+    IElementType PARAMETER_LIST = new IElementType("SQL_PARAMETER_LIST", SqlLanguage.INSTANCE);
+
+    // PL/pgSQL block elements
+    IElementType PLPGSQL_BLOCK = new IElementType("SQL_PLPGSQL_BLOCK", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_DECLARE_SECTION = new IElementType("SQL_PLPGSQL_DECLARE_SECTION", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_VARIABLE_DECLARATION = new IElementType("SQL_PLPGSQL_VARIABLE_DECLARATION", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_IF_STATEMENT = new IElementType("SQL_PLPGSQL_IF_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_LOOP_STATEMENT = new IElementType("SQL_PLPGSQL_LOOP_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_WHILE_STATEMENT = new IElementType("SQL_PLPGSQL_WHILE_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_FOR_STATEMENT = new IElementType("SQL_PLPGSQL_FOR_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_RETURN_STATEMENT = new IElementType("SQL_PLPGSQL_RETURN_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_RAISE_STATEMENT = new IElementType("SQL_PLPGSQL_RAISE_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_PERFORM_STATEMENT = new IElementType("SQL_PLPGSQL_PERFORM_STATEMENT", SqlLanguage.INSTANCE);
+    IElementType PLPGSQL_ASSIGNMENT_STATEMENT = new IElementType("SQL_PLPGSQL_ASSIGNMENT_STATEMENT", SqlLanguage.INSTANCE);
 }

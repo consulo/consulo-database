@@ -28,12 +28,14 @@ import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.provider.DataSourceConfigurationException;
 import consulo.database.icon.DatabaseIconGroup;
+import consulo.language.version.LanguageVersion;
 import consulo.localize.LocalizeValue;
+import consulo.sql.lang.impl.postgresql.PostgreSqlLanguageVersion;
 import consulo.ui.image.Image;
 import consulo.util.lang.StringUtil;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.Map;
 
 /**
@@ -41,63 +43,59 @@ import java.util.Map;
  * @since 2020-08-19
  */
 @ExtensionImpl
-public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider
-{
-	@Nonnull
-	@Override
-	public String getId()
-	{
-		return "postgresql";
-	}
+public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider {
+    @Nonnull
+    @Override
+    public String getId() {
+        return "postgresql";
+    }
 
-	@Nonnull
-	@Override
-	public LocalizeValue getName()
-	{
-		return LocalizeValue.of("PostgreSQL");
-	}
+    @Nonnull
+    @Override
+    public LocalizeValue getName() {
+        return LocalizeValue.of("PostgreSQL");
+    }
 
-	@Nonnull
-	@Override
-	public Image getIcon()
-	{
-		return DatabaseIconGroup.providersPostgresql();
-	}
+    @Nonnull
+    @Override
+    public Image getIcon() {
+        return DatabaseIconGroup.providersPostgresql();
+    }
 
-	@Nonnull
-	@Override
-	public UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource)
-	{
-		return new JdbcConfigurable((EditableDataSource) dataSource);
-	}
+    @Nullable
+    @Override
+    public Class<? extends LanguageVersion> getSqlDialect() {
+        return PostgreSqlLanguageVersion.class;
+    }
 
-	@Override
-	public void fillDefaultProperties(@Nonnull EditablePropertiesHolder propertiesHolder)
-	{
-		propertiesHolder.set(GenericPropertyKeys.PORT, 5432);
-		propertiesHolder.set(GenericPropertyKeys.LOGIN, "postgres");
-		propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
-	}
+    @Nonnull
+    @Override
+    public UnnamedConfigurable createConfigurable(@Nonnull DataSource dataSource) {
+        return new JdbcConfigurable((EditableDataSource) dataSource);
+    }
 
-	@Override
-	public void validateConfiguration(@Nonnull PropertiesHolder propertiesHolder) throws DataSourceConfigurationException
-	{
-		String dbName = propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME);
-		if(StringUtil.isEmptyOrSpaces(dbName))
-		{
-			throw new DataSourceConfigurationException(LocalizeValue.localizeTODO("Database must be not empty"));
-		}
-	}
+    @Override
+    public void fillDefaultProperties(@Nonnull EditablePropertiesHolder propertiesHolder) {
+        propertiesHolder.set(GenericPropertyKeys.PORT, 5432);
+        propertiesHolder.set(GenericPropertyKeys.LOGIN, "postgres");
+        propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
+    }
 
-	@Override
-	public void fillDrivers(Map<String, String> map)
-	{
-		map.put("postgresql-42.2.15.jar", "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.15/postgresql-42.2.15.jar");
-	}
+    @Override
+    public void validateConfiguration(@Nonnull PropertiesHolder propertiesHolder) throws DataSourceConfigurationException {
+        String dbName = propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME);
+        if (StringUtil.isEmptyOrSpaces(dbName)) {
+            throw new DataSourceConfigurationException(LocalizeValue.localizeTODO("Database must be not empty"));
+        }
+    }
 
-	@Override
-	public boolean isTableType(@Nullable String type)
-	{
-		return super.isTableType(type) || "SYSTEM TABLE".equals(type);
-	}
+    @Override
+    public void fillDrivers(Map<String, String> map) {
+        map.put("postgresql-42.2.15.jar", "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.15/postgresql-42.2.15.jar");
+    }
+
+    @Override
+    public boolean isTableType(@Nullable String type) {
+        return super.isTableType(type) || "SYSTEM TABLE".equals(type);
+    }
 }
