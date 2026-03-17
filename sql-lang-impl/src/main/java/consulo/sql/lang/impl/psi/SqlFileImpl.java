@@ -20,17 +20,14 @@ import consulo.language.file.FileViewProvider;
 import consulo.language.impl.psi.PsiFileBase;
 import consulo.sql.lang.api.SqlLanguage;
 import consulo.sql.lang.api.psi.SqlFile;
-
 import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL
  * @since 22/10/2021
  */
-public class SqlFileImpl extends PsiFileBase implements SqlFile
-{
-	public SqlFileImpl(@Nonnull FileViewProvider viewProvider)
-	{
-		super(viewProvider, SqlLanguage.INSTANCE);
-	}
+public class SqlFileImpl extends PsiFileBase implements SqlFile {
+    public SqlFileImpl(@Nonnull FileViewProvider viewProvider) {
+        super(viewProvider, SqlLanguage.INSTANCE);
+    }
 }

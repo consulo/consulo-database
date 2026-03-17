@@ -22,7 +22,6 @@ import consulo.language.Language;
 import consulo.language.PairedBraceMatcher;
 import consulo.sql.lang.api.SqlLanguage;
 import consulo.sql.lang.impl.psi.SqlTokenType;
-
 import jakarta.annotation.Nonnull;
 
 /**
@@ -30,22 +29,19 @@ import jakarta.annotation.Nonnull;
  * @since 02/12/2021
  */
 @ExtensionImpl
-public class SqlPairBraceMatcher implements PairedBraceMatcher
-{
-	private final BracePair[] myPairBraces = {
-			new BracePair(SqlTokenType.LPAR, SqlTokenType.RPAR, false)
-	};
+public class SqlPairBraceMatcher implements PairedBraceMatcher {
+    private final BracePair[] myPairBraces = {
+        new BracePair(SqlTokenType.LPAR, SqlTokenType.RPAR, false)
+    };
 
-	@Override
-	public BracePair[] getPairs()
-	{
-		return myPairBraces;
-	}
+    @Override
+    public BracePair[] getPairs() {
+        return myPairBraces;
+    }
 
-	@Nonnull
-	@Override
-	public Language getLanguage()
-	{
-		return SqlLanguage.INSTANCE;
-	}
+    @Nonnull
+    @Override
+    public Language getLanguage() {
+        return SqlLanguage.INSTANCE;
+    }
 }

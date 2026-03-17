@@ -18,14 +18,15 @@ package consulo.sql.lang.impl.parser;
 
 import consulo.annotation.component.ExtensionImpl;
 import consulo.language.Language;
+import consulo.language.ast.ASTNode;
+import consulo.language.ast.IElementType;
 import consulo.language.ast.IFileElementType;
 import consulo.language.file.FileViewProvider;
+import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
 import consulo.language.version.LanguageVersionableParserDefinition;
 import consulo.sql.lang.api.SqlLanguage;
-import consulo.sql.lang.impl.psi.SqlFileImpl;
-import consulo.sql.lang.impl.psi.SqlKeywordTokenTypes;
-
+import consulo.sql.lang.impl.psi.*;
 import jakarta.annotation.Nonnull;
 
 /**
@@ -33,33 +34,88 @@ import jakarta.annotation.Nonnull;
  * @since 22/10/2021
  */
 @ExtensionImpl
-public class SqlParserDefinition extends LanguageVersionableParserDefinition
-{
-	private static final IFileElementType FILE_ELEMENT_TYPE = new IFileElementType("SQL_FILE", SqlLanguage.INSTANCE);
+public class SqlParserDefinition extends LanguageVersionableParserDefinition {
+    private static final IFileElementType FILE_ELEMENT_TYPE = new IFileElementType("SQL_FILE", SqlLanguage.INSTANCE);
 
-	static
-	{
-		SqlKeywordTokenTypes.init();
-	}
+    static {
+        SqlKeywordTokenTypes.init();
+    }
 
-	@Nonnull
-	@Override
-	public Language getLanguage()
-	{
-		return SqlLanguage.INSTANCE;
-	}
+    @Nonnull
+    @Override
+    public Language getLanguage() {
+        return SqlLanguage.INSTANCE;
+    }
 
-	@Nonnull
-	@Override
-	public IFileElementType getFileNodeType()
-	{
-		return FILE_ELEMENT_TYPE;
-	}
+    @Nonnull
+    @Override
+    public IFileElementType getFileNodeType() {
+        return FILE_ELEMENT_TYPE;
+    }
 
-	@Nonnull
-	@Override
-	public PsiFile createFile(@Nonnull FileViewProvider fileViewProvider)
-	{
-		return new SqlFileImpl(fileViewProvider);
-	}
+    @Nonnull
+    @Override
+    public PsiFile createFile(@Nonnull FileViewProvider fileViewProvider) {
+        return new SqlFileImpl(fileViewProvider);
+    }
+
+    @Nonnull
+    @Override
+    public PsiElement createElement(@Nonnull ASTNode node) {
+        IElementType type = node.getElementType();
+
+        if (type == SqlCompositeElementTypes.SELECT_STATEMENT) {
+            return new SqlSelectStatementImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.INSERT_STATEMENT) {
+            return new SqlInsertStatementImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.UPDATE_STATEMENT) {
+            return new SqlUpdateStatementImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.DELETE_STATEMENT) {
+            return new SqlDeleteStatementImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.CREATE_TABLE_STATEMENT) {
+            return new SqlCreateTableStatementImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.DROP_TABLE_STATEMENT) {
+            return new SqlDropTableStatementImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.ALTER_TABLE_STATEMENT) {
+            return new SqlAlterTableStatementImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.QUERY_EXPRESSION) {
+            return new SqlQueryExpressionImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.SELECT_CLAUSE) {
+            return new SqlSelectClauseImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.FROM_CLAUSE) {
+            return new SqlFromClauseImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.WHERE_CLAUSE) {
+            return new SqlWhereClauseImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.BINARY_EXPRESSION) {
+            return new SqlBinaryExpressionImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.FUNCTION_CALL_EXPRESSION) {
+            return new SqlFunctionCallExpressionImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.LITERAL_EXPRESSION) {
+            return new SqlLiteralExpressionImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.REFERENCE_EXPRESSION) {
+            return new SqlReferenceExpressionImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.TABLE_EXPRESSION) {
+            return new SqlTableExpressionImpl(node);
+        }
+        if (type == SqlCompositeElementTypes.COLUMN_DEFINITION) {
+            return new SqlColumnDefinitionImpl(node);
+        }
+
+        return new SqlCompositeElementImpl(node);
+    }
 }

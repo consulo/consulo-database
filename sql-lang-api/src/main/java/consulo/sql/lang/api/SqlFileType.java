@@ -20,47 +20,40 @@ import consulo.language.file.LanguageFileType;
 import consulo.localize.LocalizeValue;
 import consulo.sql.lang.api.icon.SqlLangApiIconGroup;
 import consulo.ui.image.Image;
-
 import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL
  * @since 2020-10-31
  */
-public class SqlFileType extends LanguageFileType
-{
-	public static final SqlFileType INSTANCE = new SqlFileType();
+public class SqlFileType extends LanguageFileType {
+    public static final SqlFileType INSTANCE = new SqlFileType();
 
-	private SqlFileType()
-	{
-		super(SqlLanguage.INSTANCE);
-	}
+    private SqlFileType() {
+        super(SqlLanguage.INSTANCE);
+    }
 
-	@Nonnull
-	@Override
-	public String getId()
-	{
-		return "SQL";
-	}
+    @Nonnull
+    @Override
+    public String getId() {
+        return "SQL";
+    }
 
-	@Nonnull
-	@Override
-	public LocalizeValue getDescription()
-	{
-		return LocalizeValue.localizeTODO("SQL files");
-	}
+    @Nonnull
+    @Override
+    public LocalizeValue getDescription() {
+        return LocalizeValue.localizeTODO("SQL files");
+    }
 
-	@Nonnull
-	@Override
-	public String getDefaultExtension()
-	{
-		return "sql";
-	}
+    @Nonnull
+    @Override
+    public String getDefaultExtension() {
+        return "sql";
+    }
 
-	@Nonnull
-	@Override
-	public Image getIcon()
-	{
-		return SqlLangApiIconGroup.sql();
-	}
+    @Nonnull
+    @Override
+    public Image getIcon() {
+        return SqlLangApiIconGroup.sql();
+    }
 }

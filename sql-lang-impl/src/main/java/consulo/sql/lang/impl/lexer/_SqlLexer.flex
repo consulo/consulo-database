@@ -33,7 +33,7 @@ SINGLE_QUOTED_LITERAL="'"([^\\\']|{ESCAPE_SEQUENCE})*("'"|\\)?
 
 DIGIT=[0-9]
 
-NUMBER={DIGIT}*
+NUMBER={DIGIT}+
 
 %%
 
@@ -54,5 +54,33 @@ NUMBER={DIGIT}*
 <YYINITIAL> ")" { return SqlTokenType.RPAR; }
 
 <YYINITIAL> "," { return SqlTokenType.COMMA; }
+
+<YYINITIAL> "." { return SqlTokenType.DOT; }
+
+<YYINITIAL> ";" { return SqlTokenType.SEMICOLON; }
+
+<YYINITIAL> "*" { return SqlTokenType.ASTERISK; }
+
+<YYINITIAL> "||" { return SqlTokenType.CONCAT; }
+
+<YYINITIAL> "<>" { return SqlTokenType.NE; }
+
+<YYINITIAL> "!=" { return SqlTokenType.NE; }
+
+<YYINITIAL> "<=" { return SqlTokenType.LE; }
+
+<YYINITIAL> ">=" { return SqlTokenType.GE; }
+
+<YYINITIAL> "=" { return SqlTokenType.EQ; }
+
+<YYINITIAL> "<" { return SqlTokenType.LT; }
+
+<YYINITIAL> ">" { return SqlTokenType.GT; }
+
+<YYINITIAL> "+" { return SqlTokenType.PLUS; }
+
+<YYINITIAL> "-" { return SqlTokenType.MINUS; }
+
+<YYINITIAL> "/" { return SqlTokenType.SLASH; }
 
 <YYINITIAL>  . { return TokenType.BAD_CHARACTER; }

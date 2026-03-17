@@ -28,36 +28,29 @@ import jakarta.annotation.Nonnull;
  * @author VISTALL
  * @since 22/10/2021
  */
-public class SqlLexer extends LookAheadLexer
-{
-	@Nonnull
-	private final BaseSqlLanguageVersion myBaseSqlLanguageVersion;
+public class SqlLexer extends LookAheadLexer {
+    @Nonnull
+    private final BaseSqlLanguageVersion myBaseSqlLanguageVersion;
 
-	public SqlLexer(@Nonnull BaseSqlLanguageVersion baseSqlLanguageVersion)
-	{
-		super(new _SqlLexer());
-		myBaseSqlLanguageVersion = baseSqlLanguageVersion;
-	}
+    public SqlLexer(@Nonnull BaseSqlLanguageVersion baseSqlLanguageVersion) {
+        super(new _SqlLexer());
+        myBaseSqlLanguageVersion = baseSqlLanguageVersion;
+    }
 
-	@Override
-	protected void lookAhead(Lexer baseLexer)
-	{
-		IElementType tokenType = baseLexer.getTokenType();
-		if(tokenType == SqlTokenType.IDENTIFIER)
-		{
-			IElementType keywordElement = SqlKeywordElementType.toKeyword(baseLexer.getTokenSequence());
-			if(keywordElement != null && myBaseSqlLanguageVersion.getReservedKeywords().contains(keywordElement))
-			{
-				advanceAs(baseLexer, keywordElement);
-			}
-			else
-			{
-				super.lookAhead(baseLexer);
-			}
-		}
-		else
-		{
-			super.lookAhead(baseLexer);
-		}
-	}
+    @Override
+    protected void lookAhead(Lexer baseLexer) {
+        IElementType tokenType = baseLexer.getTokenType();
+        if (tokenType == SqlTokenType.IDENTIFIER) {
+            IElementType keywordElement = SqlKeywordElementType.toKeyword(baseLexer.getTokenSequence());
+            if (keywordElement != null && myBaseSqlLanguageVersion.getReservedKeywords().contains(keywordElement)) {
+                advanceAs(baseLexer, keywordElement);
+            }
+            else {
+                super.lookAhead(baseLexer);
+            }
+        }
+        else {
+            super.lookAhead(baseLexer);
+        }
+    }
 }

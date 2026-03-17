@@ -2,9 +2,9 @@
  * @author VISTALL
  * @since 08-Jul-22
  */
-module consulo.database.sql.lang.impl
-{
-	requires consulo.ide.api;
-	requires consulo.database.sql.lang.api;
-	requires consulo.language.impl;
+module consulo.database.sql.lang.impl {
+    requires consulo.database.sql.lang.api;
+
+    requires consulo.language.editor.api;
+    requires consulo.language.impl;
 }

@@ -22,6 +22,5 @@ import consulo.language.psi.PsiFile;
  * @author VISTALL
  * @since 22/10/2021
  */
-public interface SqlFile extends PsiFile
-{
+public interface SqlFile extends PsiFile {
 }

@@ -34,43 +34,50 @@ import java.util.Map;
  * @author VISTALL
  * @since 22/10/2021
  */
-public class SqlSyntaxHighlighter extends LanguageVersionableSyntaxHighlighter
-{
-	private static Map<IElementType, TextAttributesKey> ourTextAttributes = new HashMap<>();
+public class SqlSyntaxHighlighter extends LanguageVersionableSyntaxHighlighter {
+    private static Map<IElementType, TextAttributesKey> ourTextAttributes = new HashMap<>();
 
-	static
-	{
-		safeMap(ourTextAttributes, SqlTokenType.LPAR, DefaultLanguageHighlighterColors.PARENTHESES);
-		safeMap(ourTextAttributes, SqlTokenType.RPAR, DefaultLanguageHighlighterColors.PARENTHESES);
-		safeMap(ourTextAttributes, SqlTokenType.COMMA, DefaultLanguageHighlighterColors.COMMA);
-		safeMap(ourTextAttributes, SqlTokenType.IDENTIFIER, DefaultLanguageHighlighterColors.IDENTIFIER);
-		safeMap(ourTextAttributes, SqlTokenType.SINGLE_QUOTED_LITERAL, DefaultLanguageHighlighterColors.STRING);
-		safeMap(ourTextAttributes, SqlTokenType.NUMBER, DefaultLanguageHighlighterColors.NUMBER);
-		safeMap(ourTextAttributes, SqlTokenType.C_STYLE_COMMENT, DefaultLanguageHighlighterColors.BLOCK_COMMENT);
-		safeMap(ourTextAttributes, SqlTokenType.END_OF_LINE_COMMENT, DefaultLanguageHighlighterColors.LINE_COMMENT);
-	}
+    static {
+        safeMap(ourTextAttributes, SqlTokenType.LPAR, DefaultLanguageHighlighterColors.PARENTHESES);
+        safeMap(ourTextAttributes, SqlTokenType.RPAR, DefaultLanguageHighlighterColors.PARENTHESES);
+        safeMap(ourTextAttributes, SqlTokenType.COMMA, DefaultLanguageHighlighterColors.COMMA);
+        safeMap(ourTextAttributes, SqlTokenType.DOT, DefaultLanguageHighlighterColors.DOT);
+        safeMap(ourTextAttributes, SqlTokenType.SEMICOLON, DefaultLanguageHighlighterColors.SEMICOLON);
+        safeMap(ourTextAttributes, SqlTokenType.IDENTIFIER, DefaultLanguageHighlighterColors.IDENTIFIER);
+        safeMap(ourTextAttributes, SqlTokenType.SINGLE_QUOTED_LITERAL, DefaultLanguageHighlighterColors.STRING);
+        safeMap(ourTextAttributes, SqlTokenType.NUMBER, DefaultLanguageHighlighterColors.NUMBER);
+        safeMap(ourTextAttributes, SqlTokenType.ASTERISK, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.EQ, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.NE, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.LT, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.GT, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.LE, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.GE, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.PLUS, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.MINUS, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.SLASH, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.CONCAT, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+        safeMap(ourTextAttributes, SqlTokenType.C_STYLE_COMMENT, DefaultLanguageHighlighterColors.BLOCK_COMMENT);
+        safeMap(ourTextAttributes, SqlTokenType.END_OF_LINE_COMMENT, DefaultLanguageHighlighterColors.LINE_COMMENT);
+    }
 
-	public SqlSyntaxHighlighter(LanguageVersion languageVersion)
-	{
-		super(languageVersion);
-	}
+    public SqlSyntaxHighlighter(LanguageVersion languageVersion) {
+        super(languageVersion);
+    }
 
-	@Override
-	public Lexer getHighlightingLexer(LanguageVersion languageVersion)
-	{
-		BaseSqlLanguageVersion sqlLanguageVersion = (BaseSqlLanguageVersion) languageVersion;
-		return sqlLanguageVersion.createLexer();
-	}
+    @Override
+    public Lexer getHighlightingLexer(LanguageVersion languageVersion) {
+        BaseSqlLanguageVersion sqlLanguageVersion = (BaseSqlLanguageVersion) languageVersion;
+        return sqlLanguageVersion.createLexer();
+    }
 
-	@Nonnull
-	@Override
-	public TextAttributesKey[] getTokenHighlights(IElementType tokenType)
-	{
-		if(SqlKeywordElementType.isKeyword(tokenType))
-		{
-			return pack(DefaultLanguageHighlighterColors.KEYWORD);
-		}
+    @Nonnull
+    @Override
+    public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
+        if (SqlKeywordElementType.isKeyword(tokenType)) {
+            return pack(DefaultLanguageHighlighterColors.KEYWORD);
+        }
 
-		return pack(ourTextAttributes.get(tokenType));
-	}
+        return pack(ourTextAttributes.get(tokenType));
+    }
 }

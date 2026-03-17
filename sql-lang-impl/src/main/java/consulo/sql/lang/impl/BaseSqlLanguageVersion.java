@@ -24,65 +24,55 @@ import consulo.sql.lang.api.SqlLanguageVersion;
 import consulo.sql.lang.impl.lexer.SqlLexer;
 import consulo.sql.lang.impl.parser.SqlParser;
 import consulo.sql.lang.impl.psi.SqlTokenType;
-
 import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL
  * @since 22/10/2021
  */
-public class BaseSqlLanguageVersion extends SqlLanguageVersion implements LanguageVersionWithParsing
-{
-	private TokenSet myReservedKeywords = TokenSet.EMPTY;
+public abstract class BaseSqlLanguageVersion extends SqlLanguageVersion implements LanguageVersionWithParsing {
+    private TokenSet myReservedKeywords = TokenSet.EMPTY;
 
-	public BaseSqlLanguageVersion(@Nonnull String id, @Nonnull String name)
-	{
-		super(id, name);
-	}
+    public BaseSqlLanguageVersion(@Nonnull String id, @Nonnull String name) {
+        super(id, name);
+    }
 
-	public void addReservedKeywords(TokenSet tokenSet)
-	{
-		myReservedKeywords = TokenSet.orSet(myReservedKeywords, tokenSet);
-	}
+    public void addReservedKeywords(TokenSet tokenSet) {
+        myReservedKeywords = TokenSet.orSet(myReservedKeywords, tokenSet);
+    }
 
-	@Nonnull
-	public TokenSet getReservedKeywords()
-	{
-		return myReservedKeywords;
-	}
+    @Nonnull
+    public TokenSet getReservedKeywords() {
+        return myReservedKeywords;
+    }
 
-	@Nonnull
-	@Override
-	public Lexer createLexer()
-	{
-		return new SqlLexer(this);
-	}
+    @Nonnull
+    @Override
+    public Lexer createLexer() {
+        return new SqlLexer(this);
+    }
 
-	@Nonnull
-	@Override
-	public PsiParser createParser()
-	{
-		return new SqlParser();
-	}
+    @Nonnull
+    @Override
+    public PsiParser createParser() {
+        return new SqlParser();
+    }
 
-	@Nonnull
-	@Override
-	public TokenSet getWhitespaceTokens()
-	{
-		return TokenSet.WHITE_SPACE;
-	}
+    @Nonnull
+    @Override
+    public TokenSet getWhitespaceTokens() {
+        return TokenSet.WHITE_SPACE;
+    }
 
-	@Nonnull
-	@Override
-	public TokenSet getCommentTokens()
-	{
-		return SqlTokenType.COMMENTS;
-	}
+    @Nonnull
+    @Override
+    public TokenSet getCommentTokens() {
+        return SqlTokenType.COMMENTS;
+    }
 
-	@Nonnull
-	@Override
-	public TokenSet getStringLiteralElements()
-	{
-		return SqlTokenType.STRINGS;
-	}
+    @Nonnull
+    @Override
+    public TokenSet getStringLiteralElements() {
+        return SqlTokenType.STRINGS;
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 consulo.io
+ * Copyright 2013-2026 consulo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@ package consulo.sql.lang.api.psi;
 
 /**
  * @author VISTALL
- * @since 09/12/2021
+ * @since 2026-02-28
  */
-public interface SqlWhereClause extends SqlQueryClause
-{
+public interface SqlWhereClause extends SqlQueryClause {
 }
