@@ -275,11 +275,15 @@ public class PostgreSqlParser extends SqlParser {
             else if (isToken(builder, PostgreSqlTokenTypes.IMMUTABLE_KEYWORD)
                 || isToken(builder, PostgreSqlTokenTypes.STABLE_KEYWORD)
                 || isToken(builder, PostgreSqlTokenTypes.VOLATILE_KEYWORD)
-                || isToken(builder, PostgreSqlTokenTypes.STRICT_KEYWORD)
-                || isToken(builder, PostgreSqlTokenTypes.PARALLEL_KEYWORD)) {
+                || isToken(builder, PostgreSqlTokenTypes.STRICT_KEYWORD)) {
                 builder.advanceLexer();
-                // PARALLEL SAFE/UNSAFE/RESTRICTED
-                if (isIdentifier(builder)) {
+            }
+            else if (isToken(builder, PostgreSqlTokenTypes.PARALLEL_KEYWORD)) {
+                builder.advanceLexer(); // PARALLEL
+                // SAFE/UNSAFE/RESTRICTED
+                if (isTokenIdentifierText(builder, "SAFE")
+                    || isTokenIdentifierText(builder, "UNSAFE")
+                    || isTokenIdentifierText(builder, "RESTRICTED")) {
                     builder.advanceLexer();
                 }
             }

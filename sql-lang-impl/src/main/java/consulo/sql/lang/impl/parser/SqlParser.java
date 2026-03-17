@@ -1369,11 +1369,13 @@ public class SqlParser implements PsiParser {
     }
 
     protected boolean isIdentifier(PsiBuilder builder) {
-        return SqlTokenType.IDENTIFIERS.contains(builder.getTokenType());
+        IElementType token = builder.getTokenType();
+        return SqlTokenType.IDENTIFIERS.contains(token) || token instanceof SqlKeywordElementType;
     }
 
     protected void expectIdentifier(PsiBuilder builder, LocalizeValue errorMessage) {
-        if (SqlTokenType.IDENTIFIERS.contains(builder.getTokenType())) {
+        IElementType token = builder.getTokenType();
+        if (SqlTokenType.IDENTIFIERS.contains(token) || token instanceof SqlKeywordElementType) {
             builder.advanceLexer();
         }
         else {
@@ -1404,7 +1406,7 @@ public class SqlParser implements PsiParser {
         }
     }
 
-    private boolean isStatementBoundary(PsiBuilder builder) {
+    protected boolean isStatementBoundary(PsiBuilder builder) {
         IElementType t = builder.getTokenType();
         return t == SqlKeywordTokenTypes.FROM_KEYWORD
             || t == SqlKeywordTokenTypes.WHERE_KEYWORD
@@ -1422,11 +1424,14 @@ public class SqlParser implements PsiParser {
             || t == SqlKeywordTokenTypes.FULL_KEYWORD
             || t == SqlKeywordTokenTypes.CROSS_KEYWORD
             || t == SqlKeywordTokenTypes.NATURAL_KEYWORD
+            || t == SqlKeywordTokenTypes.USING_KEYWORD
             || t == SqlKeywordTokenTypes.SET_KEYWORD
             || t == SqlKeywordTokenTypes.VALUES_KEYWORD
             || t == SqlKeywordTokenTypes.INTO_KEYWORD
+            || t == SqlKeywordTokenTypes.LIMIT_KEYWORD
             || t == SqlTokenType.SEMICOLON
-            || t == SqlTokenType.RPAR;
+            || t == SqlTokenType.RPAR
+            || t == SqlTokenType.COMMA;
     }
 
     private boolean lookAheadIs(PsiBuilder builder, IElementType expected) {
