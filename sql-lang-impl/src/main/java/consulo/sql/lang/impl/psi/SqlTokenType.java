@@ -38,6 +38,12 @@ public interface SqlTokenType extends TokenType {
 
     IElementType SINGLE_QUOTED_LITERAL = new IElementType("SQL_SINGLE_QUOTED_LITERAL", SqlLanguage.INSTANCE);
 
+    IElementType BACKTICK_QUOTED_IDENTIFIER = new IElementType("SQL_BACKTICK_QUOTED_IDENTIFIER", SqlLanguage.INSTANCE);
+
+    IElementType DOUBLE_QUOTED_IDENTIFIER = new IElementType("SQL_DOUBLE_QUOTED_IDENTIFIER", SqlLanguage.INSTANCE);
+
+    IElementType BRACKET_QUOTED_IDENTIFIER = new IElementType("SQL_BRACKET_QUOTED_IDENTIFIER", SqlLanguage.INSTANCE);
+
     IElementType C_STYLE_COMMENT = new IElementType("SQL_C_STYLE_COMMENT", SqlLanguage.INSTANCE);
 
     IElementType END_OF_LINE_COMMENT = new IElementType("SQL_END_OF_LINE_COMMENT", SqlLanguage.INSTANCE);
@@ -67,6 +73,8 @@ public interface SqlTokenType extends TokenType {
     IElementType SLASH = new IElementType("SQL_SLASH", SqlLanguage.INSTANCE);
 
     IElementType CONCAT = new IElementType("SQL_CONCAT", SqlLanguage.INSTANCE);
+
+    TokenSet IDENTIFIERS = TokenSet.create(IDENTIFIER, BACKTICK_QUOTED_IDENTIFIER, DOUBLE_QUOTED_IDENTIFIER, BRACKET_QUOTED_IDENTIFIER);
 
     TokenSet COMMENTS = TokenSet.create(C_STYLE_COMMENT, END_OF_LINE_COMMENT);
 

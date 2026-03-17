@@ -7,4 +7,9 @@ module consulo.database.sql.lang.impl {
 
     requires consulo.language.editor.api;
     requires consulo.language.impl;
+
+    exports consulo.sql.lang.impl;
+    exports consulo.sql.lang.impl.psi;
+    exports consulo.sql.lang.impl.lexer;
+    exports consulo.sql.lang.impl.version.sql92;
 }

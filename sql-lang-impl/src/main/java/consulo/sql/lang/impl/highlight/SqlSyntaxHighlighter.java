@@ -44,6 +44,9 @@ public class SqlSyntaxHighlighter extends LanguageVersionableSyntaxHighlighter {
         safeMap(ourTextAttributes, SqlTokenType.DOT, DefaultLanguageHighlighterColors.DOT);
         safeMap(ourTextAttributes, SqlTokenType.SEMICOLON, DefaultLanguageHighlighterColors.SEMICOLON);
         safeMap(ourTextAttributes, SqlTokenType.IDENTIFIER, DefaultLanguageHighlighterColors.IDENTIFIER);
+        safeMap(ourTextAttributes, SqlTokenType.BACKTICK_QUOTED_IDENTIFIER, DefaultLanguageHighlighterColors.IDENTIFIER);
+        safeMap(ourTextAttributes, SqlTokenType.DOUBLE_QUOTED_IDENTIFIER, DefaultLanguageHighlighterColors.IDENTIFIER);
+        safeMap(ourTextAttributes, SqlTokenType.BRACKET_QUOTED_IDENTIFIER, DefaultLanguageHighlighterColors.IDENTIFIER);
         safeMap(ourTextAttributes, SqlTokenType.SINGLE_QUOTED_LITERAL, DefaultLanguageHighlighterColors.STRING);
         safeMap(ourTextAttributes, SqlTokenType.NUMBER, DefaultLanguageHighlighterColors.NUMBER);
         safeMap(ourTextAttributes, SqlTokenType.ASTERISK, DefaultLanguageHighlighterColors.OPERATION_SIGN);
@@ -74,7 +77,7 @@ public class SqlSyntaxHighlighter extends LanguageVersionableSyntaxHighlighter {
     @Nonnull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        if (SqlKeywordElementType.isKeyword(tokenType)) {
+        if (tokenType instanceof SqlKeywordElementType) {
             return pack(DefaultLanguageHighlighterColors.KEYWORD);
         }
 

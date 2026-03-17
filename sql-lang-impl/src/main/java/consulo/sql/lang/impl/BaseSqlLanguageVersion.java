@@ -23,6 +23,8 @@ import consulo.language.version.LanguageVersionWithParsing;
 import consulo.sql.lang.api.SqlLanguageVersion;
 import consulo.sql.lang.impl.lexer.SqlLexer;
 import consulo.sql.lang.impl.parser.SqlParser;
+import consulo.sql.lang.impl.psi.SqlKeywordElementType;
+import consulo.sql.lang.impl.psi.SqlKeywordRegistry;
 import consulo.sql.lang.impl.psi.SqlTokenType;
 import jakarta.annotation.Nonnull;
 
@@ -31,19 +33,19 @@ import jakarta.annotation.Nonnull;
  * @since 22/10/2021
  */
 public abstract class BaseSqlLanguageVersion extends SqlLanguageVersion implements LanguageVersionWithParsing {
-    private TokenSet myReservedKeywords = TokenSet.EMPTY;
+    private final SqlKeywordRegistry myKeywordRegistry = new SqlKeywordRegistry();
 
     public BaseSqlLanguageVersion(@Nonnull String id, @Nonnull String name) {
         super(id, name);
     }
 
-    public void addReservedKeywords(TokenSet tokenSet) {
-        myReservedKeywords = TokenSet.orSet(myReservedKeywords, tokenSet);
+    protected void registerKeywords(@Nonnull SqlKeywordElementType... keywords) {
+        myKeywordRegistry.registerKeywords(keywords);
     }
 
     @Nonnull
-    public TokenSet getReservedKeywords() {
-        return myReservedKeywords;
+    public SqlKeywordRegistry getKeywordRegistry() {
+        return myKeywordRegistry;
     }
 
     @Nonnull

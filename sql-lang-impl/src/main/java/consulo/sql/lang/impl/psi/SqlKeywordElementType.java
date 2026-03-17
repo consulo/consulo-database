@@ -18,44 +18,22 @@ package consulo.sql.lang.impl.psi;
 
 import consulo.language.Language;
 import consulo.language.ast.IElementType;
-import consulo.util.collection.CharSequenceHashingStrategy;
-import consulo.util.collection.Maps;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author VISTALL
  * @since 22/10/2021
  */
 public class SqlKeywordElementType extends IElementType {
-    private static final Map<CharSequence, SqlKeywordElementType> ourRegistry = Maps.newConcurrentHashMap(CharSequenceHashingStrategy.CASE_INSENSITIVE);
-    private static final Map<IElementType, String> ourRegistry2 = Maps.newConcurrentHashMap();
-
     @Nonnull
     private final String myKeyword;
 
     public SqlKeywordElementType(@Nonnull String keyword, @Nullable Language language) {
         super(keyword.toUpperCase(Locale.ROOT) + "_KEYWORD", language);
         myKeyword = keyword;
-
-        if (ourRegistry.put(keyword, this) != null) {
-            throw new IllegalArgumentException("Already registered keyword " + keyword);
-        }
-        else {
-            ourRegistry2.put(this, keyword);
-        }
-    }
-
-    @Nullable
-    public static IElementType toKeyword(@Nonnull CharSequence keywordText) {
-        return ourRegistry.get(keywordText);
-    }
-
-    public static boolean isKeyword(@Nonnull IElementType elementType) {
-        return ourRegistry2.get(elementType) != null;
     }
 
     @Nonnull

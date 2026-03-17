@@ -20,7 +20,7 @@ import consulo.language.ast.IElementType;
 import consulo.language.lexer.Lexer;
 import consulo.language.lexer.LookAheadLexer;
 import consulo.sql.lang.impl.BaseSqlLanguageVersion;
-import consulo.sql.lang.impl.psi.SqlKeywordElementType;
+import consulo.sql.lang.impl.psi.SqlKeywordRegistry;
 import consulo.sql.lang.impl.psi.SqlTokenType;
 import jakarta.annotation.Nonnull;
 
@@ -30,19 +30,23 @@ import jakarta.annotation.Nonnull;
  */
 public class SqlLexer extends LookAheadLexer {
     @Nonnull
-    private final BaseSqlLanguageVersion myBaseSqlLanguageVersion;
+    private final SqlKeywordRegistry myKeywordRegistry;
 
     public SqlLexer(@Nonnull BaseSqlLanguageVersion baseSqlLanguageVersion) {
-        super(new _SqlLexer());
-        myBaseSqlLanguageVersion = baseSqlLanguageVersion;
+        this(baseSqlLanguageVersion, new _SqlLexer());
+    }
+
+    public SqlLexer(@Nonnull BaseSqlLanguageVersion baseSqlLanguageVersion, @Nonnull Lexer baseLexer) {
+        super(baseLexer);
+        myKeywordRegistry = baseSqlLanguageVersion.getKeywordRegistry();
     }
 
     @Override
     protected void lookAhead(Lexer baseLexer) {
         IElementType tokenType = baseLexer.getTokenType();
         if (tokenType == SqlTokenType.IDENTIFIER) {
-            IElementType keywordElement = SqlKeywordElementType.toKeyword(baseLexer.getTokenSequence());
-            if (keywordElement != null && myBaseSqlLanguageVersion.getReservedKeywords().contains(keywordElement)) {
+            IElementType keywordElement = myKeywordRegistry.toKeyword(baseLexer.getTokenSequence());
+            if (keywordElement != null) {
                 advanceAs(baseLexer, keywordElement);
             }
             else {

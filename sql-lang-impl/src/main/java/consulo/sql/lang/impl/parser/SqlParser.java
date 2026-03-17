@@ -28,80 +28,65 @@ import consulo.sql.lang.impl.psi.SqlKeywordElementType;
 import consulo.sql.lang.impl.psi.SqlKeywordTokenTypes;
 import consulo.sql.lang.impl.psi.SqlTokenType;
 import consulo.sql.lang.localize.SqlLocalize;
-
 import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL
  * @since 2026-02-28
  */
-public class SqlParser implements PsiParser
-{
+public class SqlParser implements PsiParser {
     private static final TokenSet ADDITIVE_OPS = TokenSet.create(SqlTokenType.PLUS, SqlTokenType.MINUS, SqlTokenType.CONCAT);
 
     private static final TokenSet MULTIPLICATIVE_OPS = TokenSet.create(SqlTokenType.ASTERISK, SqlTokenType.SLASH);
 
     private static final TokenSet COMPARISON_OPS = TokenSet.create(
-            SqlTokenType.EQ, SqlTokenType.NE, SqlTokenType.LT, SqlTokenType.GT, SqlTokenType.LE, SqlTokenType.GE
+        SqlTokenType.EQ, SqlTokenType.NE, SqlTokenType.LT, SqlTokenType.GT, SqlTokenType.LE, SqlTokenType.GE
     );
 
     @Nonnull
     @Override
-    public ASTNode parse(@Nonnull IElementType root, @Nonnull PsiBuilder builder, @Nonnull LanguageVersion languageVersion)
-    {
+    public ASTNode parse(@Nonnull IElementType root, @Nonnull PsiBuilder builder, @Nonnull LanguageVersion languageVersion) {
         PsiBuilder.Marker rootMark = builder.mark();
-        while (!builder.eof())
-        {
+        while (!builder.eof()) {
             parseStatement(builder);
         }
         rootMark.done(root);
         return builder.getTreeBuilt();
     }
 
-    private void parseStatement(PsiBuilder builder)
-    {
+    private void parseStatement(PsiBuilder builder) {
         IElementType token = builder.getTokenType();
-        if (token == null)
-        {
+        if (token == null) {
             return;
         }
 
-        if (token == SqlTokenType.SEMICOLON)
-        {
+        if (token == SqlTokenType.SEMICOLON) {
             builder.advanceLexer();
             return;
         }
 
-        if (token == SqlKeywordTokenTypes.SELECT_KEYWORD)
-        {
+        if (token == SqlKeywordTokenTypes.SELECT_KEYWORD) {
             parseSelectStatement(builder);
         }
-        else if (token == SqlKeywordTokenTypes.INSERT_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.INSERT_KEYWORD) {
             parseInsertStatement(builder);
         }
-        else if (token == SqlKeywordTokenTypes.UPDATE_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.UPDATE_KEYWORD) {
             parseUpdateStatement(builder);
         }
-        else if (token == SqlKeywordTokenTypes.DELETE_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.DELETE_KEYWORD) {
             parseDeleteStatement(builder);
         }
-        else if (token == SqlKeywordTokenTypes.CREATE_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.CREATE_KEYWORD) {
             parseCreateStatement(builder);
         }
-        else if (token == SqlKeywordTokenTypes.DROP_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.DROP_KEYWORD) {
             parseDropStatement(builder);
         }
-        else if (token == SqlKeywordTokenTypes.ALTER_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.ALTER_KEYWORD) {
             parseAlterTableStatement(builder);
         }
-        else
-        {
+        else {
             builder.error(SqlLocalize.parserStatementExpected());
             builder.advanceLexer();
         }
@@ -109,90 +94,75 @@ public class SqlParser implements PsiParser
 
     // =================== SELECT ===================
 
-    private void parseSelectStatement(PsiBuilder builder)
-    {
+    private void parseSelectStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         parseQueryExpression(builder);
         mark.done(SqlCompositeElementTypes.SELECT_STATEMENT);
     }
 
-    private void parseQueryExpression(PsiBuilder builder)
-    {
+    private void parseQueryExpression(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         parseSelectClause(builder);
 
-        if (isToken(builder, SqlKeywordTokenTypes.FROM_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.FROM_KEYWORD)) {
             parseFromClause(builder);
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.WHERE_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.WHERE_KEYWORD)) {
             parseWhereClause(builder);
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.GROUP_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.GROUP_KEYWORD)) {
             parseGroupByClause(builder);
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.HAVING_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.HAVING_KEYWORD)) {
             parseHavingClause(builder);
         }
 
         // UNION / INTERSECT / EXCEPT
         while (isToken(builder, SqlKeywordTokenTypes.UNION_KEYWORD)
-                || isToken(builder, SqlKeywordTokenTypes.INTERSECT_KEYWORD)
-                || isToken(builder, SqlKeywordTokenTypes.EXCEPT_KEYWORD))
-        {
+            || isToken(builder, SqlKeywordTokenTypes.INTERSECT_KEYWORD)
+            || isToken(builder, SqlKeywordTokenTypes.EXCEPT_KEYWORD)) {
             builder.advanceLexer(); // UNION / INTERSECT / EXCEPT
 
-            if (isToken(builder, SqlKeywordTokenTypes.ALL_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.ALL_KEYWORD)) {
                 builder.advanceLexer();
             }
 
             parseSelectClause(builder);
 
-            if (isToken(builder, SqlKeywordTokenTypes.FROM_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.FROM_KEYWORD)) {
                 parseFromClause(builder);
             }
 
-            if (isToken(builder, SqlKeywordTokenTypes.WHERE_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.WHERE_KEYWORD)) {
                 parseWhereClause(builder);
             }
 
-            if (isToken(builder, SqlKeywordTokenTypes.GROUP_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.GROUP_KEYWORD)) {
                 parseGroupByClause(builder);
             }
 
-            if (isToken(builder, SqlKeywordTokenTypes.HAVING_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.HAVING_KEYWORD)) {
                 parseHavingClause(builder);
             }
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.ORDER_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.ORDER_KEYWORD)) {
             parseOrderByClause(builder);
         }
 
         mark.done(SqlCompositeElementTypes.QUERY_EXPRESSION);
     }
 
-    private void parseSelectClause(PsiBuilder builder)
-    {
+    private void parseSelectClause(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         expectKeyword(builder, SqlKeywordTokenTypes.SELECT_KEYWORD, SqlLocalize.parserSelectExpected());
 
-        if (isToken(builder, SqlKeywordTokenTypes.DISTINCT_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.ALL_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.DISTINCT_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.ALL_KEYWORD)) {
             builder.advanceLexer();
         }
 
@@ -201,39 +171,32 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.SELECT_CLAUSE);
     }
 
-    private void parseSelectItemList(PsiBuilder builder)
-    {
+    private void parseSelectItemList(PsiBuilder builder) {
         parseSelectItem(builder);
-        while (isToken(builder, SqlTokenType.COMMA))
-        {
+        while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
             parseSelectItem(builder);
         }
     }
 
-    private void parseSelectItem(PsiBuilder builder)
-    {
+    private void parseSelectItem(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
-        if (isToken(builder, SqlTokenType.ASTERISK))
-        {
+        if (isToken(builder, SqlTokenType.ASTERISK)) {
             PsiBuilder.Marker starMark = builder.mark();
             builder.advanceLexer();
             starMark.done(SqlCompositeElementTypes.STAR_EXPRESSION);
         }
-        else
-        {
+        else {
             parseExpression(builder);
 
-            if (isToken(builder, SqlKeywordTokenTypes.AS_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.AS_KEYWORD)) {
                 PsiBuilder.Marker aliasMark = builder.mark();
                 builder.advanceLexer();
-                expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserAliasNameExpected());
+                expectIdentifier(builder, SqlLocalize.parserAliasNameExpected());
                 aliasMark.done(SqlCompositeElementTypes.ALIAS);
             }
-            else if (isToken(builder, SqlTokenType.IDENTIFIER) && !isStatementBoundary(builder))
-            {
+            else if (isIdentifier(builder) && !isStatementBoundary(builder)) {
                 PsiBuilder.Marker aliasMark = builder.mark();
                 builder.advanceLexer();
                 aliasMark.done(SqlCompositeElementTypes.ALIAS);
@@ -245,8 +208,7 @@ public class SqlParser implements PsiParser
 
     // =================== FROM ===================
 
-    private void parseFromClause(PsiBuilder builder)
-    {
+    private void parseFromClause(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         expectKeyword(builder, SqlKeywordTokenTypes.FROM_KEYWORD, SqlLocalize.parserFromExpected());
@@ -256,32 +218,25 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.FROM_CLAUSE);
     }
 
-    private void parseTableReferenceList(PsiBuilder builder)
-    {
+    private void parseTableReferenceList(PsiBuilder builder) {
         parseTableReference(builder);
-        while (isToken(builder, SqlTokenType.COMMA))
-        {
+        while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
             parseTableReference(builder);
         }
     }
 
-    private void parseTableReference(PsiBuilder builder)
-    {
+    private void parseTableReference(PsiBuilder builder) {
         parseTablePrimary(builder);
 
-        while (isJoinKeyword(builder))
-        {
+        while (isJoinKeyword(builder)) {
             parseJoin(builder);
         }
     }
 
-    private void parseTablePrimary(PsiBuilder builder)
-    {
-        if (isToken(builder, SqlTokenType.LPAR))
-        {
-            if (lookAheadIs(builder, SqlKeywordTokenTypes.SELECT_KEYWORD))
-            {
+    private void parseTablePrimary(PsiBuilder builder) {
+        if (isToken(builder, SqlTokenType.LPAR)) {
+            if (lookAheadIs(builder, SqlKeywordTokenTypes.SELECT_KEYWORD)) {
                 PsiBuilder.Marker mark = builder.mark();
                 builder.advanceLexer(); // (
                 parseQueryExpression(builder);
@@ -289,8 +244,7 @@ public class SqlParser implements PsiParser
                 parseOptionalAlias(builder);
                 mark.done(SqlCompositeElementTypes.SUBQUERY_EXPRESSION);
             }
-            else
-            {
+            else {
                 PsiBuilder.Marker mark = builder.mark();
                 builder.advanceLexer(); // (
                 parseTableReferenceList(builder);
@@ -298,8 +252,7 @@ public class SqlParser implements PsiParser
                 mark.done(SqlCompositeElementTypes.PARENTHESIZED_EXPRESSION);
             }
         }
-        else
-        {
+        else {
             PsiBuilder.Marker mark = builder.mark();
             parseQualifiedName(builder);
             parseOptionalAlias(builder);
@@ -307,62 +260,52 @@ public class SqlParser implements PsiParser
         }
     }
 
-    private void parseOptionalAlias(PsiBuilder builder)
-    {
-        if (isToken(builder, SqlKeywordTokenTypes.AS_KEYWORD))
-        {
+    private void parseOptionalAlias(PsiBuilder builder) {
+        if (isToken(builder, SqlKeywordTokenTypes.AS_KEYWORD)) {
             PsiBuilder.Marker aliasMark = builder.mark();
             builder.advanceLexer();
-            expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserAliasNameExpected());
+            expectIdentifier(builder, SqlLocalize.parserAliasNameExpected());
             aliasMark.done(SqlCompositeElementTypes.ALIAS);
         }
-        else if (isToken(builder, SqlTokenType.IDENTIFIER) && !isStatementBoundary(builder))
-        {
+        else if (isIdentifier(builder) && !isStatementBoundary(builder)) {
             PsiBuilder.Marker aliasMark = builder.mark();
             builder.advanceLexer();
             aliasMark.done(SqlCompositeElementTypes.ALIAS);
         }
     }
 
-    private boolean isJoinKeyword(PsiBuilder builder)
-    {
+    private boolean isJoinKeyword(PsiBuilder builder) {
         IElementType t = builder.getTokenType();
         return t == SqlKeywordTokenTypes.JOIN_KEYWORD
-                || t == SqlKeywordTokenTypes.INNER_KEYWORD
-                || t == SqlKeywordTokenTypes.LEFT_KEYWORD
-                || t == SqlKeywordTokenTypes.RIGHT_KEYWORD
-                || t == SqlKeywordTokenTypes.FULL_KEYWORD
-                || t == SqlKeywordTokenTypes.CROSS_KEYWORD
-                || t == SqlKeywordTokenTypes.NATURAL_KEYWORD;
+            || t == SqlKeywordTokenTypes.INNER_KEYWORD
+            || t == SqlKeywordTokenTypes.LEFT_KEYWORD
+            || t == SqlKeywordTokenTypes.RIGHT_KEYWORD
+            || t == SqlKeywordTokenTypes.FULL_KEYWORD
+            || t == SqlKeywordTokenTypes.CROSS_KEYWORD
+            || t == SqlKeywordTokenTypes.NATURAL_KEYWORD;
     }
 
-    private void parseJoin(PsiBuilder builder)
-    {
+    private void parseJoin(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         // optional: NATURAL
-        if (isToken(builder, SqlKeywordTokenTypes.NATURAL_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.NATURAL_KEYWORD)) {
             builder.advanceLexer();
         }
 
         // optional: INNER / LEFT [OUTER] / RIGHT [OUTER] / FULL [OUTER] / CROSS
-        if (isToken(builder, SqlKeywordTokenTypes.INNER_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.INNER_KEYWORD)) {
             builder.advanceLexer();
         }
         else if (isToken(builder, SqlKeywordTokenTypes.LEFT_KEYWORD)
-                || isToken(builder, SqlKeywordTokenTypes.RIGHT_KEYWORD)
-                || isToken(builder, SqlKeywordTokenTypes.FULL_KEYWORD))
-        {
+            || isToken(builder, SqlKeywordTokenTypes.RIGHT_KEYWORD)
+            || isToken(builder, SqlKeywordTokenTypes.FULL_KEYWORD)) {
             builder.advanceLexer();
-            if (isToken(builder, SqlKeywordTokenTypes.OUTER_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.OUTER_KEYWORD)) {
                 builder.advanceLexer();
             }
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.CROSS_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.CROSS_KEYWORD)) {
             builder.advanceLexer();
         }
 
@@ -370,15 +313,13 @@ public class SqlParser implements PsiParser
 
         parseTablePrimary(builder);
 
-        if (isToken(builder, SqlKeywordTokenTypes.ON_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.ON_KEYWORD)) {
             PsiBuilder.Marker condMark = builder.mark();
             builder.advanceLexer();
             parseExpression(builder);
             condMark.done(SqlCompositeElementTypes.JOIN_CONDITION);
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.USING_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.USING_KEYWORD)) {
             PsiBuilder.Marker condMark = builder.mark();
             builder.advanceLexer();
             expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
@@ -392,8 +333,7 @@ public class SqlParser implements PsiParser
 
     // =================== WHERE ===================
 
-    private void parseWhereClause(PsiBuilder builder)
-    {
+    private void parseWhereClause(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.WHERE_KEYWORD, SqlLocalize.parserWhereExpected());
         parseExpression(builder);
@@ -402,8 +342,7 @@ public class SqlParser implements PsiParser
 
     // =================== GROUP BY ===================
 
-    private void parseGroupByClause(PsiBuilder builder)
-    {
+    private void parseGroupByClause(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.GROUP_KEYWORD, SqlLocalize.parserGroupExpected());
         expectKeyword(builder, SqlKeywordTokenTypes.BY_KEYWORD, SqlLocalize.parserByExpected());
@@ -413,8 +352,7 @@ public class SqlParser implements PsiParser
 
     // =================== HAVING ===================
 
-    private void parseHavingClause(PsiBuilder builder)
-    {
+    private void parseHavingClause(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.HAVING_KEYWORD, SqlLocalize.parserHavingExpected());
         parseExpression(builder);
@@ -423,15 +361,13 @@ public class SqlParser implements PsiParser
 
     // =================== ORDER BY ===================
 
-    private void parseOrderByClause(PsiBuilder builder)
-    {
+    private void parseOrderByClause(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.ORDER_KEYWORD, SqlLocalize.parserOrderExpected());
         expectKeyword(builder, SqlKeywordTokenTypes.BY_KEYWORD, SqlLocalize.parserByExpected());
 
         parseOrderItem(builder);
-        while (isToken(builder, SqlTokenType.COMMA))
-        {
+        while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
             parseOrderItem(builder);
         }
@@ -439,21 +375,17 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.ORDER_BY_CLAUSE);
     }
 
-    private void parseOrderItem(PsiBuilder builder)
-    {
+    private void parseOrderItem(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         parseExpression(builder);
 
-        if (isToken(builder, SqlKeywordTokenTypes.ASC_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.DESC_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.ASC_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.DESC_KEYWORD)) {
             builder.advanceLexer();
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.NULL_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.NULL_KEYWORD)) {
             builder.advanceLexer();
-            if (isToken(builder, SqlKeywordTokenTypes.FIRST_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.LAST_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.FIRST_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.LAST_KEYWORD)) {
                 builder.advanceLexer();
             }
         }
@@ -463,8 +395,7 @@ public class SqlParser implements PsiParser
 
     // =================== INSERT ===================
 
-    private void parseInsertStatement(PsiBuilder builder)
-    {
+    private void parseInsertStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         expectKeyword(builder, SqlKeywordTokenTypes.INSERT_KEYWORD, SqlLocalize.parserInsertExpected());
@@ -474,8 +405,7 @@ public class SqlParser implements PsiParser
         parseQualifiedName(builder);
         tableMark.done(SqlCompositeElementTypes.TABLE_EXPRESSION);
 
-        if (isToken(builder, SqlTokenType.LPAR))
-        {
+        if (isToken(builder, SqlTokenType.LPAR)) {
             PsiBuilder.Marker colListMark = builder.mark();
             builder.advanceLexer();
             parseIdentifierList(builder);
@@ -483,35 +413,29 @@ public class SqlParser implements PsiParser
             colListMark.done(SqlCompositeElementTypes.COLUMN_LIST);
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.VALUES_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.VALUES_KEYWORD)) {
             parseValuesClause(builder);
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.SELECT_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.SELECT_KEYWORD)) {
             parseQueryExpression(builder);
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD)) {
             builder.advanceLexer();
             expectKeyword(builder, SqlKeywordTokenTypes.VALUES_KEYWORD, SqlLocalize.parserValuesExpected());
         }
-        else
-        {
+        else {
             builder.error(SqlLocalize.parserValuesOrSelectExpected());
         }
 
         mark.done(SqlCompositeElementTypes.INSERT_STATEMENT);
     }
 
-    private void parseValuesClause(PsiBuilder builder)
-    {
+    private void parseValuesClause(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.VALUES_KEYWORD, SqlLocalize.parserValuesExpected());
 
         parseValueRow(builder);
-        while (isToken(builder, SqlTokenType.COMMA))
-        {
+        while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
             parseValueRow(builder);
         }
@@ -519,8 +443,7 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.VALUES_CLAUSE);
     }
 
-    private void parseValueRow(PsiBuilder builder)
-    {
+    private void parseValueRow(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
         parseExpressionList(builder);
@@ -530,8 +453,7 @@ public class SqlParser implements PsiParser
 
     // =================== UPDATE ===================
 
-    private void parseUpdateStatement(PsiBuilder builder)
-    {
+    private void parseUpdateStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         expectKeyword(builder, SqlKeywordTokenTypes.UPDATE_KEYWORD, SqlLocalize.parserUpdateExpected());
@@ -543,22 +465,19 @@ public class SqlParser implements PsiParser
 
         parseSetClause(builder);
 
-        if (isToken(builder, SqlKeywordTokenTypes.WHERE_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.WHERE_KEYWORD)) {
             parseWhereClause(builder);
         }
 
         mark.done(SqlCompositeElementTypes.UPDATE_STATEMENT);
     }
 
-    private void parseSetClause(PsiBuilder builder)
-    {
+    private void parseSetClause(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.SET_KEYWORD, SqlLocalize.parserSetExpected());
 
         parseAssignment(builder);
-        while (isToken(builder, SqlTokenType.COMMA))
-        {
+        while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
             parseAssignment(builder);
         }
@@ -566,8 +485,7 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.SET_CLAUSE);
     }
 
-    private void parseAssignment(PsiBuilder builder)
-    {
+    private void parseAssignment(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         parseQualifiedName(builder);
         expectToken(builder, SqlTokenType.EQ, SqlLocalize.parserEqExpected());
@@ -577,8 +495,7 @@ public class SqlParser implements PsiParser
 
     // =================== DELETE ===================
 
-    private void parseDeleteStatement(PsiBuilder builder)
-    {
+    private void parseDeleteStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         expectKeyword(builder, SqlKeywordTokenTypes.DELETE_KEYWORD, SqlLocalize.parserDeleteExpected());
@@ -589,8 +506,7 @@ public class SqlParser implements PsiParser
         parseOptionalAlias(builder);
         tableMark.done(SqlCompositeElementTypes.TABLE_EXPRESSION);
 
-        if (isToken(builder, SqlKeywordTokenTypes.WHERE_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.WHERE_KEYWORD)) {
             parseWhereClause(builder);
         }
 
@@ -599,13 +515,11 @@ public class SqlParser implements PsiParser
 
     // =================== CREATE ===================
 
-    private void parseCreateStatement(PsiBuilder builder)
-    {
+    private void parseCreateStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.CREATE_KEYWORD, SqlLocalize.parserCreateExpected());
 
-        if (isToken(builder, SqlKeywordTokenTypes.TABLE_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.TABLE_KEYWORD)) {
             builder.advanceLexer();
 
             PsiBuilder.Marker tableMark = builder.mark();
@@ -618,8 +532,7 @@ public class SqlParser implements PsiParser
 
             mark.done(SqlCompositeElementTypes.CREATE_TABLE_STATEMENT);
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.VIEW_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.VIEW_KEYWORD)) {
             builder.advanceLexer();
 
             PsiBuilder.Marker viewMark = builder.mark();
@@ -632,20 +545,16 @@ public class SqlParser implements PsiParser
 
             mark.done(SqlCompositeElementTypes.CREATE_VIEW_STATEMENT);
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD) || isTokenIdentifierText(builder, "INDEX"))
-        {
-            if (isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD))
-            {
+        else if (isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD) || isTokenIdentifierText(builder, "INDEX")) {
+            if (isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD)) {
                 builder.advanceLexer();
             }
 
             // INDEX is not a reserved keyword, consume it as identifier
-            if (isTokenIdentifierText(builder, "INDEX"))
-            {
+            if (isTokenIdentifierText(builder, "INDEX")) {
                 builder.advanceLexer();
             }
-            else
-            {
+            else {
                 builder.error(SqlLocalize.parserIndexExpected());
             }
 
@@ -665,104 +574,87 @@ public class SqlParser implements PsiParser
 
             mark.done(SqlCompositeElementTypes.CREATE_INDEX_STATEMENT);
         }
-        else
-        {
+        else {
             builder.error(SqlLocalize.parserTableViewOrIndexExpected());
             mark.done(SqlCompositeElementTypes.CREATE_TABLE_STATEMENT);
         }
     }
 
-    private void parseTableElementList(PsiBuilder builder)
-    {
+    private void parseTableElementList(PsiBuilder builder) {
         parseTableElement(builder);
-        while (isToken(builder, SqlTokenType.COMMA))
-        {
+        while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
             parseTableElement(builder);
         }
     }
 
-    private void parseTableElement(PsiBuilder builder)
-    {
+    private void parseTableElement(PsiBuilder builder) {
         if (isToken(builder, SqlKeywordTokenTypes.CONSTRAINT_KEYWORD)
-                || isToken(builder, SqlKeywordTokenTypes.PRIMARY_KEYWORD)
-                || isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD)
-                || isToken(builder, SqlKeywordTokenTypes.FOREIGN_KEYWORD)
-                || isToken(builder, SqlKeywordTokenTypes.CHECK_KEYWORD))
-        {
+            || isToken(builder, SqlKeywordTokenTypes.PRIMARY_KEYWORD)
+            || isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD)
+            || isToken(builder, SqlKeywordTokenTypes.FOREIGN_KEYWORD)
+            || isToken(builder, SqlKeywordTokenTypes.CHECK_KEYWORD)) {
             parseTableConstraint(builder);
         }
-        else
-        {
+        else {
             parseColumnDefinition(builder);
         }
     }
 
-    private void parseColumnDefinition(PsiBuilder builder)
-    {
+    private void parseColumnDefinition(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
-        expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserColumnNameExpected());
+        expectIdentifier(builder, SqlLocalize.parserColumnNameExpected());
 
         parseDataType(builder);
 
-        while (isColumnConstraintStart(builder))
-        {
+        while (isColumnConstraintStart(builder)) {
             parseColumnConstraint(builder);
         }
 
         mark.done(SqlCompositeElementTypes.COLUMN_DEFINITION);
     }
 
-    private void parseDataType(PsiBuilder builder)
-    {
+    private void parseDataType(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         IElementType token = builder.getTokenType();
-        if (token == null)
-        {
+        if (token == null) {
             builder.error(SqlLocalize.parserDataTypeExpected());
             mark.drop();
             return;
         }
 
         boolean consumed = false;
-        if (SqlKeywordElementType.isKeyword(token))
-        {
+        if (token instanceof SqlKeywordElementType) {
             builder.advanceLexer();
             consumed = true;
 
             // DOUBLE PRECISION, CHARACTER VARYING, etc.
             IElementType next = builder.getTokenType();
-            if (next != null && SqlKeywordElementType.isKeyword(next))
-            {
+            if (next != null && next instanceof SqlKeywordElementType) {
                 if (next == SqlKeywordTokenTypes.PRECISION_KEYWORD
-                        || next == SqlKeywordTokenTypes.VARYING_KEYWORD)
-                {
+                    || next == SqlKeywordTokenTypes.VARYING_KEYWORD) {
                     builder.advanceLexer();
                 }
             }
         }
-        else if (token == SqlTokenType.IDENTIFIER)
-        {
+        else if (SqlTokenType.IDENTIFIERS.contains(token)) {
             builder.advanceLexer();
             consumed = true;
         }
 
-        if (!consumed)
-        {
+        if (!consumed) {
             builder.error(SqlLocalize.parserDataTypeExpected());
             mark.drop();
             return;
         }
 
         // optional (precision, scale)
-        if (isToken(builder, SqlTokenType.LPAR))
-        {
+        if (isToken(builder, SqlTokenType.LPAR)) {
             builder.advanceLexer();
             expectToken(builder, SqlTokenType.NUMBER, SqlLocalize.parserPrecisionExpected());
-            if (isToken(builder, SqlTokenType.COMMA))
-            {
+            if (isToken(builder, SqlTokenType.COMMA)) {
                 builder.advanceLexer();
                 expectToken(builder, SqlTokenType.NUMBER, SqlLocalize.parserScaleExpected());
             }
@@ -772,65 +664,54 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.TYPE_EXPRESSION);
     }
 
-    private boolean isColumnConstraintStart(PsiBuilder builder)
-    {
+    private boolean isColumnConstraintStart(PsiBuilder builder) {
         IElementType t = builder.getTokenType();
         return t == SqlKeywordTokenTypes.NOT_KEYWORD
-                || t == SqlKeywordTokenTypes.NULL_KEYWORD
-                || t == SqlKeywordTokenTypes.PRIMARY_KEYWORD
-                || t == SqlKeywordTokenTypes.UNIQUE_KEYWORD
-                || t == SqlKeywordTokenTypes.DEFAULT_KEYWORD
-                || t == SqlKeywordTokenTypes.CHECK_KEYWORD
-                || t == SqlKeywordTokenTypes.REFERENCES_KEYWORD
-                || t == SqlKeywordTokenTypes.CONSTRAINT_KEYWORD;
+            || t == SqlKeywordTokenTypes.NULL_KEYWORD
+            || t == SqlKeywordTokenTypes.PRIMARY_KEYWORD
+            || t == SqlKeywordTokenTypes.UNIQUE_KEYWORD
+            || t == SqlKeywordTokenTypes.DEFAULT_KEYWORD
+            || t == SqlKeywordTokenTypes.CHECK_KEYWORD
+            || t == SqlKeywordTokenTypes.REFERENCES_KEYWORD
+            || t == SqlKeywordTokenTypes.CONSTRAINT_KEYWORD;
     }
 
-    private void parseColumnConstraint(PsiBuilder builder)
-    {
+    private void parseColumnConstraint(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
-        if (isToken(builder, SqlKeywordTokenTypes.CONSTRAINT_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.CONSTRAINT_KEYWORD)) {
             builder.advanceLexer();
-            expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserConstraintNameExpected());
+            expectIdentifier(builder, SqlLocalize.parserConstraintNameExpected());
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD)) {
             builder.advanceLexer();
             expectKeyword(builder, SqlKeywordTokenTypes.NULL_KEYWORD, SqlLocalize.parserNullExpected());
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.NULL_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.NULL_KEYWORD)) {
             builder.advanceLexer();
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.PRIMARY_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.PRIMARY_KEYWORD)) {
             builder.advanceLexer();
             expectKeyword(builder, SqlKeywordTokenTypes.KEY_KEYWORD, SqlLocalize.parserKeyExpected());
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD)) {
             builder.advanceLexer();
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD)) {
             builder.advanceLexer();
             parseExpression(builder);
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.CHECK_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.CHECK_KEYWORD)) {
             builder.advanceLexer();
             expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
             parseExpression(builder);
             expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.REFERENCES_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.REFERENCES_KEYWORD)) {
             builder.advanceLexer();
             parseQualifiedName(builder);
-            if (isToken(builder, SqlTokenType.LPAR))
-            {
+            if (isToken(builder, SqlTokenType.LPAR)) {
                 builder.advanceLexer();
                 parseIdentifierList(builder);
                 expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
@@ -841,33 +722,28 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.COLUMN_CONSTRAINT);
     }
 
-    private void parseTableConstraint(PsiBuilder builder)
-    {
+    private void parseTableConstraint(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
-        if (isToken(builder, SqlKeywordTokenTypes.CONSTRAINT_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.CONSTRAINT_KEYWORD)) {
             builder.advanceLexer();
-            expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserConstraintNameExpected());
+            expectIdentifier(builder, SqlLocalize.parserConstraintNameExpected());
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.PRIMARY_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.PRIMARY_KEYWORD)) {
             builder.advanceLexer();
             expectKeyword(builder, SqlKeywordTokenTypes.KEY_KEYWORD, SqlLocalize.parserKeyExpected());
             expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
             parseIdentifierList(builder);
             expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD)) {
             builder.advanceLexer();
             expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
             parseIdentifierList(builder);
             expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.FOREIGN_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.FOREIGN_KEYWORD)) {
             builder.advanceLexer();
             expectKeyword(builder, SqlKeywordTokenTypes.KEY_KEYWORD, SqlLocalize.parserKeyExpected());
             expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
@@ -875,16 +751,14 @@ public class SqlParser implements PsiParser
             expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
             expectKeyword(builder, SqlKeywordTokenTypes.REFERENCES_KEYWORD, SqlLocalize.parserReferencesExpected());
             parseQualifiedName(builder);
-            if (isToken(builder, SqlTokenType.LPAR))
-            {
+            if (isToken(builder, SqlTokenType.LPAR)) {
                 builder.advanceLexer();
                 parseIdentifierList(builder);
                 expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
             }
             parseReferentialActions(builder);
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.CHECK_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.CHECK_KEYWORD)) {
             builder.advanceLexer();
             expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
             parseExpression(builder);
@@ -894,40 +768,31 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.TABLE_CONSTRAINT);
     }
 
-    private void parseReferentialActions(PsiBuilder builder)
-    {
+    private void parseReferentialActions(PsiBuilder builder) {
         // ON DELETE / ON UPDATE action
-        while (isToken(builder, SqlKeywordTokenTypes.ON_KEYWORD))
-        {
+        while (isToken(builder, SqlKeywordTokenTypes.ON_KEYWORD)) {
             builder.advanceLexer();
-            if (isToken(builder, SqlKeywordTokenTypes.DELETE_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.UPDATE_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.DELETE_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.UPDATE_KEYWORD)) {
                 builder.advanceLexer();
             }
-            else
-            {
+            else {
                 builder.error(SqlLocalize.parserDeleteOrUpdateExpected());
                 break;
             }
 
-            if (isToken(builder, SqlKeywordTokenTypes.CASCADE_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.CASCADE_KEYWORD)) {
                 builder.advanceLexer();
             }
-            else if (isToken(builder, SqlKeywordTokenTypes.SET_KEYWORD))
-            {
+            else if (isToken(builder, SqlKeywordTokenTypes.SET_KEYWORD)) {
                 builder.advanceLexer();
-                if (isToken(builder, SqlKeywordTokenTypes.NULL_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD))
-                {
+                if (isToken(builder, SqlKeywordTokenTypes.NULL_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD)) {
                     builder.advanceLexer();
                 }
             }
-            else if (isToken(builder, SqlKeywordTokenTypes.RESTRICT_KEYWORD))
-            {
+            else if (isToken(builder, SqlKeywordTokenTypes.RESTRICT_KEYWORD)) {
                 builder.advanceLexer();
             }
-            else if (isToken(builder, SqlKeywordTokenTypes.NO_KEYWORD))
-            {
+            else if (isToken(builder, SqlKeywordTokenTypes.NO_KEYWORD)) {
                 builder.advanceLexer();
                 expectKeyword(builder, SqlKeywordTokenTypes.ACTION_KEYWORD, SqlLocalize.parserActionExpected());
             }
@@ -936,17 +801,14 @@ public class SqlParser implements PsiParser
 
     // =================== DROP ===================
 
-    private void parseDropStatement(PsiBuilder builder)
-    {
+    private void parseDropStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.DROP_KEYWORD, SqlLocalize.parserDropExpected());
 
-        if (isToken(builder, SqlKeywordTokenTypes.TABLE_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.TABLE_KEYWORD)) {
             builder.advanceLexer();
 
-            if (isToken(builder, SqlKeywordTokenTypes.IF_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.IF_KEYWORD)) {
                 builder.advanceLexer();
                 expectKeyword(builder, SqlKeywordTokenTypes.EXISTS_KEYWORD, SqlLocalize.parserExistsExpected());
             }
@@ -955,15 +817,13 @@ public class SqlParser implements PsiParser
             parseQualifiedName(builder);
             tableMark.done(SqlCompositeElementTypes.TABLE_EXPRESSION);
 
-            if (isToken(builder, SqlKeywordTokenTypes.CASCADE_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.RESTRICT_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.CASCADE_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.RESTRICT_KEYWORD)) {
                 builder.advanceLexer();
             }
 
             mark.done(SqlCompositeElementTypes.DROP_TABLE_STATEMENT);
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.VIEW_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.VIEW_KEYWORD)) {
             builder.advanceLexer();
 
             PsiBuilder.Marker viewMark = builder.mark();
@@ -972,8 +832,7 @@ public class SqlParser implements PsiParser
 
             mark.done(SqlCompositeElementTypes.DROP_VIEW_STATEMENT);
         }
-        else if (isTokenIdentifierText(builder, "INDEX"))
-        {
+        else if (isTokenIdentifierText(builder, "INDEX")) {
             builder.advanceLexer();
 
             PsiBuilder.Marker indexMark = builder.mark();
@@ -982,8 +841,7 @@ public class SqlParser implements PsiParser
 
             mark.done(SqlCompositeElementTypes.DROP_INDEX_STATEMENT);
         }
-        else
-        {
+        else {
             builder.error(SqlLocalize.parserTableViewOrIndexExpected());
             mark.done(SqlCompositeElementTypes.DROP_TABLE_STATEMENT);
         }
@@ -991,8 +849,7 @@ public class SqlParser implements PsiParser
 
     // =================== ALTER TABLE ===================
 
-    private void parseAlterTableStatement(PsiBuilder builder)
-    {
+    private void parseAlterTableStatement(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
         expectKeyword(builder, SqlKeywordTokenTypes.ALTER_KEYWORD, SqlLocalize.parserAlterExpected());
@@ -1003,77 +860,61 @@ public class SqlParser implements PsiParser
         tableMark.done(SqlCompositeElementTypes.TABLE_EXPRESSION);
 
         // parse alter action(s)
-        if (isToken(builder, SqlKeywordTokenTypes.ADD_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.ADD_KEYWORD)) {
             builder.advanceLexer();
-            if (isToken(builder, SqlKeywordTokenTypes.COLUMN_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.COLUMN_KEYWORD)) {
                 builder.advanceLexer();
             }
 
             if (isToken(builder, SqlKeywordTokenTypes.CONSTRAINT_KEYWORD)
-                    || isToken(builder, SqlKeywordTokenTypes.PRIMARY_KEYWORD)
-                    || isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD)
-                    || isToken(builder, SqlKeywordTokenTypes.FOREIGN_KEYWORD)
-                    || isToken(builder, SqlKeywordTokenTypes.CHECK_KEYWORD))
-            {
+                || isToken(builder, SqlKeywordTokenTypes.PRIMARY_KEYWORD)
+                || isToken(builder, SqlKeywordTokenTypes.UNIQUE_KEYWORD)
+                || isToken(builder, SqlKeywordTokenTypes.FOREIGN_KEYWORD)
+                || isToken(builder, SqlKeywordTokenTypes.CHECK_KEYWORD)) {
                 parseTableConstraint(builder);
             }
-            else
-            {
+            else {
                 parseColumnDefinition(builder);
             }
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.DROP_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.DROP_KEYWORD)) {
             builder.advanceLexer();
-            if (isToken(builder, SqlKeywordTokenTypes.COLUMN_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.COLUMN_KEYWORD)) {
                 builder.advanceLexer();
             }
-            else if (isToken(builder, SqlKeywordTokenTypes.CONSTRAINT_KEYWORD))
-            {
+            else if (isToken(builder, SqlKeywordTokenTypes.CONSTRAINT_KEYWORD)) {
                 builder.advanceLexer();
             }
-            expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserNameExpected());
+            expectIdentifier(builder, SqlLocalize.parserNameExpected());
 
-            if (isToken(builder, SqlKeywordTokenTypes.CASCADE_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.RESTRICT_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.CASCADE_KEYWORD) || isToken(builder, SqlKeywordTokenTypes.RESTRICT_KEYWORD)) {
                 builder.advanceLexer();
             }
         }
-        else if (isToken(builder, SqlKeywordTokenTypes.ALTER_KEYWORD))
-        {
+        else if (isToken(builder, SqlKeywordTokenTypes.ALTER_KEYWORD)) {
             builder.advanceLexer();
-            if (isToken(builder, SqlKeywordTokenTypes.COLUMN_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.COLUMN_KEYWORD)) {
                 builder.advanceLexer();
             }
-            expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserColumnNameExpected());
+            expectIdentifier(builder, SqlLocalize.parserColumnNameExpected());
 
-            if (isToken(builder, SqlKeywordTokenTypes.SET_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.SET_KEYWORD)) {
                 builder.advanceLexer();
-                if (isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD))
-                {
+                if (isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD)) {
                     builder.advanceLexer();
                     parseExpression(builder);
                 }
-                else if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD))
-                {
+                else if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD)) {
                     builder.advanceLexer();
                     expectKeyword(builder, SqlKeywordTokenTypes.NULL_KEYWORD, SqlLocalize.parserNullExpected());
                 }
             }
-            else if (isToken(builder, SqlKeywordTokenTypes.DROP_KEYWORD))
-            {
+            else if (isToken(builder, SqlKeywordTokenTypes.DROP_KEYWORD)) {
                 builder.advanceLexer();
-                if (isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD))
-                {
+                if (isToken(builder, SqlKeywordTokenTypes.DEFAULT_KEYWORD)) {
                     builder.advanceLexer();
                 }
-                else if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD))
-                {
+                else if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD)) {
                     builder.advanceLexer();
                     expectKeyword(builder, SqlKeywordTokenTypes.NULL_KEYWORD, SqlLocalize.parserNullExpected());
                 }
@@ -1085,18 +926,15 @@ public class SqlParser implements PsiParser
 
     // =================== EXPRESSIONS ===================
 
-    private void parseExpression(PsiBuilder builder)
-    {
+    private void parseExpression(PsiBuilder builder) {
         parseOrExpression(builder);
     }
 
-    private void parseOrExpression(PsiBuilder builder)
-    {
+    private void parseOrExpression(PsiBuilder builder) {
         PsiBuilder.Marker left = builder.mark();
         parseAndExpression(builder);
 
-        while (isToken(builder, SqlKeywordTokenTypes.OR_KEYWORD))
-        {
+        while (isToken(builder, SqlKeywordTokenTypes.OR_KEYWORD)) {
             builder.advanceLexer();
             parseAndExpression(builder);
             left.done(SqlCompositeElementTypes.BINARY_EXPRESSION);
@@ -1106,13 +944,11 @@ public class SqlParser implements PsiParser
         left.drop();
     }
 
-    private void parseAndExpression(PsiBuilder builder)
-    {
+    private void parseAndExpression(PsiBuilder builder) {
         PsiBuilder.Marker left = builder.mark();
         parseNotExpression(builder);
 
-        while (isToken(builder, SqlKeywordTokenTypes.AND_KEYWORD))
-        {
+        while (isToken(builder, SqlKeywordTokenTypes.AND_KEYWORD)) {
             builder.advanceLexer();
             parseNotExpression(builder);
             left.done(SqlCompositeElementTypes.BINARY_EXPRESSION);
@@ -1122,75 +958,60 @@ public class SqlParser implements PsiParser
         left.drop();
     }
 
-    private void parseNotExpression(PsiBuilder builder)
-    {
-        if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD))
-        {
+    private void parseNotExpression(PsiBuilder builder) {
+        if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD)) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             parseNotExpression(builder);
             mark.done(SqlCompositeElementTypes.PREFIX_EXPRESSION);
         }
-        else
-        {
+        else {
             parseComparisonExpression(builder);
         }
     }
 
-    private void parseComparisonExpression(PsiBuilder builder)
-    {
+    private void parseComparisonExpression(PsiBuilder builder) {
         PsiBuilder.Marker left = builder.mark();
         parseAdditiveExpression(builder);
 
         IElementType token = builder.getTokenType();
 
-        if (token != null && COMPARISON_OPS.contains(token))
-        {
+        if (token != null && COMPARISON_OPS.contains(token)) {
             builder.advanceLexer();
             parseAdditiveExpression(builder);
             left.done(SqlCompositeElementTypes.BINARY_EXPRESSION);
         }
-        else if (token == SqlKeywordTokenTypes.IS_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.IS_KEYWORD) {
             builder.advanceLexer();
-            if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.NOT_KEYWORD)) {
                 builder.advanceLexer();
             }
-            if (isToken(builder, SqlKeywordTokenTypes.NULL_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.NULL_KEYWORD)) {
                 builder.advanceLexer();
             }
-            else
-            {
+            else {
                 builder.error(SqlLocalize.parserNullExpected());
             }
             left.done(SqlCompositeElementTypes.IS_NULL_EXPRESSION);
         }
-        else if (token == SqlKeywordTokenTypes.IN_KEYWORD || (token == SqlKeywordTokenTypes.NOT_KEYWORD && lookAheadTokenIs(builder, SqlKeywordTokenTypes.IN_KEYWORD)))
-        {
-            if (token == SqlKeywordTokenTypes.NOT_KEYWORD)
-            {
+        else if (token == SqlKeywordTokenTypes.IN_KEYWORD || (token == SqlKeywordTokenTypes.NOT_KEYWORD && lookAheadTokenIs(builder, SqlKeywordTokenTypes.IN_KEYWORD))) {
+            if (token == SqlKeywordTokenTypes.NOT_KEYWORD) {
                 builder.advanceLexer();
             }
             builder.advanceLexer(); // IN
 
             expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
-            if (isToken(builder, SqlKeywordTokenTypes.SELECT_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.SELECT_KEYWORD)) {
                 parseQueryExpression(builder);
             }
-            else
-            {
+            else {
                 parseExpressionList(builder);
             }
             expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
             left.done(SqlCompositeElementTypes.IN_EXPRESSION);
         }
-        else if (token == SqlKeywordTokenTypes.BETWEEN_KEYWORD || (token == SqlKeywordTokenTypes.NOT_KEYWORD && lookAheadTokenIs(builder, SqlKeywordTokenTypes.BETWEEN_KEYWORD)))
-        {
-            if (token == SqlKeywordTokenTypes.NOT_KEYWORD)
-            {
+        else if (token == SqlKeywordTokenTypes.BETWEEN_KEYWORD || (token == SqlKeywordTokenTypes.NOT_KEYWORD && lookAheadTokenIs(builder, SqlKeywordTokenTypes.BETWEEN_KEYWORD))) {
+            if (token == SqlKeywordTokenTypes.NOT_KEYWORD) {
                 builder.advanceLexer();
             }
             builder.advanceLexer(); // BETWEEN
@@ -1199,34 +1020,28 @@ public class SqlParser implements PsiParser
             parseAdditiveExpression(builder);
             left.done(SqlCompositeElementTypes.BETWEEN_EXPRESSION);
         }
-        else if (token == SqlKeywordTokenTypes.LIKE_KEYWORD || (token == SqlKeywordTokenTypes.NOT_KEYWORD && lookAheadTokenIs(builder, SqlKeywordTokenTypes.LIKE_KEYWORD)))
-        {
-            if (token == SqlKeywordTokenTypes.NOT_KEYWORD)
-            {
+        else if (token == SqlKeywordTokenTypes.LIKE_KEYWORD || (token == SqlKeywordTokenTypes.NOT_KEYWORD && lookAheadTokenIs(builder, SqlKeywordTokenTypes.LIKE_KEYWORD))) {
+            if (token == SqlKeywordTokenTypes.NOT_KEYWORD) {
                 builder.advanceLexer();
             }
             builder.advanceLexer(); // LIKE
             parseAdditiveExpression(builder);
-            if (isToken(builder, SqlKeywordTokenTypes.ESCAPE_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.ESCAPE_KEYWORD)) {
                 builder.advanceLexer();
                 parseAdditiveExpression(builder);
             }
             left.done(SqlCompositeElementTypes.LIKE_EXPRESSION);
         }
-        else
-        {
+        else {
             left.drop();
         }
     }
 
-    private void parseAdditiveExpression(PsiBuilder builder)
-    {
+    private void parseAdditiveExpression(PsiBuilder builder) {
         PsiBuilder.Marker left = builder.mark();
         parseMultiplicativeExpression(builder);
 
-        while (builder.getTokenType() != null && ADDITIVE_OPS.contains(builder.getTokenType()))
-        {
+        while (builder.getTokenType() != null && ADDITIVE_OPS.contains(builder.getTokenType())) {
             builder.advanceLexer();
             parseMultiplicativeExpression(builder);
             left.done(SqlCompositeElementTypes.BINARY_EXPRESSION);
@@ -1236,13 +1051,11 @@ public class SqlParser implements PsiParser
         left.drop();
     }
 
-    private void parseMultiplicativeExpression(PsiBuilder builder)
-    {
+    private void parseMultiplicativeExpression(PsiBuilder builder) {
         PsiBuilder.Marker left = builder.mark();
         parseUnaryExpression(builder);
 
-        while (builder.getTokenType() != null && MULTIPLICATIVE_OPS.contains(builder.getTokenType()))
-        {
+        while (builder.getTokenType() != null && MULTIPLICATIVE_OPS.contains(builder.getTokenType())) {
             builder.advanceLexer();
             parseUnaryExpression(builder);
             left.done(SqlCompositeElementTypes.BINARY_EXPRESSION);
@@ -1252,83 +1065,69 @@ public class SqlParser implements PsiParser
         left.drop();
     }
 
-    private void parseUnaryExpression(PsiBuilder builder)
-    {
-        if (isToken(builder, SqlTokenType.MINUS) || isToken(builder, SqlTokenType.PLUS))
-        {
+    private void parseUnaryExpression(PsiBuilder builder) {
+        if (isToken(builder, SqlTokenType.MINUS) || isToken(builder, SqlTokenType.PLUS)) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             parsePrimaryExpression(builder);
             mark.done(SqlCompositeElementTypes.PREFIX_EXPRESSION);
         }
-        else
-        {
+        else {
             parsePrimaryExpression(builder);
         }
     }
 
-    private void parsePrimaryExpression(PsiBuilder builder)
-    {
+    private void parsePrimaryExpression(PsiBuilder builder) {
         IElementType token = builder.getTokenType();
-        if (token == null)
-        {
+        if (token == null) {
             builder.error(SqlLocalize.parserExpressionExpected());
             return;
         }
 
-        if (token == SqlTokenType.NUMBER)
-        {
+        if (token == SqlTokenType.NUMBER) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             mark.done(SqlCompositeElementTypes.LITERAL_EXPRESSION);
         }
-        else if (token == SqlTokenType.SINGLE_QUOTED_LITERAL)
-        {
+        else if (token == SqlTokenType.SINGLE_QUOTED_LITERAL) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             mark.done(SqlCompositeElementTypes.LITERAL_EXPRESSION);
         }
-        else if (token == SqlKeywordTokenTypes.NULL_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.NULL_KEYWORD) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             mark.done(SqlCompositeElementTypes.LITERAL_EXPRESSION);
         }
-        else if (token == SqlKeywordTokenTypes.TRUE_KEYWORD || token == SqlKeywordTokenTypes.FALSE_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.TRUE_KEYWORD || token == SqlKeywordTokenTypes.FALSE_KEYWORD) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             mark.done(SqlCompositeElementTypes.LITERAL_EXPRESSION);
         }
         else if (token == SqlKeywordTokenTypes.CURRENT_DATE_KEYWORD
-                || token == SqlKeywordTokenTypes.CURRENT_TIME_KEYWORD
-                || token == SqlKeywordTokenTypes.CURRENT_TIMESTAMP_KEYWORD
-                || token == SqlKeywordTokenTypes.CURRENT_USER_KEYWORD
-                || token == SqlKeywordTokenTypes.SESSION_USER_KEYWORD
-                || token == SqlKeywordTokenTypes.SYSTEM_USER_KEYWORD)
-        {
+            || token == SqlKeywordTokenTypes.CURRENT_TIME_KEYWORD
+            || token == SqlKeywordTokenTypes.CURRENT_TIMESTAMP_KEYWORD
+            || token == SqlKeywordTokenTypes.CURRENT_USER_KEYWORD
+            || token == SqlKeywordTokenTypes.SESSION_USER_KEYWORD
+            || token == SqlKeywordTokenTypes.SYSTEM_USER_KEYWORD) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             mark.done(SqlCompositeElementTypes.LITERAL_EXPRESSION);
         }
-        else if (token == SqlTokenType.ASTERISK)
-        {
+        else if (token == SqlTokenType.ASTERISK) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             mark.done(SqlCompositeElementTypes.STAR_EXPRESSION);
         }
-        else if (token == SqlTokenType.LPAR)
-        {
-            if (lookAheadIs(builder, SqlKeywordTokenTypes.SELECT_KEYWORD))
-            {
+        else if (token == SqlTokenType.LPAR) {
+            if (lookAheadIs(builder, SqlKeywordTokenTypes.SELECT_KEYWORD)) {
                 PsiBuilder.Marker mark = builder.mark();
                 builder.advanceLexer(); // (
                 parseQueryExpression(builder);
                 expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
                 mark.done(SqlCompositeElementTypes.SUBQUERY_EXPRESSION);
             }
-            else
-            {
+            else {
                 PsiBuilder.Marker mark = builder.mark();
                 builder.advanceLexer(); // (
                 parseExpression(builder);
@@ -1336,8 +1135,7 @@ public class SqlParser implements PsiParser
                 mark.done(SqlCompositeElementTypes.PARENTHESIZED_EXPRESSION);
             }
         }
-        else if (token == SqlKeywordTokenTypes.EXISTS_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.EXISTS_KEYWORD) {
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
@@ -1345,81 +1143,69 @@ public class SqlParser implements PsiParser
             expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
             mark.done(SqlCompositeElementTypes.EXISTS_EXPRESSION);
         }
-        else if (token == SqlKeywordTokenTypes.CASE_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.CASE_KEYWORD) {
             parseCaseExpression(builder);
         }
-        else if (token == SqlKeywordTokenTypes.CAST_KEYWORD)
-        {
+        else if (token == SqlKeywordTokenTypes.CAST_KEYWORD) {
             parseCastExpression(builder);
         }
-        else if (isAggregateFunction(token))
-        {
+        else if (isAggregateFunction(token)) {
             parseFunctionCall(builder);
         }
-        else if (token == SqlTokenType.IDENTIFIER)
-        {
+        else if (SqlTokenType.IDENTIFIERS.contains(token)) {
             parseIdentifierOrFunctionCall(builder);
         }
-        else if (SqlKeywordElementType.isKeyword(token))
-        {
+        else if (token instanceof SqlKeywordElementType) {
             // Some keywords can be used as identifiers in expression context
             PsiBuilder.Marker mark = builder.mark();
             builder.advanceLexer();
             mark.done(SqlCompositeElementTypes.REFERENCE_EXPRESSION);
         }
-        else
-        {
+        else {
             builder.error(SqlLocalize.parserExpressionExpected());
             builder.advanceLexer();
         }
     }
 
-    private boolean isAggregateFunction(IElementType token)
-    {
+    private boolean isAggregateFunction(IElementType token) {
         return token == SqlKeywordTokenTypes.COUNT_KEYWORD
-                || token == SqlKeywordTokenTypes.SUM_KEYWORD
-                || token == SqlKeywordTokenTypes.AVG_KEYWORD
-                || token == SqlKeywordTokenTypes.MIN_KEYWORD
-                || token == SqlKeywordTokenTypes.MAX_KEYWORD
-                || token == SqlKeywordTokenTypes.COALESCE_KEYWORD
-                || token == SqlKeywordTokenTypes.NULLIF_KEYWORD
-                || token == SqlKeywordTokenTypes.UPPER_KEYWORD
-                || token == SqlKeywordTokenTypes.LOWER_KEYWORD
-                || token == SqlKeywordTokenTypes.TRIM_KEYWORD
-                || token == SqlKeywordTokenTypes.SUBSTRING_KEYWORD
-                || token == SqlKeywordTokenTypes.POSITION_KEYWORD
-                || token == SqlKeywordTokenTypes.EXTRACT_KEYWORD
-                || token == SqlKeywordTokenTypes.CONVERT_KEYWORD
-                || token == SqlKeywordTokenTypes.TRANSLATE_KEYWORD
-                || token == SqlKeywordTokenTypes.CHAR_LENGTH_KEYWORD
-                || token == SqlKeywordTokenTypes.CHARACTER_LENGTH_KEYWORD
-                || token == SqlKeywordTokenTypes.OCTET_LENGTH_KEYWORD
-                || token == SqlKeywordTokenTypes.BIT_LENGTH_KEYWORD;
+            || token == SqlKeywordTokenTypes.SUM_KEYWORD
+            || token == SqlKeywordTokenTypes.AVG_KEYWORD
+            || token == SqlKeywordTokenTypes.MIN_KEYWORD
+            || token == SqlKeywordTokenTypes.MAX_KEYWORD
+            || token == SqlKeywordTokenTypes.COALESCE_KEYWORD
+            || token == SqlKeywordTokenTypes.NULLIF_KEYWORD
+            || token == SqlKeywordTokenTypes.UPPER_KEYWORD
+            || token == SqlKeywordTokenTypes.LOWER_KEYWORD
+            || token == SqlKeywordTokenTypes.TRIM_KEYWORD
+            || token == SqlKeywordTokenTypes.SUBSTRING_KEYWORD
+            || token == SqlKeywordTokenTypes.POSITION_KEYWORD
+            || token == SqlKeywordTokenTypes.EXTRACT_KEYWORD
+            || token == SqlKeywordTokenTypes.CONVERT_KEYWORD
+            || token == SqlKeywordTokenTypes.TRANSLATE_KEYWORD
+            || token == SqlKeywordTokenTypes.CHAR_LENGTH_KEYWORD
+            || token == SqlKeywordTokenTypes.CHARACTER_LENGTH_KEYWORD
+            || token == SqlKeywordTokenTypes.OCTET_LENGTH_KEYWORD
+            || token == SqlKeywordTokenTypes.BIT_LENGTH_KEYWORD;
     }
 
-    private void parseFunctionCall(PsiBuilder builder)
-    {
+    private void parseFunctionCall(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         builder.advanceLexer(); // function name keyword
 
         expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
 
-        if (isToken(builder, SqlKeywordTokenTypes.DISTINCT_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.DISTINCT_KEYWORD)) {
             builder.advanceLexer();
         }
 
-        if (!isToken(builder, SqlTokenType.RPAR))
-        {
-            if (isToken(builder, SqlTokenType.ASTERISK))
-            {
+        if (!isToken(builder, SqlTokenType.RPAR)) {
+            if (isToken(builder, SqlTokenType.ASTERISK)) {
                 PsiBuilder.Marker starMark = builder.mark();
                 builder.advanceLexer();
                 starMark.done(SqlCompositeElementTypes.STAR_EXPRESSION);
             }
-            else
-            {
+            else {
                 parseExpressionList(builder);
             }
         }
@@ -1428,31 +1214,25 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.FUNCTION_CALL_EXPRESSION);
     }
 
-    private void parseIdentifierOrFunctionCall(PsiBuilder builder)
-    {
+    private void parseIdentifierOrFunctionCall(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         builder.advanceLexer(); // identifier
 
-        if (isToken(builder, SqlTokenType.LPAR))
-        {
+        if (isToken(builder, SqlTokenType.LPAR)) {
             // function call
             builder.advanceLexer(); // (
 
-            if (isToken(builder, SqlKeywordTokenTypes.DISTINCT_KEYWORD))
-            {
+            if (isToken(builder, SqlKeywordTokenTypes.DISTINCT_KEYWORD)) {
                 builder.advanceLexer();
             }
 
-            if (!isToken(builder, SqlTokenType.RPAR))
-            {
-                if (isToken(builder, SqlTokenType.ASTERISK))
-                {
+            if (!isToken(builder, SqlTokenType.RPAR)) {
+                if (isToken(builder, SqlTokenType.ASTERISK)) {
                     PsiBuilder.Marker starMark = builder.mark();
                     builder.advanceLexer();
                     starMark.done(SqlCompositeElementTypes.STAR_EXPRESSION);
                 }
-                else
-                {
+                else {
                     parseExpressionList(builder);
                 }
             }
@@ -1460,65 +1240,53 @@ public class SqlParser implements PsiParser
             expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
             mark.done(SqlCompositeElementTypes.FUNCTION_CALL_EXPRESSION);
         }
-        else if (isToken(builder, SqlTokenType.DOT))
-        {
+        else if (isToken(builder, SqlTokenType.DOT)) {
             // qualified reference: schema.table.column or table.column
-            while (isToken(builder, SqlTokenType.DOT))
-            {
+            while (isToken(builder, SqlTokenType.DOT)) {
                 builder.advanceLexer(); // .
 
-                if (isToken(builder, SqlTokenType.ASTERISK))
-                {
+                if (isToken(builder, SqlTokenType.ASTERISK)) {
                     builder.advanceLexer();
                     break;
                 }
-                else if (isToken(builder, SqlTokenType.IDENTIFIER))
-                {
+                else if (isIdentifier(builder)) {
                     builder.advanceLexer();
                 }
-                else
-                {
+                else {
                     builder.error(SqlLocalize.parserIdentifierExpected());
                     break;
                 }
             }
 
             // Check if this qualified name is actually a function call
-            if (isToken(builder, SqlTokenType.LPAR))
-            {
+            if (isToken(builder, SqlTokenType.LPAR)) {
                 builder.advanceLexer(); // (
-                if (!isToken(builder, SqlTokenType.RPAR))
-                {
+                if (!isToken(builder, SqlTokenType.RPAR)) {
                     parseExpressionList(builder);
                 }
                 expectToken(builder, SqlTokenType.RPAR, SqlLocalize.parserRparExpected());
                 mark.done(SqlCompositeElementTypes.FUNCTION_CALL_EXPRESSION);
             }
-            else
-            {
+            else {
                 mark.done(SqlCompositeElementTypes.REFERENCE_EXPRESSION);
             }
         }
-        else
-        {
+        else {
             mark.done(SqlCompositeElementTypes.REFERENCE_EXPRESSION);
         }
     }
 
-    private void parseCaseExpression(PsiBuilder builder)
-    {
+    private void parseCaseExpression(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.CASE_KEYWORD, SqlLocalize.parserCaseExpected());
 
         // simple CASE: CASE expr WHEN ...
         // searched CASE: CASE WHEN ...
-        if (!isToken(builder, SqlKeywordTokenTypes.WHEN_KEYWORD))
-        {
+        if (!isToken(builder, SqlKeywordTokenTypes.WHEN_KEYWORD)) {
             parseExpression(builder);
         }
 
-        while (isToken(builder, SqlKeywordTokenTypes.WHEN_KEYWORD))
-        {
+        while (isToken(builder, SqlKeywordTokenTypes.WHEN_KEYWORD)) {
             PsiBuilder.Marker whenMark = builder.mark();
             builder.advanceLexer(); // WHEN
             parseExpression(builder);
@@ -1527,8 +1295,7 @@ public class SqlParser implements PsiParser
             whenMark.done(SqlCompositeElementTypes.CASE_WHEN_CLAUSE);
         }
 
-        if (isToken(builder, SqlKeywordTokenTypes.ELSE_KEYWORD))
-        {
+        if (isToken(builder, SqlKeywordTokenTypes.ELSE_KEYWORD)) {
             builder.advanceLexer();
             parseExpression(builder);
         }
@@ -1537,8 +1304,7 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.CASE_EXPRESSION);
     }
 
-    private void parseCastExpression(PsiBuilder builder)
-    {
+    private void parseCastExpression(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
         expectKeyword(builder, SqlKeywordTokenTypes.CAST_KEYWORD, SqlLocalize.parserCastExpected());
         expectToken(builder, SqlTokenType.LPAR, SqlLocalize.parserLparExpected());
@@ -1551,30 +1317,24 @@ public class SqlParser implements PsiParser
 
     // =================== HELPERS ===================
 
-    private void parseQualifiedName(PsiBuilder builder)
-    {
+    private void parseQualifiedName(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
 
-        if (isToken(builder, SqlTokenType.IDENTIFIER))
-        {
+        if (isIdentifier(builder)) {
             builder.advanceLexer();
         }
-        else
-        {
+        else {
             builder.error(SqlLocalize.parserIdentifierExpected());
             mark.done(SqlCompositeElementTypes.REFERENCE_EXPRESSION);
             return;
         }
 
-        while (isToken(builder, SqlTokenType.DOT))
-        {
+        while (isToken(builder, SqlTokenType.DOT)) {
             builder.advanceLexer();
-            if (isToken(builder, SqlTokenType.IDENTIFIER))
-            {
+            if (isIdentifier(builder)) {
                 builder.advanceLexer();
             }
-            else
-            {
+            else {
                 builder.error(SqlLocalize.parserIdentifierExpected());
                 break;
             }
@@ -1583,100 +1343,98 @@ public class SqlParser implements PsiParser
         mark.done(SqlCompositeElementTypes.REFERENCE_EXPRESSION);
     }
 
-    private void parseIdentifierList(PsiBuilder builder)
-    {
+    private void parseIdentifierList(PsiBuilder builder) {
         PsiBuilder.Marker mark = builder.mark();
-        expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserIdentifierExpected());
+        expectIdentifier(builder, SqlLocalize.parserIdentifierExpected());
         mark.done(SqlCompositeElementTypes.REFERENCE_EXPRESSION);
 
-        while (isToken(builder, SqlTokenType.COMMA))
-        {
+        while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
             PsiBuilder.Marker idMark = builder.mark();
-            expectToken(builder, SqlTokenType.IDENTIFIER, SqlLocalize.parserIdentifierExpected());
+            expectIdentifier(builder, SqlLocalize.parserIdentifierExpected());
             idMark.done(SqlCompositeElementTypes.REFERENCE_EXPRESSION);
         }
     }
 
-    private void parseExpressionList(PsiBuilder builder)
-    {
+    private void parseExpressionList(PsiBuilder builder) {
         parseExpression(builder);
-        while (isToken(builder, SqlTokenType.COMMA))
-        {
+        while (isToken(builder, SqlTokenType.COMMA)) {
             builder.advanceLexer();
             parseExpression(builder);
         }
     }
 
-    private boolean isToken(PsiBuilder builder, IElementType type)
-    {
+    private boolean isToken(PsiBuilder builder, IElementType type) {
         return builder.getTokenType() == type;
     }
 
-    private boolean isTokenIdentifierText(PsiBuilder builder, String text)
-    {
-        return builder.getTokenType() == SqlTokenType.IDENTIFIER
-                && text.equalsIgnoreCase(builder.getTokenText());
+    private boolean isIdentifier(PsiBuilder builder) {
+        return SqlTokenType.IDENTIFIERS.contains(builder.getTokenType());
     }
 
-    private void expectToken(PsiBuilder builder, IElementType type, LocalizeValue errorMessage)
-    {
-        if (builder.getTokenType() == type)
-        {
+    private void expectIdentifier(PsiBuilder builder, LocalizeValue errorMessage) {
+        if (SqlTokenType.IDENTIFIERS.contains(builder.getTokenType())) {
             builder.advanceLexer();
         }
-        else
-        {
+        else {
             builder.error(errorMessage);
         }
     }
 
-    private void expectKeyword(PsiBuilder builder, IElementType keyword, LocalizeValue errorMessage)
-    {
-        if (builder.getTokenType() == keyword)
-        {
+    private boolean isTokenIdentifierText(PsiBuilder builder, String text) {
+        return SqlTokenType.IDENTIFIERS.contains(builder.getTokenType())
+            && text.equalsIgnoreCase(builder.getTokenText());
+    }
+
+    private void expectToken(PsiBuilder builder, IElementType type, LocalizeValue errorMessage) {
+        if (builder.getTokenType() == type) {
             builder.advanceLexer();
         }
-        else
-        {
+        else {
             builder.error(errorMessage);
         }
     }
 
-    private boolean isStatementBoundary(PsiBuilder builder)
-    {
+    private void expectKeyword(PsiBuilder builder, IElementType keyword, LocalizeValue errorMessage) {
+        if (builder.getTokenType() == keyword) {
+            builder.advanceLexer();
+        }
+        else {
+            builder.error(errorMessage);
+        }
+    }
+
+    private boolean isStatementBoundary(PsiBuilder builder) {
         IElementType t = builder.getTokenType();
         return t == SqlKeywordTokenTypes.FROM_KEYWORD
-                || t == SqlKeywordTokenTypes.WHERE_KEYWORD
-                || t == SqlKeywordTokenTypes.GROUP_KEYWORD
-                || t == SqlKeywordTokenTypes.HAVING_KEYWORD
-                || t == SqlKeywordTokenTypes.ORDER_KEYWORD
-                || t == SqlKeywordTokenTypes.UNION_KEYWORD
-                || t == SqlKeywordTokenTypes.INTERSECT_KEYWORD
-                || t == SqlKeywordTokenTypes.EXCEPT_KEYWORD
-                || t == SqlKeywordTokenTypes.ON_KEYWORD
-                || t == SqlKeywordTokenTypes.JOIN_KEYWORD
-                || t == SqlKeywordTokenTypes.INNER_KEYWORD
-                || t == SqlKeywordTokenTypes.LEFT_KEYWORD
-                || t == SqlKeywordTokenTypes.RIGHT_KEYWORD
-                || t == SqlKeywordTokenTypes.FULL_KEYWORD
-                || t == SqlKeywordTokenTypes.CROSS_KEYWORD
-                || t == SqlKeywordTokenTypes.NATURAL_KEYWORD
-                || t == SqlKeywordTokenTypes.SET_KEYWORD
-                || t == SqlKeywordTokenTypes.VALUES_KEYWORD
-                || t == SqlKeywordTokenTypes.INTO_KEYWORD
-                || t == SqlTokenType.SEMICOLON
-                || t == SqlTokenType.RPAR;
+            || t == SqlKeywordTokenTypes.WHERE_KEYWORD
+            || t == SqlKeywordTokenTypes.GROUP_KEYWORD
+            || t == SqlKeywordTokenTypes.HAVING_KEYWORD
+            || t == SqlKeywordTokenTypes.ORDER_KEYWORD
+            || t == SqlKeywordTokenTypes.UNION_KEYWORD
+            || t == SqlKeywordTokenTypes.INTERSECT_KEYWORD
+            || t == SqlKeywordTokenTypes.EXCEPT_KEYWORD
+            || t == SqlKeywordTokenTypes.ON_KEYWORD
+            || t == SqlKeywordTokenTypes.JOIN_KEYWORD
+            || t == SqlKeywordTokenTypes.INNER_KEYWORD
+            || t == SqlKeywordTokenTypes.LEFT_KEYWORD
+            || t == SqlKeywordTokenTypes.RIGHT_KEYWORD
+            || t == SqlKeywordTokenTypes.FULL_KEYWORD
+            || t == SqlKeywordTokenTypes.CROSS_KEYWORD
+            || t == SqlKeywordTokenTypes.NATURAL_KEYWORD
+            || t == SqlKeywordTokenTypes.SET_KEYWORD
+            || t == SqlKeywordTokenTypes.VALUES_KEYWORD
+            || t == SqlKeywordTokenTypes.INTO_KEYWORD
+            || t == SqlTokenType.SEMICOLON
+            || t == SqlTokenType.RPAR;
     }
 
-    private boolean lookAheadIs(PsiBuilder builder, IElementType expected)
-    {
+    private boolean lookAheadIs(PsiBuilder builder, IElementType expected) {
         // look past '(' to see if next meaningful token matches
         return builder.lookAhead(1) == expected;
     }
 
-    private boolean lookAheadTokenIs(PsiBuilder builder, IElementType expected)
-    {
+    private boolean lookAheadTokenIs(PsiBuilder builder, IElementType expected) {
         return builder.lookAhead(1) == expected;
     }
 }

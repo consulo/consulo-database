@@ -24,12 +24,10 @@ import consulo.sql.lang.impl.BaseSqlLanguageVersion;
  * @since 22/10/2021
  */
 @ExtensionImpl
-public class Sql92LanguageVersion extends BaseSqlLanguageVersion
-{
-	public Sql92LanguageVersion()
-	{
-		super("SQL-92", "SQL-92");
+public class Sql92LanguageVersion extends BaseSqlLanguageVersion {
+    public Sql92LanguageVersion() {
+        super("SQL-92", "SQL-92");
 
-		addReservedKeywords(Sql92TokenTypes.RESERVED_KEYWORDS);
-	}
+        registerKeywords(Sql92TokenTypes.RESERVED_KEYWORDS);
+    }
 }

@@ -54,6 +54,12 @@
 		<module>impl/mongo-impl</module>
 		<module>sql-lang-api</module>
 		<module>sql-lang-impl</module>
+		<module>sql-versions/mysql-sql-impl</module>
+		<module>sql-versions/mariadb-sql-impl</module>
+		<module>sql-versions/postgresql-sql-impl</module>
+		<module>sql-versions/oracle-sql-impl</module>
+		<module>sql-versions/sqlite-sql-impl</module>
+		<module>sql-versions/tsql-impl</module>
 		<module>plugin</module>
 	</modules>
 </project>
