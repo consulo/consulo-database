@@ -1,0 +1,159 @@
+Manifest-Version: 1.0
+Class-Path: ../../../../../../../../../home/vistall/.m2/repository/org/a
+ pache/maven/surefire/surefire-shared-utils/3.1.0/surefire-shared-utils-
+ 3.1.0.jar ../../../../../../../../../home/vistall/.m2/repository/org/ap
+ ache/maven/surefire/surefire-extensions-spi/3.1.0/surefire-extensions-s
+ pi-3.1.0.jar ../../../../../../../../../home/vistall/.m2/repository/org
+ /apache/maven/surefire/surefire-api/3.1.0/surefire-api-3.1.0.jar ../../
+ ../../../../../../../home/vistall/.m2/repository/org/apache/maven/suref
+ ire/surefire-logger-api/3.1.0/surefire-logger-api-3.1.0.jar ../../../..
+ /../../../../../home/vistall/.m2/repository/org/apache/maven/surefire/s
+ urefire-booter/3.1.0/surefire-booter-3.1.0.jar ../test-classes/ ../clas
+ ses/ ../../../../../../../../../home/vistall/.m2/repository/consulo/con
+ sulo-language-editor-api/3-SNAPSHOT/consulo-language-editor-api-3-SNAPS
+ HOT.jar ../../../../../../../../../home/vistall/.m2/repository/consulo/
+ consulo-language-api/3-SNAPSHOT/consulo-language-api-3-SNAPSHOT.jar ../
+ ../../../../../../../../home/vistall/.m2/repository/consulo/consulo-app
+ lication-content-api/3-SNAPSHOT/consulo-application-content-api-3-SNAPS
+ HOT.jar ../../../../../../../../../home/vistall/.m2/repository/consulo/
+ consulo-file-chooser-api/3-SNAPSHOT/consulo-file-chooser-api-3-SNAPSHOT
+ .jar ../../../../../../../../../home/vistall/.m2/repository/consulo/con
+ sulo-project-content-api/3-SNAPSHOT/consulo-project-content-api-3-SNAPS
+ HOT.jar ../../../../../../../../../home/vistall/.m2/repository/consulo/
+ consulo-module-content-api/3-SNAPSHOT/consulo-module-content-api-3-SNAP
+ SHOT.jar ../../../../../../../../../home/vistall/.m2/repository/consulo
+ /consulo-module-api/3-SNAPSHOT/consulo-module-api-3-SNAPSHOT.jar ../../
+ ../../../../../../../home/vistall/.m2/repository/consulo/consulo-docume
+ nt-api/3-SNAPSHOT/consulo-document-api-3-SNAPSHOT.jar ../../../../../..
+ /../../../home/vistall/.m2/repository/consulo/kava.beans/1.0/kava.beans
+ -1.0.jar ../../../../../../../../../home/vistall/.m2/repository/consulo
+ /consulo-navigation-api/3-SNAPSHOT/consulo-navigation-api-3-SNAPSHOT.ja
+ r ../../../../../../../../../home/vistall/.m2/repository/consulo/consul
+ o-index-io/3-SNAPSHOT/consulo-index-io-3-SNAPSHOT.jar ../../../../../..
+ /../../../home/vistall/.m2/repository/consulo/consulo-util-collection-p
+ rimitive/3-SNAPSHOT/consulo-util-collection-primitive-3-SNAPSHOT.jar ..
+ /../../../../../../../../home/vistall/.m2/repository/consulo/consulo-fi
+ le-editor-api/3-SNAPSHOT/consulo-file-editor-api-3-SNAPSHOT.jar ../../.
+ ./../../../../../../home/vistall/.m2/repository/consulo/consulo-applica
+ tion-api/3-SNAPSHOT/consulo-application-api-3-SNAPSHOT.jar ../../../../
+ ../../../../../home/vistall/.m2/repository/consulo/consulo-proxy/3-SNAP
+ SHOT/consulo-proxy-3-SNAPSHOT.jar ../../../../../../../../../home/vista
+ ll/.m2/repository/consulo/consulo-base-icon-library/3-SNAPSHOT/consulo-
+ base-icon-library-3-SNAPSHOT.jar ../../../../../../../../../home/vistal
+ l/.m2/repository/consulo/consulo-util-concurrent-coroutine/3-SNAPSHOT/c
+ onsulo-util-concurrent-coroutine-3-SNAPSHOT.jar ../../../../../../../..
+ /../home/vistall/.m2/repository/consulo/consulo-util-concurrent/3-SNAPS
+ HOT/consulo-util-concurrent-3-SNAPSHOT.jar ../../../../../../../../../h
+ ome/vistall/.m2/repository/it/unimi/dsi/fastutil/8.5.14/fastutil-8.5.14
+ .jar ../../../../../../../../../home/vistall/.m2/repository/consulo/con
+ sulo-project-api/3-SNAPSHOT/consulo-project-api-3-SNAPSHOT.jar ../../..
+ /../../../../../../home/vistall/.m2/repository/consulo/consulo-datacont
+ ext-api/3-SNAPSHOT/consulo-datacontext-api-3-SNAPSHOT.jar ../../../../.
+ ./../../../../home/vistall/.m2/repository/consulo/consulo-project-ui-ap
+ i/3-SNAPSHOT/consulo-project-ui-api-3-SNAPSHOT.jar ../../../../../../..
+ /../../home/vistall/.m2/repository/consulo/consulo-application-ui-api/3
+ -SNAPSHOT/consulo-application-ui-api-3-SNAPSHOT.jar ../../../../../../.
+ ./../../home/vistall/.m2/repository/consulo/consulo-virtual-file-system
+ -api/3-SNAPSHOT/consulo-virtual-file-system-api-3-SNAPSHOT.jar ../../..
+ /../../../../../../home/vistall/.m2/repository/consulo/consulo-base-loc
+ alize-library/3-SNAPSHOT/consulo-base-localize-library-3-SNAPSHOT.jar .
+ ./../../../../../../../../home/vistall/.m2/repository/consulo/consulo-l
+ ocalize-api/3-SNAPSHOT/consulo-localize-api-3-SNAPSHOT.jar ../../../../
+ ../../../../../home/vistall/.m2/repository/consulo/consulo-util-jna/3-S
+ NAPSHOT/consulo-util-jna-3-SNAPSHOT.jar ../../../../../../../../../home
+ /vistall/.m2/repository/consulo/consulo-language-code-style-api/3-SNAPS
+ HOT/consulo-language-code-style-api-3-SNAPSHOT.jar ../../../../../../..
+ /../../home/vistall/.m2/repository/consulo/consulo-code-editor-api/3-SN
+ APSHOT/consulo-code-editor-api-3-SNAPSHOT.jar ../../../../../../../../.
+ ./home/vistall/.m2/repository/consulo/consulo-color-scheme-api/3-SNAPSH
+ OT/consulo-color-scheme-api-3-SNAPSHOT.jar ../../../../../../../../../h
+ ome/vistall/.m2/repository/consulo/consulo-ui-ex-api/3-SNAPSHOT/consulo
+ -ui-ex-api-3-SNAPSHOT.jar ../../../../../../../../../home/vistall/.m2/r
+ epository/consulo/consulo-ui-api/3-SNAPSHOT/consulo-ui-api-3-SNAPSHOT.j
+ ar ../../../../../../../../../home/vistall/.m2/repository/consulo/consu
+ lo-undo-redo-api/3-SNAPSHOT/consulo-undo-redo-api-3-SNAPSHOT.jar ../../
+ ../../../../../../../home/vistall/.m2/repository/consulo/consulo-virtua
+ l-file-status-api/3-SNAPSHOT/consulo-virtual-file-status-api-3-SNAPSHOT
+ .jar ../../../../../../../../../home/vistall/.m2/repository/consulo/con
+ sulo-external-service-api/3-SNAPSHOT/consulo-external-service-api-3-SNA
+ PSHOT.jar ../../../../../../../../../home/vistall/.m2/repository/consul
+ o/consulo-configurable-api/3-SNAPSHOT/consulo-configurable-api-3-SNAPSH
+ OT.jar ../../../../../../../../../home/vistall/.m2/repository/consulo/c
+ onsulo-util-jdom/3-SNAPSHOT/consulo-util-jdom-3-SNAPSHOT.jar ../../../.
+ ./../../../../../home/vistall/.m2/repository/consulo/consulo-util-lang/
+ 3-SNAPSHOT/consulo-util-lang-3-SNAPSHOT.jar ../../../../../../../../../
+ home/vistall/.m2/repository/org/slf4j/slf4j-api/2.0.7/slf4j-api-2.0.7.j
+ ar ../../../../../../../../../home/vistall/.m2/repository/consulo/consu
+ lo-util-io/3-SNAPSHOT/consulo-util-io-3-SNAPSHOT.jar ../../../../../../
+ ../../../home/vistall/.m2/repository/consulo/consulo-util-collection/3-
+ SNAPSHOT/consulo-util-collection-3-SNAPSHOT.jar ../../../../../../../..
+ /../home/vistall/.m2/repository/org/jdom/jdom-core/3.1/jdom-core-3.1.ja
+ r ../../../../../../../../../home/vistall/.m2/repository/consulo/consul
+ o-language-impl/3-SNAPSHOT/consulo-language-impl-3-SNAPSHOT.jar ../../.
+ ./../../../../../../home/vistall/.m2/repository/consulo/consulo-util-in
+ terner/3-SNAPSHOT/consulo-util-interner-3-SNAPSHOT.jar ../../../../../.
+ ./../../../home/vistall/.m2/repository/consulo/plugin/consulo.database-
+ sql.lang.api/3-SNAPSHOT/consulo.database-sql.lang.api-3-SNAPSHOT.jar ..
+ /../../../../../../../../home/vistall/.m2/repository/consulo/consulo-te
+ st-junit-impl/3-SNAPSHOT/consulo-test-junit-impl-3-SNAPSHOT.jar ../../.
+ ./../../../../../../home/vistall/.m2/repository/consulo/consulo-test-im
+ pl/3-SNAPSHOT/consulo-test-impl-3-SNAPSHOT.jar ../../../../../../../../
+ ../home/vistall/.m2/repository/consulo/consulo-container-api/3-SNAPSHOT
+ /consulo-container-api-3-SNAPSHOT.jar ../../../../../../../../../home/v
+ istall/.m2/repository/consulo/consulo-component-api/3-SNAPSHOT/consulo-
+ component-api-3-SNAPSHOT.jar ../../../../../../../../../home/vistall/.m
+ 2/repository/consulo/consulo-disposer-api/3-SNAPSHOT/consulo-disposer-a
+ pi-3-SNAPSHOT.jar ../../../../../../../../../home/vistall/.m2/repositor
+ y/consulo/consulo-platform-api/3-SNAPSHOT/consulo-platform-api-3-SNAPSH
+ OT.jar ../../../../../../../../../home/vistall/.m2/repository/consulo/c
+ onsulo-logging-api/3-SNAPSHOT/consulo-logging-api-3-SNAPSHOT.jar ../../
+ ../../../../../../../home/vistall/.m2/repository/consulo/consulo-util-d
+ ataholder/3-SNAPSHOT/consulo-util-dataholder-3-SNAPSHOT.jar ../../../..
+ /../../../../../home/vistall/.m2/repository/consulo/consulo-util-xml-se
+ rializer/3-SNAPSHOT/consulo-util-xml-serializer-3-SNAPSHOT.jar ../../..
+ /../../../../../../home/vistall/.m2/repository/consulo/consulo-componen
+ t-impl/3-SNAPSHOT/consulo-component-impl-3-SNAPSHOT.jar ../../../../../
+ ../../../../home/vistall/.m2/repository/consulo/consulo-document-impl/3
+ -SNAPSHOT/consulo-document-impl-3-SNAPSHOT.jar ../../../../../../../../
+ ../home/vistall/.m2/repository/consulo/consulo-platform-impl/3-SNAPSHOT
+ /consulo-platform-impl-3-SNAPSHOT.jar ../../../../../../../../../home/v
+ istall/.m2/repository/net/java/dev/jna/jna-jpms/5.16.0/jna-jpms-5.16.0.
+ jar ../../../../../../../../../home/vistall/.m2/repository/net/java/dev
+ /jna/jna-platform-jpms/5.16.0/jna-platform-jpms-5.16.0.jar ../../../../
+ ../../../../../home/vistall/.m2/repository/consulo/consulo-disposer-imp
+ l/3-SNAPSHOT/consulo-disposer-impl-3-SNAPSHOT.jar ../../../../../../../
+ ../../home/vistall/.m2/repository/consulo/consulo-util-nodep/3-SNAPSHOT
+ /consulo-util-nodep-3-SNAPSHOT.jar ../../../../../../../../../home/vist
+ all/.m2/repository/consulo/consulo-util-collection-via-trove/3-SNAPSHOT
+ /consulo-util-collection-via-trove-3-SNAPSHOT.jar ../../../../../../../
+ ../../home/vistall/.m2/repository/consulo/internal/trove4j/2.2/trove4j-
+ 2.2.jar ../../../../../../../../../home/vistall/.m2/repository/consulo/
+ consulo-logging-slf4j-binding-impl/3-SNAPSHOT/consulo-logging-slf4j-bin
+ ding-impl-3-SNAPSHOT.jar ../../../../../../../../../home/vistall/.m2/re
+ pository/org/slf4j/jcl-over-slf4j/2.0.7/jcl-over-slf4j-2.0.7.jar ../../
+ ../../../../../../../home/vistall/.m2/repository/org/junit/jupiter/juni
+ t-jupiter-api/5.10.3/junit-jupiter-api-5.10.3.jar ../../../../../../../
+ ../../home/vistall/.m2/repository/org/opentest4j/opentest4j/1.3.0/opent
+ est4j-1.3.0.jar ../../../../../../../../../home/vistall/.m2/repository/
+ org/junit/platform/junit-platform-commons/1.10.3/junit-platform-commons
+ -1.10.3.jar ../../../../../../../../../home/vistall/.m2/repository/org/
+ junit/jupiter/junit-jupiter-engine/5.10.3/junit-jupiter-engine-5.10.3.j
+ ar ../../../../../../../../../home/vistall/.m2/repository/org/junit/pla
+ tform/junit-platform-engine/1.10.3/junit-platform-engine-1.10.3.jar ../
+ ../../../../../../../../home/vistall/.m2/repository/consulo/consulo-ann
+ otation/3-SNAPSHOT/consulo-annotation-3-SNAPSHOT.jar ../../../../../../
+ ../../../home/vistall/.m2/repository/jakarta/annotation/jakarta.annotat
+ ion-api/2.1.1/jakarta.annotation-api-2.1.1.jar ../../../../../../../../
+ ../home/vistall/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/ap
+ iguardian-api-1.1.2.jar ../../../../../../../../../home/vistall/.m2/rep
+ ository/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar ../../../../../.
+ ./../../../home/vistall/.m2/repository/jakarta/inject/jakarta.inject-ap
+ i/2.0.1/jakarta.inject-api-2.0.1.jar ../../../../../../../../../home/vi
+ stall/.m2/repository/org/apache/maven/surefire/surefire-junit-platform/
+ 3.1.0/surefire-junit-platform-3.1.0.jar ../../../../../../../../../home
+ /vistall/.m2/repository/org/apache/maven/surefire/common-java5/3.1.0/co
+ mmon-java5-3.1.0.jar ../../../../../../../../../home/vistall/.m2/reposi
+ tory/org/junit/platform/junit-platform-launcher/1.10.3/junit-platform-l
+ auncher-1.10.3.jar
+Main-Class: org.apache.maven.surefire.booter.ForkedBooter
+
