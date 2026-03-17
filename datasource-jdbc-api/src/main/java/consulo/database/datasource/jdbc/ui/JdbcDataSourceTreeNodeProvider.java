@@ -17,7 +17,6 @@
 package consulo.database.datasource.jdbc.ui;
 
 import consulo.annotation.component.ExtensionImpl;
-import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.JdbcDatabaseState;
 import consulo.database.datasource.jdbc.provider.impl.JdbcState;
@@ -27,9 +26,8 @@ import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.datasource.ui.DataSourceTreeNodeProvider;
 import consulo.project.Project;
 import consulo.project.ui.view.tree.AbstractTreeNode;
-import consulo.util.lang.StringUtil;
-
 import jakarta.annotation.Nonnull;
+
 import java.util.function.Consumer;
 
 /**
@@ -37,49 +35,27 @@ import java.util.function.Consumer;
  * @since 2020-08-18
  */
 @ExtensionImpl(id = "jdbc")
-public class JdbcDataSourceTreeNodeProvider implements DataSourceTreeNodeProvider
-{
-	@Override
-	public boolean accept(@Nonnull DataSource dataSource)
-	{
-		return dataSource.getProvider() instanceof JdbcDataSourceProvider;
-	}
+public class JdbcDataSourceTreeNodeProvider implements DataSourceTreeNodeProvider {
+    @Override
+    public boolean accept(@Nonnull DataSource dataSource) {
+        return dataSource.getProvider() instanceof JdbcDataSourceProvider;
+    }
 
-	@Override
-	public void fillTreeNodes(@Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull Consumer<AbstractTreeNode<?>> consumer)
-	{
-		String dbName = dataSource.getProperties().get(GenericPropertyKeys.DATABASE_NAME);
-		if(!StringUtil.isEmpty(dbName))
-		{
-			JdbcDatabaseState state = new JdbcDatabaseState();
-			state.setTablesState(null);
-			state.setName(dbName);
+    @Override
+    public void fillTreeNodes(@Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull Consumer<AbstractTreeNode<?>> consumer) {
+        JdbcState state = DataSourceTransportManager.getInstance(project).getDataState(dataSource);
 
-			DatabaseJdbcDatabaseNode node = createDatabaseNode(project, dataSource, state);
-			for(AbstractTreeNode child : node.getChildren())
-			{
-				consumer.accept(child);
-			}
-		}
-		else
-		{
-			JdbcState state = DataSourceTransportManager.getInstance(project).getDataState(dataSource);
+        if (state == null) {
+            return;
+        }
 
-			if(state == null)
-			{
-				return;
-			}
+        for (JdbcDatabaseState databaseState : state.getDatabases().values()) {
+            consumer.accept(createDatabaseNode(project, dataSource, databaseState));
+        }
+    }
 
-			for(JdbcDatabaseState databaseState : state.getDatabases().values())
-			{
-				consumer.accept(createDatabaseNode(project, dataSource, databaseState));
-			}
-		}
-	}
-
-	@Nonnull
-	protected DatabaseJdbcDatabaseNode createDatabaseNode(Project project, DataSource dataSource, JdbcDatabaseState state)
-	{
-		return new DatabaseJdbcDatabaseNode(project, dataSource, state);
-	}
+    @Nonnull
+    protected DatabaseJdbcDatabaseNode createDatabaseNode(Project project, DataSource dataSource, JdbcDatabaseState state) {
+        return new DatabaseJdbcDatabaseNode(project, dataSource, state);
+    }
 }

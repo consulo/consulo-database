@@ -16,32 +16,40 @@
 
 package consulo.database.datasource.model;
 
+import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.provider.DataSourceProvider;
-
 import jakarta.annotation.Nonnull;
+
 import java.util.UUID;
 
 /**
  * @author VISTALL
  * @since 2020-08-12
  */
-public interface DataSource
-{
-	@Nonnull
-	DataSourceProvider getProvider();
+public interface DataSource {
+    @Nonnull
+    DataSourceProvider getProvider();
 
-	@Nonnull
-	String getName();
+    @Nonnull
+    String getName();
 
-	/**
-	 * @return unique uuid for datasource. this id never change
-	 */
-	@Nonnull
-	UUID getId();
+    /**
+     * @return unique uuid for datasource. this id never change
+     */
+    @Nonnull
+    UUID getId();
 
-	@Nonnull
-	PropertiesHolder getProperties();
+    @Nonnull
+    PropertiesHolder getProperties();
 
-	boolean isApplicationAware();
+    boolean isApplicationAware();
+
+    default <T> T getValueWithDefault(GenericPropertyKey<T> key) {
+        T t = getProperties().get(key);
+        if (t != null) {
+            return t;
+        }
+        return getProvider().getDefaultValue(key);
+    }
 }

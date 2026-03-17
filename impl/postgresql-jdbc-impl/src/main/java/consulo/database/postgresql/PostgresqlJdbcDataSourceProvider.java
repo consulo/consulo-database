@@ -19,20 +19,18 @@ package consulo.database.postgresql;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
+import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
-import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.configurable.SecureString;
 import consulo.database.datasource.jdbc.configurable.JdbcConfigurable;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.model.EditableDataSource;
-import consulo.database.datasource.provider.DataSourceConfigurationException;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.language.version.LanguageVersion;
 import consulo.localize.LocalizeValue;
 import consulo.sql.lang.impl.postgresql.PostgreSqlLanguageVersion;
 import consulo.ui.image.Image;
-import consulo.util.lang.StringUtil;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -82,20 +80,22 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider {
     }
 
     @Override
-    public void validateConfiguration(@Nonnull PropertiesHolder propertiesHolder) throws DataSourceConfigurationException {
-        String dbName = propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME);
-        if (StringUtil.isEmptyOrSpaces(dbName)) {
-            throw new DataSourceConfigurationException(LocalizeValue.localizeTODO("Database must be not empty"));
-        }
-    }
-
-    @Override
     public void fillDrivers(Map<String, String> map) {
-        map.put("postgresql-42.2.15.jar", "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.15/postgresql-42.2.15.jar");
+        map.put("postgresql-42.7.10.jar", "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.10/postgresql-42.7.10.jar");
     }
 
     @Override
     public boolean isTableType(@Nullable String type) {
         return super.isTableType(type) || "SYSTEM TABLE".equals(type);
+    }
+
+    @Nullable
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getDefaultValue(GenericPropertyKey<T> key) {
+        if (key == GenericPropertyKeys.DATABASE_NAME) {
+            return (T) "postgres";
+        }
+        return null;
     }
 }

@@ -42,14 +42,18 @@ import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.transport.TSocket;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -60,226 +64,202 @@ import java.util.concurrent.TimeUnit;
  * @author VISTALL
  * @since 2020-08-18
  */
-public class JdbcSession implements AutoCloseable
-{
-	private enum SessionState
-	{
-		UNDEFINED,
-		WAIT_CLIENT,
-		CANCELED,
-		ERROR
-	}
+public class JdbcSession implements AutoCloseable {
+    private enum SessionState {
+        UNDEFINED,
+        WAIT_CLIENT,
+        CANCELED,
+        ERROR
+    }
 
-	private ProcessHandler myProcessHandler;
+    private ProcessHandler myProcessHandler;
 
-	private Future<?> myWatcherTask = CompletableFuture.completedFuture(null);
+    private Future<?> myWatcherTask = CompletableFuture.completedFuture(null);
 
-	private JdbcExecutor.Client myClient;
+    private JdbcExecutor.Client myClient;
 
-	private final TSocket mySocket;
+    private final TSocket mySocket;
 
-	private SessionState myState = SessionState.UNDEFINED;
+    private SessionState myState = SessionState.UNDEFINED;
 
-	private final CountDownLatch myCountDownLatch = new CountDownLatch(1);
+    private final CountDownLatch myCountDownLatch = new CountDownLatch(1);
 
-	private final int myPort;
+    private final int myPort;
 
-	public JdbcSession(@Nonnull ProgressIndicator indicator, @Nonnull DataSource dataSource) throws Exception
-	{
-		JdbcDataSourceProvider provider = (JdbcDataSourceProvider) dataSource.getProvider();
+    public JdbcSession(@Nonnull ProgressIndicator indicator, @Nonnull DataSource dataSource) throws Exception {
+        JdbcDataSourceProvider provider = (JdbcDataSourceProvider) dataSource.getProvider();
 
-		Path driverPath = prepareJdbcDriver(indicator, provider);
+        Path driverPath = prepareJdbcDriver(indicator, provider);
 
-		String jdbcUrl = provider.buildJdbcUrl(dataSource);
+        String jdbcUrl = provider.buildJdbcUrl(dataSource);
 
-		myPort = NetUtil.findAvailableSocketPort();
+        myPort = NetUtil.findAvailableSocketPort();
 
-		String login = dataSource.getProperties().get(GenericPropertyKeys.LOGIN);
-		SecureString password = dataSource.getProperties().get(GenericPropertyKeys.PASSWORD);
+        String login = dataSource.getProperties().get(GenericPropertyKeys.LOGIN);
+        SecureString password = dataSource.getProperties().get(GenericPropertyKeys.PASSWORD);
 
-		Map<String, String> properties = new HashMap<>();
-		properties.put("user", login);
-		properties.put("password", password.getValue(dataSource));
+        Map<String, String> properties = new HashMap<>();
+        properties.put("user", login);
+        properties.put("password", password.getValue(dataSource));
 
-		SimpleReference<Integer> exitCodeRef = SimpleReference.create();
+        SimpleReference<Integer> exitCodeRef = SimpleReference.create();
 
-		Platform platform = Platform.current();
+        Platform platform = Platform.current();
 
-		String java_home = platform.jvm().getRuntimeProperty("java.home");
+        String java_home = platform.jvm().getRuntimeProperty("java.home");
 
-		SimpleJavaParameters simpleJavaParameters = new SimpleJavaParameters();
-		simpleJavaParameters.getClassPath().add(new File(PluginManager.getPluginPath(DefaultJdbcDataSourceTransport.class), "rt/consulo.database-datasource.jdbc.rt.jar"));
-		simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(JdbcExecutor.class));
-		simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(TServer.class));
-		simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(org.slf4j.Logger.class));
-		simpleJavaParameters.getClassPath().add(driverPath.toFile());
-		simpleJavaParameters.setMainClass("consulo.database.jdbc.rt.Main");
-		simpleJavaParameters.setJdkHome(java_home);
-		simpleJavaParameters.getProgramParametersList().add(String.valueOf(myPort));
+        SimpleJavaParameters simpleJavaParameters = new SimpleJavaParameters();
+        simpleJavaParameters.getClassPath().add(new File(PluginManager.getPluginPath(DefaultJdbcDataSourceTransport.class), "rt/consulo.database-datasource.jdbc.rt.jar"));
+        simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(JdbcExecutor.class));
+        simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(TServer.class));
+        simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(Logger.class));
+        simpleJavaParameters.getClassPath().add(driverPath.toFile());
+        simpleJavaParameters.setMainClass("consulo.database.jdbc.rt.Main");
+        simpleJavaParameters.setJdkHome(java_home);
+        simpleJavaParameters.getProgramParametersList().add(String.valueOf(myPort));
 
-		ProcessHandler processHandler = simpleJavaParameters.createProcessHandler();
-		myProcessHandler = processHandler;
+        String userTimeZone = ZoneId.systemDefault().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.ROOT);
 
-		processHandler.addProcessListener(new ProcessListener()
-		{
-			@Override
-			public void onTextAvailable(ProcessEvent event, Key outputType)
-			{
-				if(event.getText().trim().equals("[binded]"))
-				{
-					changeState(SessionState.WAIT_CLIENT);
-				}
-			}
+        simpleJavaParameters.getVMParametersList().add("-Duser.timezone=" + userTimeZone);
 
-			@Override
-			public void processTerminated(ProcessEvent event)
-			{
-				exitCodeRef.setIfNull(event.getExitCode());
+        ProcessHandler processHandler = simpleJavaParameters.createProcessHandler();
+        myProcessHandler = processHandler;
 
-				changeState(SessionState.ERROR);
-			}
-		});
+        processHandler.addProcessListener(new ProcessListener() {
+            @Override
+            public void onTextAvailable(ProcessEvent event, Key outputType) {
+                if (event.getText().trim().equals("[binded]")) {
+                    changeState(SessionState.WAIT_CLIENT);
+                }
+            }
 
-		myWatcherTask = AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() ->
-		{
-			// process terminated
-			if(exitCodeRef.get() != null)
-			{
-				myWatcherTask.cancel(false);
-				return;
-			}
+            @Override
+            public void processTerminated(ProcessEvent event) {
+                exitCodeRef.setIfNull(event.getExitCode());
 
-			if(indicator.isCanceled())
-			{
-				// force set canceled
-				myState = SessionState.CANCELED;
+                changeState(SessionState.ERROR);
+            }
+        });
 
-				ProcessHandler handler = myProcessHandler;
-				if(handler != null)
-				{
-					// reset ref - no need kill process twice
-					myProcessHandler = null;
-					handler.destroyProcess();
-				}
-			}
+        myWatcherTask = AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() ->
+        {
+            // process terminated
+            if (exitCodeRef.get() != null) {
+                myWatcherTask.cancel(false);
+                return;
+            }
 
-		}, 500, 500, TimeUnit.MILLISECONDS);
+            if (indicator.isCanceled()) {
+                // force set canceled
+                myState = SessionState.CANCELED;
 
-		processHandler.startNotify();
+                ProcessHandler handler = myProcessHandler;
+                if (handler != null) {
+                    // reset ref - no need kill process twice
+                    myProcessHandler = null;
+                    handler.destroyProcess();
+                }
+            }
 
-		myCountDownLatch.await();
+        }, 500, 500, TimeUnit.MILLISECONDS);
 
-		if(myState == SessionState.CANCELED)
-		{
-			closeImpl();
+        processHandler.startNotify();
 
-			throw new ProcessCanceledException();
-		}
+        myCountDownLatch.await();
 
-		if(myState != SessionState.WAIT_CLIENT)
-		{
-			closeImpl();
+        if (myState == SessionState.CANCELED) {
+            closeImpl();
 
-			throw new Exception("Connection error");
-		}
+            throw new ProcessCanceledException();
+        }
 
-		try
-		{
-			mySocket = new TSocket("localhost", myPort);
+        if (myState != SessionState.WAIT_CLIENT) {
+            closeImpl();
 
-			mySocket.open();
+            throw new Exception("Connection error");
+        }
 
-			myClient = new JdbcExecutor.Client(new TBinaryProtocol(mySocket));
+        try {
+            mySocket = new TSocket("localhost", myPort);
 
-			myClient.connect(jdbcUrl, properties);
-		}
-		catch(Exception e)
-		{
-			closeImpl();
+            mySocket.open();
 
-			throw e;
-		}
-	}
+            myClient = new JdbcExecutor.Client(new TBinaryProtocol(mySocket));
 
-	private void changeState(SessionState state)
-	{
-		if(myState == SessionState.UNDEFINED)
-		{
-			myState = state;
-			myCountDownLatch.countDown();
-		}
-	}
+            myClient.connect(jdbcUrl, properties);
+        }
+        catch (Exception e) {
+            closeImpl();
 
-	public <T> T execute(@Nonnull JdbcExecutorAction<T> action) throws TException
-	{
-		assert myClient != null;
-		try
-		{
-			return action.run(myClient);
-		}
-		catch(TException e)
-		{
-			if(myState == SessionState.CANCELED)
-			{
-				closeImpl();
+            throw e;
+        }
+    }
 
-				throw new ProcessCanceledException();
-			}
+    private void changeState(SessionState state) {
+        if (myState == SessionState.UNDEFINED) {
+            myState = state;
+            myCountDownLatch.countDown();
+        }
+    }
 
-			closeImpl();
+    public <T> T execute(@Nonnull JdbcExecutorAction<T> action) throws TException {
+        assert myClient != null;
+        try {
+            return action.run(myClient);
+        }
+        catch (TException e) {
+            if (myState == SessionState.CANCELED) {
+                closeImpl();
 
-			throw e;
-		}
-	}
+                throw new ProcessCanceledException();
+            }
 
-	@Nonnull
-	private Path prepareJdbcDriver(@Nonnull ProgressIndicator indicator, @Nonnull JdbcDataSourceProvider provider) throws IOException
-	{
-		LinkedHashMap<String, String> drivers = new LinkedHashMap<>();
+            closeImpl();
 
-		provider.fillDrivers(drivers);
+            throw e;
+        }
+    }
 
-		Map.Entry<String, String> selectedDriver = ContainerUtil.getFirstItem(drivers.entrySet());
+    @Nonnull
+    private Path prepareJdbcDriver(@Nonnull ProgressIndicator indicator, @Nonnull JdbcDataSourceProvider provider) throws IOException {
+        LinkedHashMap<String, String> drivers = new LinkedHashMap<>();
 
-		Path driverPath = Paths.get(ContainerPathManager.get().getSystemPath(), "datasource-drivers", provider.getId(), selectedDriver.getKey());
+        provider.fillDrivers(drivers);
 
-		if(!Files.exists(driverPath))
-		{
-			String url = selectedDriver.getValue();
+        Map.Entry<String, String> selectedDriver = ContainerUtil.getFirstItem(drivers.entrySet());
 
-			Files.createDirectories(driverPath.getParent());
+        Path driverPath = Paths.get(ContainerPathManager.get().getSystemPath(), "datasource-drivers", provider.getId(), selectedDriver.getKey());
 
-			DownloadUtil.downloadContentToFile(indicator, url, driverPath.toFile());
-		}
+        if (!Files.exists(driverPath)) {
+            String url = selectedDriver.getValue();
 
-		return driverPath;
-	}
+            Files.createDirectories(driverPath.getParent());
 
-	@Override
-	public void close() throws Exception
-	{
-		closeImpl();
-	}
+            DownloadUtil.downloadContentToFile(indicator, url, driverPath.toFile());
+        }
 
-	private void closeImpl()
-	{
-		try
-		{
-			if(mySocket != null)
-			{
-				mySocket.close();
-			}
-		}
-		catch(Exception ignored)
-		{
-		}
+        return driverPath;
+    }
 
-		if(myProcessHandler != null)
-		{
-			myProcessHandler.destroyProcess();
-			myProcessHandler = null;
-		}
+    @Override
+    public void close() throws Exception {
+        closeImpl();
+    }
 
-		myWatcherTask.cancel(false);
-	}
+    private void closeImpl() {
+        try {
+            if (mySocket != null) {
+                mySocket.close();
+            }
+        }
+        catch (Exception ignored) {
+        }
+
+        if (myProcessHandler != null) {
+            myProcessHandler.destroyProcess();
+            myProcessHandler = null;
+        }
+
+        myWatcherTask.cancel(false);
+    }
 }

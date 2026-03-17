@@ -21,6 +21,7 @@ import consulo.annotation.component.ExtensionAPI;
 import consulo.component.extension.ExtensionPointName;
 import consulo.configurable.UnnamedConfigurable;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
+import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.PropertiesHolder;
 import consulo.database.datasource.model.DataSource;
 import consulo.language.version.LanguageVersion;
@@ -58,5 +59,10 @@ public interface DataSourceProvider {
     }
 
     default void fillDefaultProperties(@Nonnull EditablePropertiesHolder propertiesHolder) {
+    }
+
+    @Nullable
+    default <T> T getDefaultValue(GenericPropertyKey<T> key) {
+        return null;
     }
 }
