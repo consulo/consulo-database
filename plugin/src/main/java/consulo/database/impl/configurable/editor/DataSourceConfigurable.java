@@ -144,9 +144,9 @@ public class DataSourceConfigurable extends NamedConfigurable<EditableDataSource
 	}
 
 	@Override
-	public String getBannerSlogan()
+	public LocalizeValue getBannerSlogan()
 	{
-		return null;
+		return LocalizeValue.empty();
 	}
 
 	@Nonnull
