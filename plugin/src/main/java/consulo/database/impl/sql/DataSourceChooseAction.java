@@ -46,7 +46,7 @@ import java.util.function.Supplier;
 
 /**
  * @author VISTALL
- * @since 31/01/2021
+ * @since 2021-01-31
  */
 public class DataSourceChooseAction extends ComboBoxAction {
     private final DataSourceManager myDataSourceManager;
@@ -95,9 +95,8 @@ public class DataSourceChooseAction extends ComboBoxAction {
         return itemBuild.build();
     }
 
-
-    @RequiredUIAccess
     @Override
+    @RequiredUIAccess
     public void update(@Nonnull AnActionEvent e) {
         Presentation presentation = e.getPresentation();
         updatePresentation(presentation);
@@ -110,10 +109,10 @@ public class DataSourceChooseAction extends ComboBoxAction {
         DataSource source = dataSourceId == null ? null : ReadAction.compute(() -> myDataSourceManager.findDataSource(dataSourceId));
         if (source == null) {
             presentation.setIcon(null);
-            presentation.setTextValue(LocalizeValue.of("<Select DataSource>"));
+            presentation.setText(LocalizeValue.localizeTODO("<Select DataSource>"));
         }
         else {
-            presentation.setTextValue(LocalizeValue.of(source.getName()));
+            presentation.setText(LocalizeValue.of(source.getName()));
             presentation.setIcon(source.getProvider().getIcon());
         }
     }
