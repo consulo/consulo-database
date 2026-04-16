@@ -19,7 +19,7 @@ package consulo.database.datasource.editor;
 import consulo.annotation.component.ComponentScope;
 import consulo.annotation.component.ServiceAPI;
 import consulo.database.datasource.model.DataSource;
-import consulo.ide.ServiceManager;
+import consulo.application.Application;
 import consulo.project.Project;
 
 import jakarta.annotation.Nonnull;
@@ -34,7 +34,7 @@ public interface DataSourceEditorManager
 	@Nonnull
 	static DataSourceEditorManager getInstance(@Nonnull Project project)
 	{
-		return ServiceManager.getService(project, DataSourceEditorManager.class);
+		return project.getInstance(DataSourceEditorManager.class);
 	}
 
 	void openEditor(@Nonnull DataSource dataSource, @Nonnull String dbName, @Nonnull String childId);

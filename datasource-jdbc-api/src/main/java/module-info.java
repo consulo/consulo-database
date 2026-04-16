@@ -5,6 +5,10 @@
 module consulo.database.datasource.jdbc.api
 {
 	requires transitive consulo.database.datasource.api;
+	requires consulo.language.editor.ui.api;
+	requires consulo.configurable.api;
+	requires consulo.process.api;
+	requires consulo.project.ui.view.api;
 
 	requires consulo.database.datasource.jdbc.rt.shared;
 

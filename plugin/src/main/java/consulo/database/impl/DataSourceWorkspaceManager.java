@@ -7,7 +7,7 @@ import consulo.component.persist.PersistentStateComponent;
 import consulo.component.persist.State;
 import consulo.component.persist.Storage;
 import consulo.component.persist.StoragePathMacros;
-import consulo.ide.ServiceManager;
+import consulo.application.Application;
 import consulo.project.Project;
 import consulo.ui.ex.awt.tree.TreeState;
 import jakarta.inject.Inject;
@@ -29,7 +29,7 @@ public class DataSourceWorkspaceManager implements PersistentStateComponent<Elem
 {
 	public static DataSourceWorkspaceManager getInstance(@Nonnull Project project)
 	{
-		return ServiceManager.getService(project, DataSourceWorkspaceManager.class);
+		return project.getInstance(DataSourceWorkspaceManager.class);
 	}
 
 	private final Project myProject;

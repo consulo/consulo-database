@@ -7,6 +7,9 @@ module consulo.database.datasource.api {
 	requires java.desktop;
 
 	requires transitive consulo.ide.api;
+	requires consulo.configurable.api;
+	requires consulo.project.ui.view.api;
+	requires consulo.ui.ex.awt.api;
 
 	requires transitive jakarta.annotation;
 
