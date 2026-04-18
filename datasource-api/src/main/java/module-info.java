@@ -6,10 +6,20 @@ module consulo.database.datasource.api {
 	// TODO remove this dependency in future
 	requires java.desktop;
 
-	requires transitive consulo.ide.api;
+	requires transitive consulo.application.api;
+	requires transitive consulo.component.api;
+	requires transitive consulo.project.api;
+	requires transitive consulo.disposer.api;
+	requires transitive consulo.localize.api;
+	requires transitive consulo.ui.api;
+	requires transitive consulo.ui.ex.api;
+	requires transitive consulo.ui.ex.awt.api;
+
 	requires consulo.configurable.api;
+	requires consulo.language.api;
 	requires consulo.project.ui.view.api;
-	requires consulo.ui.ex.awt.api;
+	requires consulo.util.concurrent;
+	requires consulo.util.dataholder;
 
 	requires transitive jakarta.annotation;
 

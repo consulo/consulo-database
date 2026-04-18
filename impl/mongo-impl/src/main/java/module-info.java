@@ -5,6 +5,9 @@
 module consulo.database.mongo.impl
 {
 	requires consulo.database.datasource.json.api;
-	requires consulo.ui.ex.api;
-	requires consulo.project.ui.view.api;
+
+	requires consulo.configurable.api;
+	requires consulo.disposer.api;
+	requires consulo.localize.api;
+	requires consulo.ui.api;
 }
