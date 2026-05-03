@@ -129,7 +129,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.postgresql.impl</artifactId>
+            <artifactId>consulo.sql.postgresql.impl</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

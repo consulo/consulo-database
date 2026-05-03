@@ -28,7 +28,7 @@ import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.language.version.LanguageVersion;
 import consulo.localize.LocalizeValue;
-import consulo.sql.lang.impl.mysql.MySqlLanguageVersion;
+import consulo.sql.language.impl.mysql.MySqlLanguageVersion;
 import consulo.ui.image.Image;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -50,7 +50,7 @@ public class MysqJdbcDataSourceProvider extends JdbcDataSourceProvider {
     @Nonnull
     @Override
     public LocalizeValue getName() {
-        return LocalizeValue.of("MySQL");
+        return LocalizeValue.localizeTODO("MySQL");
     }
 
     @Nonnull

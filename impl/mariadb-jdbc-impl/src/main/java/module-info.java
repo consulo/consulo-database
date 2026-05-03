@@ -4,7 +4,7 @@
  */
 module consulo.database.mariadb.jdbc.impl {
     requires consulo.database.datasource.jdbc.api;
-    requires consulo.database.sql.mariadb.impl;
+    requires consulo.sql.impl.mariadb;
 
     requires consulo.configurable.api;
     requires consulo.language.api;

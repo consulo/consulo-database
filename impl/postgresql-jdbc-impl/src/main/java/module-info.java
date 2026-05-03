@@ -4,7 +4,7 @@
  */
 module consulo.database.postgresql.jdbc.impl {
     requires consulo.database.datasource.jdbc.api;
-    requires consulo.database.sql.postgresql.impl;
+    requires consulo.sql.impl.postgresql;
 
     requires consulo.configurable.api;
     requires consulo.language.api;

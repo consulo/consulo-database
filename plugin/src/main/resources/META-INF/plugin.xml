@@ -15,23 +15,23 @@
   -->
 
 <consulo-plugin url="https://github.com/consulo/consulo-database">
-	<id>consulo.database</id>
-	<name>Database (SQL/NoSQL)</name>
-	<category>Database/Custom Languages</category>
-	<version>SNAPSHOT</version>
-	<vendor>consulo.io</vendor>
-	<localize>consulo.database.DatabaseLocalize</localize>
+    <id>consulo.database</id>
+    <name>Database (SQL/NoSQL)</name>
+    <category>Database/Custom Languages</category>
+    <version>SNAPSHOT</version>
+    <vendor>consulo.io</vendor>
+    <localize>consulo.database.DatabaseLocalize</localize>
+    <depends>consulo.sql</depends>
 
-	<tags>
-		<tag>database</tag>
-		<tag>custom.language</tag>
-	</tags>
+    <tags>
+        <tag>database</tag>
+    </tags>
 
-	<permissions>
-		<permission type="SOCKET_CONNECT"/>
-		<!--required for search free port on OS for start process-->
-		<permission type="SOCKET_BIND"/>
-		<permission type="PROCESS_CREATE"/>
-		<permission type="GET_ENV"/>
-	</permissions>
+    <permissions>
+        <permission type="SOCKET_CONNECT"/>
+        <!--required for search free port on OS for start process-->
+        <permission type="SOCKET_BIND"/>
+        <permission type="PROCESS_CREATE"/>
+        <permission type="GET_ENV"/>
+    </permissions>
 </consulo-plugin>

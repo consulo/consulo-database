@@ -50,6 +50,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <dependencies>
+                        <dependency>consulo.sql</dependency>
                     </dependencies>
                     <packaging>
                         <skip>${dev.mode}</skip>
@@ -133,6 +134,24 @@
         <dependency>
             <groupId>consulo</groupId>
             <artifactId>consulo-language-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>consulo</groupId>
+            <artifactId>consulo-language-editor-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>consulo</groupId>
+            <artifactId>consulo-undo-redo-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>consulo</groupId>
+            <artifactId>consulo-util-interner</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -234,6 +253,12 @@
         </dependency>
         <dependency>
             <groupId>consulo</groupId>
+            <artifactId>consulo-virtual-file-status-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>consulo</groupId>
             <artifactId>consulo-ide-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -260,17 +285,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.lang.api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.lang.impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-mysql.jdbc.impl</artifactId>
+            <artifactId>consulo.database-postgresql.jdbc.impl</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
@@ -300,45 +315,14 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-postgresql.jdbc.impl</artifactId>
+            <artifactId>consulo.sql.language.api</artifactId>
             <version>${project.version}</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.mariadb.impl</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.mysql.impl</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.oracle.impl</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.postgresql.impl</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.sqlite.impl</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.database-sql.tsql.impl</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom-core</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

@@ -4,7 +4,7 @@
  */
 module consulo.database.mysql.jdbc.impl {
     requires consulo.database.datasource.jdbc.api;
-    requires consulo.database.sql.mysql.impl;
+    requires consulo.sql.impl.mysql;
 
     requires consulo.configurable.api;
     requires consulo.language.api;

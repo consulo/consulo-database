@@ -24,7 +24,7 @@ import consulo.codeEditor.event.EditorFactoryListener;
 import consulo.language.psi.PsiDocumentManager;
 import consulo.language.psi.PsiFile;
 import consulo.project.Project;
-import consulo.sql.lang.api.SqlFileType;
+import consulo.sql.language.SqlFileType;
 import jakarta.annotation.Nonnull;
 
 /**

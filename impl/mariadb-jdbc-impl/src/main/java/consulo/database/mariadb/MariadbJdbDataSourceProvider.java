@@ -28,7 +28,7 @@ import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.language.version.LanguageVersion;
 import consulo.localize.LocalizeValue;
-import consulo.sql.lang.impl.mariadb.MariaDbLanguageVersion;
+import consulo.sql.language.impl.mariadb.MariaDbLanguageVersion;
 import consulo.ui.image.Image;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;

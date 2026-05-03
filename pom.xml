@@ -16,50 +16,42 @@
   - limitations under the License.
   -->
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>consulo</groupId>
-		<artifactId>arch.managment</artifactId>
-		<version>3-SNAPSHOT</version>
-		<relativePath/>
-	</parent>
+    <parent>
+        <groupId>consulo</groupId>
+        <artifactId>arch.managment</artifactId>
+        <version>3-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
 
-	<repositories>
-		<repository>
-			<id>consulo</id>
-			<url>https://maven.consulo.dev/repository/snapshots/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>interval:60</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>consulo</id>
+            <url>https://maven.consulo.dev/repository/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>interval:60</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
-	<groupId>consulo.plugin</groupId>
-	<artifactId>consulo.database.parent</artifactId>
-	<version>3-SNAPSHOT</version>
-	<packaging>pom</packaging>
+    <groupId>consulo.plugin</groupId>
+    <artifactId>consulo.database.parent</artifactId>
+    <version>3-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<modules>
-		<module>datasource-api</module>
-		<module>datasource-jdbc-api</module>
-		<module>datasource-json-api</module>
-		<module>datasource-jdbc-rt</module>
-		<module>datasource-jdbc-rt-shared</module>
-		<module>impl/mysql-jdbc-impl</module>
-		<module>impl/mariadb-jdbc-impl</module>
-		<module>impl/postgresql-jdbc-impl</module>
-		<module>impl/mongo-impl</module>
-		<module>sql-lang-api</module>
-		<module>sql-lang-impl</module>
-		<module>sql-versions/mysql-sql-impl</module>
-		<module>sql-versions/mariadb-sql-impl</module>
-		<module>sql-versions/postgresql-sql-impl</module>
-		<module>sql-versions/oracle-sql-impl</module>
-		<module>sql-versions/sqlite-sql-impl</module>
-		<module>sql-versions/tsql-impl</module>
-		<module>plugin</module>
-	</modules>
+    <modules>
+        <module>datasource-api</module>
+        <module>datasource-jdbc-api</module>
+        <module>datasource-json-api</module>
+        <module>datasource-jdbc-rt</module>
+        <module>datasource-jdbc-rt-shared</module>
+        <module>impl/mysql-jdbc-impl</module>
+        <module>impl/mariadb-jdbc-impl</module>
+        <module>impl/postgresql-jdbc-impl</module>
+        <module>impl/mongo-impl</module>
+        <module>plugin</module>
+    </modules>
 </project>

@@ -29,7 +29,7 @@ import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.language.version.LanguageVersion;
 import consulo.localize.LocalizeValue;
-import consulo.sql.lang.impl.postgresql.PostgreSqlLanguageVersion;
+import consulo.sql.language.impl.postgresql.PostgreSqlLanguageVersion;
 import consulo.ui.image.Image;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -51,7 +51,7 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider {
     @Nonnull
     @Override
     public LocalizeValue getName() {
-        return LocalizeValue.of("PostgreSQL");
+        return LocalizeValue.localizeTODO("PostgreSQL");
     }
 
     @Nonnull
