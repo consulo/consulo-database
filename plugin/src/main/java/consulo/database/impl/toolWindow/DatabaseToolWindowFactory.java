@@ -44,62 +44,56 @@ import java.util.List;
  * @since 2020-06-01
  */
 @ExtensionImpl
-public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware
-{
-	public static final String ID = "Database";
+public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware {
+    public static final String ID = "Database";
 
-	@Nonnull
-	@Override
-	public ToolWindowAnchor getAnchor()
-	{
-		return ToolWindowAnchor.RIGHT;
-	}
+    @Nonnull
+    @Override
+    public ToolWindowAnchor getAnchor() {
+        return ToolWindowAnchor.RIGHT;
+    }
 
-	@Nonnull
-	@Override
-	public Image getIcon()
-	{
-		return DatabaseIconGroup.toolwindowdatabase();
-	}
+    @Nonnull
+    @Override
+    public Image getIcon() {
+        return DatabaseIconGroup.toolwindowdatabase();
+    }
 
-	@Nonnull
-	@Override
-	public LocalizeValue getDisplayName()
-	{
-		return LocalizeValue.localizeTODO("Database");
-	}
+    @Nonnull
+    @Override
+    public LocalizeValue getDisplayName() {
+        return LocalizeValue.localizeTODO("Database");
+    }
 
-	@Nonnull
-	@Override
-	public String getId()
-	{
-		return ID;
-	}
+    @Nonnull
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	@RequiredUIAccess
-	@Override
-	public void createToolWindowContent(@Nonnull Project project, @Nonnull ToolWindow toolWindow)
-	{
-		ContentManager contentManager = toolWindow.getContentManager();
+    @RequiredUIAccess
+    @Override
+    public void createToolWindowContent(@Nonnull Project project, @Nonnull ToolWindow toolWindow) {
+        ContentManager contentManager = toolWindow.getContentManager();
 
-		ContentFactory factory = contentManager.getFactory();
+        ContentFactory factory = contentManager.getFactory();
 
-		DatabaseTreePanel panel = new DatabaseTreePanel(project);
+        DatabaseTreePanel panel = new DatabaseTreePanel(project);
 
-		List<AnAction> actions = new ArrayList<>();
-		actions.add(new AddDataSourceAction());
-		actions.add(new RemoveDataSourceAction(null));
-		actions.add(new EditDataSourceAction());
-		actions.add(new RefreshDataSourcesAction());
+        List<AnAction> actions = new ArrayList<>();
+        actions.add(new AddDataSourceAction());
+        actions.add(new RemoveDataSourceAction(null));
+        actions.add(new EditDataSourceAction());
+        actions.add(new RefreshDataSourcesAction());
 
-		toolWindow.setTitleActions(actions.toArray(AnAction.EMPTY_ARRAY));
+        toolWindow.setTitleActions(actions.toArray(AnAction.EMPTY_ARRAY));
 
-		Content content = factory.createContent(panel.getRootPanel(), null, false);
+        Content content = factory.createContent(panel.getRootPanel(), null, false);
 
-		content.setDisposer(panel);
+        content.setDisposer(panel);
 
-		contentManager.addContent(content);
-		
-		contentManager.addDataProvider(panel);
-	}
+        contentManager.addContent(content);
+
+        contentManager.addUiDataProvider(panel);
+    }
 }

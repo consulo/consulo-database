@@ -17,7 +17,7 @@
 package consulo.database.impl.editor;
 
 import consulo.application.progress.Task;
-import consulo.dataContext.DataManager;
+import consulo.dataContext.UiDataProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.DataSourceTransportResult;
@@ -39,15 +39,15 @@ import consulo.ui.ex.action.ActionGroup;
 import consulo.ui.ex.action.ActionManager;
 import consulo.ui.ex.action.ActionToolbar;
 import consulo.ui.ex.action.AnSeparator;
+import consulo.ui.ex.awt.ClientProperty;
 import consulo.ui.ex.awt.JBLabel;
 import consulo.ui.ex.awt.JBUI;
 import consulo.ui.ex.awt.LoadingDecorator;
 import consulo.util.concurrent.AsyncResult;
 import consulo.util.dataholder.UserDataHolderBase;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import kava.beans.PropertyChangeListener;
-
-import jakarta.annotation.Nonnull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,202 +57,172 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author VISTALL
  * @since 2020-08-19
  */
-public class DataSourceFileEditor extends UserDataHolderBase implements FileEditor
-{
-	private final Project myProject;
-	private final DataSourceVirtualFile myFile;
-	private final LoadingDecorator myLoadingDecorator;
-	private final AtomicBoolean myLoading = new AtomicBoolean();
-	private final DataSource myDataSource;
-	private final JPanel myTargetPanel;
+public class DataSourceFileEditor extends UserDataHolderBase implements FileEditor {
+    private final Project myProject;
+    private final DataSourceVirtualFile myFile;
+    private final LoadingDecorator myLoadingDecorator;
+    private final AtomicBoolean myLoading = new AtomicBoolean();
+    private final DataSource myDataSource;
+    private final JPanel myTargetPanel;
 
-	private JComponent myLastResult;
-	private DataSourceTransportResult myLastTransportResult;
+    private JComponent myLastResult;
+    private DataSourceTransportResult myLastTransportResult;
 
-	@RequiredUIAccess
-	public DataSourceFileEditor(Project project, DataSourceVirtualFile file)
-	{
-		myProject = project;
-		myFile = file;
-		myDataSource = myFile.getDataSource();
-		myTargetPanel = new JPanel(new BorderLayout());
-		DataManager.registerDataProvider(myTargetPanel, key ->
-		{
-			if(key == DataSourceFileEditorKeys.EDITOR)
-			{
-				return DataSourceFileEditor.this;
-			}
-			return null;
-		});
+    @RequiredUIAccess
+    public DataSourceFileEditor(Project project, DataSourceVirtualFile file) {
+        myProject = project;
+        myFile = file;
+        myDataSource = myFile.getDataSource();
+        myTargetPanel = new JPanel(new BorderLayout());
+        ClientProperty.put(myTargetPanel, UiDataProvider.KEY, sink -> {
+            sink.set(DataSourceFileEditorKeys.EDITOR, this);
+        });
 
-		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
-		builder.add(new PrevPageAction());
-		builder.add(new PageAction());
-		builder.add(new NextPageAction());
-		builder.add(new AnSeparator());
-		builder.add(new RefreshDataAction());
+        ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
+        builder.add(new PrevPageAction());
+        builder.add(new PageAction());
+        builder.add(new NextPageAction());
+        builder.add(new AnSeparator());
+        builder.add(new RefreshDataAction());
 
-		myLoadingDecorator = new LoadingDecorator(myTargetPanel, this, 0);
+        myLoadingDecorator = new LoadingDecorator(myTargetPanel, this, 0);
 
-		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
-		toolbar.getComponent().setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 1));
-		toolbar.setTargetComponent(myTargetPanel);
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
+        toolbar.getComponent().setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 1));
+        toolbar.setTargetComponent(myTargetPanel);
 
-		myTargetPanel.add(toolbar.getComponent(), BorderLayout.NORTH);
+        myTargetPanel.add(toolbar.getComponent(), BorderLayout.NORTH);
 
-		UIAccess uiAccess = UIAccess.current();
+        UIAccess uiAccess = UIAccess.current();
 
-		loadData(uiAccess);
-	}
+        loadData(uiAccess);
+    }
 
-	public void loadData(@Nonnull UIAccess uiAccess)
-	{
-		if(myLoading.compareAndSet(false, true))
-		{
-			myLoadingDecorator.startLoading(false);
-			Task.Backgroundable.queue(myProject, "Fetching data...", true, indicator ->
-			{
-				DataSourceTransport transport = null;
-				for(DataSourceTransport dataSourceTransport : DataSourceTransport.EP_NAME.getExtensionList())
-				{
-					if(dataSourceTransport.accept(myDataSource))
-					{
-						transport = dataSourceTransport;
-						break;
-					}
-				}
+    public void loadData(@Nonnull UIAccess uiAccess) {
+        if (myLoading.compareAndSet(false, true)) {
+            myLoadingDecorator.startLoading(false);
+            Task.Backgroundable.queue(myProject, "Fetching data...", true, indicator ->
+            {
+                DataSourceTransport transport = null;
+                for (DataSourceTransport dataSourceTransport : DataSourceTransport.EP_NAME.getExtensionList()) {
+                    if (dataSourceTransport.accept(myDataSource)) {
+                        transport = dataSourceTransport;
+                        break;
+                    }
+                }
 
-				assert transport != null;
+                assert transport != null;
 
-				AsyncResult<DataSourceTransportResult> result = AsyncResult.undefined();
+                AsyncResult<DataSourceTransportResult> result = AsyncResult.undefined();
 
-				transport.fetchData(indicator, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), result);
+                transport.fetchData(indicator, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), result);
 
-				result.doWhenDone(o -> {
-					myLoadingDecorator.stopLoading();
-					myLoading.set(false);
+                result.doWhenDone(o -> {
+                    myLoadingDecorator.stopLoading();
+                    myLoading.set(false);
 
-					myLastTransportResult = o;
-					uiAccess.give(() -> {
-						if(myLastResult != null)
-						{
-							myTargetPanel.remove(myLastResult);
-						}
+                    myLastTransportResult = o;
+                    uiAccess.give(() -> {
+                        if (myLastResult != null) {
+                            myTargetPanel.remove(myLastResult);
+                        }
 
-						JComponent newComponent = buildUI(o, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), DataSourceFileEditor.this);
-						myTargetPanel.add(myLastResult = newComponent, BorderLayout.CENTER);
-					});
-				});
-			});
-		}
-	}
+                        JComponent newComponent = buildUI(o, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), DataSourceFileEditor.this);
+                        myTargetPanel.add(myLastResult = newComponent, BorderLayout.CENTER);
+                    });
+                });
+            });
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public static JComponent buildUI(@Nonnull Object result, @Nonnull Project project, DataSource dataSource, String dbName, String childId, Disposable parent)
-	{
-		DataSourceTransportResultPresentation target = null;
-		for(DataSourceTransportResultPresentation presentation : DataSourceTransportResultPresentation.EP_NAME.getExtensionList())
-		{
-			if(presentation.accept(dataSource))
-			{
-				target = presentation;
-				break;
-			}
-		}
+    @SuppressWarnings("unchecked")
+    public static JComponent buildUI(@Nonnull Object result, @Nonnull Project project, DataSource dataSource, String dbName, String childId, Disposable parent) {
+        DataSourceTransportResultPresentation target = null;
+        for (DataSourceTransportResultPresentation presentation : DataSourceTransportResultPresentation.EP_NAME.getExtensionList()) {
+            if (presentation.accept(dataSource)) {
+                target = presentation;
+                break;
+            }
+        }
 
-		if(target == null)
-		{
-			return new JBLabel("Not supported result");
-		}
+        if (target == null) {
+            return new JBLabel("Not supported result");
+        }
 
-		return target.buildComponentForResult(result, project, dataSource, dbName, childId, parent);
-	}
+        return target.buildComponentForResult(result, project, dataSource, dbName, childId, parent);
+    }
 
-	public long getRowsCount()
-	{
-		return myLastTransportResult == null ? 0 : myLastTransportResult.getRowsCount();
-	}
+    public long getRowsCount() {
+        return myLastTransportResult == null ? 0 : myLastTransportResult.getRowsCount();
+    }
 
-	@Nonnull
-	@Override
-	public JComponent getComponent()
-	{
-		return myLoadingDecorator.getComponent();
-	}
+    @Nonnull
+    @Override
+    public JComponent getComponent() {
+        return myLoadingDecorator.getComponent();
+    }
 
-	@Nullable
-	@Override
-	public JComponent getPreferredFocusedComponent()
-	{
-		return myLoadingDecorator.getComponent();
-	}
+    @Nullable
+    @Override
+    public JComponent getPreferredFocusedComponent() {
+        return myLoadingDecorator.getComponent();
+    }
 
-	@Nonnull
-	@Override
-	public String getName()
-	{
-		return "datasource";
-	}
+    @Nonnull
+    @Override
+    public String getName() {
+        return "datasource";
+    }
 
-	@Nonnull
-	@Override
-	public FileEditorState getState(@Nonnull FileEditorStateLevel fileEditorStateLevel)
-	{
-		return FileEditorState.INSTANCE;
-	}
+    @Nonnull
+    @Override
+    public FileEditorState getState(@Nonnull FileEditorStateLevel fileEditorStateLevel) {
+        return FileEditorState.INSTANCE;
+    }
 
-	@Override
-	public void setState(@Nonnull FileEditorState fileEditorState)
-	{
+    @Override
+    public void setState(@Nonnull FileEditorState fileEditorState) {
 
-	}
+    }
 
-	@Override
-	public boolean isModified()
-	{
-		return false;
-	}
+    @Override
+    public boolean isModified() {
+        return false;
+    }
 
-	@Override
-	public boolean isValid()
-	{
-		return true;
-	}
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 
-	@Override
-	public void selectNotify()
-	{
+    @Override
+    public void selectNotify() {
 
-	}
+    }
 
-	@Override
-	public void deselectNotify()
-	{
+    @Override
+    public void deselectNotify() {
 
-	}
+    }
 
-	@Override
-	public void addPropertyChangeListener(@Nonnull PropertyChangeListener propertyChangeListener)
-	{
+    @Override
+    public void addPropertyChangeListener(@Nonnull PropertyChangeListener propertyChangeListener) {
 
-	}
+    }
 
-	@Override
-	public void removePropertyChangeListener(@Nonnull PropertyChangeListener propertyChangeListener)
-	{
+    @Override
+    public void removePropertyChangeListener(@Nonnull PropertyChangeListener propertyChangeListener) {
 
-	}
+    }
 
-	@Nullable
-	@Override
-	public FileEditorLocation getCurrentLocation()
-	{
-		return null;
-	}
+    @Nullable
+    @Override
+    public FileEditorLocation getCurrentLocation() {
+        return null;
+    }
 
-	@Override
-	public void dispose()
-	{
+    @Override
+    public void dispose() {
 
-	}
+    }
 }

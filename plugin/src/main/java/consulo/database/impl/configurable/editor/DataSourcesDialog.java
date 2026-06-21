@@ -18,7 +18,7 @@ package consulo.database.impl.configurable.editor;
 
 import consulo.configurable.Configurable;
 import consulo.configurable.ConfigurationException;
-import consulo.dataContext.DataManager;
+import consulo.dataContext.UiDataProvider;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.*;
 import consulo.database.datasource.ui.DataSourceKeys;
@@ -33,15 +33,16 @@ import consulo.ui.ex.action.ActionGroup;
 import consulo.ui.ex.action.ActionManager;
 import consulo.ui.ex.action.ActionToolbar;
 import consulo.ui.ex.awt.BorderLayoutPanel;
+import consulo.ui.ex.awt.ClientProperty;
 import consulo.ui.ex.awt.JBUI;
 import consulo.ui.ex.awt.WholeWestDialogWrapper;
 import consulo.ui.ex.awt.tree.*;
 import consulo.ui.ex.awt.update.UiNotifyConnector;
 import consulo.ui.ex.awtUnsafe.TargetAWT;
 import consulo.util.lang.Couple;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -53,277 +54,238 @@ import java.util.List;
  * @author VISTALL
  * @since 2020-08-13
  */
-public class DataSourcesDialog extends WholeWestDialogWrapper
-{
-	@Nonnull
-	private final Project myProject;
-	@Nullable
-	private final DataSource mySelectedDataSource;
+public class DataSourcesDialog extends WholeWestDialogWrapper {
+    @Nonnull
+    private final Project myProject;
+    @Nullable
+    private final DataSource mySelectedDataSource;
 
-	private JPanel myConfigurablePanel;
+    private JPanel myConfigurablePanel;
 
-	private Configurable mySelectedConfigurable;
+    private Configurable mySelectedConfigurable;
 
-	private final EditableDataSourceModel myEditableDataSourceModel;
+    private final EditableDataSourceModel myEditableDataSourceModel;
 
-	public DataSourcesDialog(@Nonnull Project project, @Nullable DataSource selectedDataSource)
-	{
-		this(project, DataSourceManager.getInstance(project).createEditableModel(), selectedDataSource);
-	}
+    public DataSourcesDialog(@Nonnull Project project, @Nullable DataSource selectedDataSource) {
+        this(project, DataSourceManager.getInstance(project).createEditableModel(), selectedDataSource);
+    }
 
-	public DataSourcesDialog(@Nonnull Project project, @Nonnull EditableDataSourceModel editableDataSourceModel, @Nullable DataSource selectedDataSource)
-	{
-		super(project);
-		myProject = project;
-		mySelectedDataSource = selectedDataSource;
-		myEditableDataSourceModel = editableDataSourceModel;
+    public DataSourcesDialog(@Nonnull Project project, @Nonnull EditableDataSourceModel editableDataSourceModel, @Nullable DataSource selectedDataSource) {
+        super(project);
+        myProject = project;
+        mySelectedDataSource = selectedDataSource;
+        myEditableDataSourceModel = editableDataSourceModel;
 
-		setTitle("Add/Edit DataSources");
+        setTitle("Add/Edit DataSources");
 
-		init();
-	}
+        init();
+    }
 
-	@Nullable
-	@Override
-	protected String getDimensionServiceKey()
-	{
-		return DataSourcesDialog.class.getName();
-	}
+    @Nullable
+    @Override
+    protected String getDimensionServiceKey() {
+        return DataSourcesDialog.class.getName();
+    }
 
-	@Override
-	public Size2D getDefaultSize()
-	{
-		return new Size2D(700, 500);
-	}
+    @Override
+    public Size2D getDefaultSize() {
+        return new Size2D(700, 500);
+    }
 
-	@RequiredUIAccess
-	@Nonnull
-	@Override
-	public Couple<JComponent> createSplitterComponents(JPanel rootPanel)
-	{
-		DataSourceTreeStructure structure = new DataSourceTreeStructure(myProject, myEditableDataSourceModel);
+    @RequiredUIAccess
+    @Nonnull
+    @Override
+    public Couple<JComponent> createSplitterComponents(JPanel rootPanel) {
+        DataSourceTreeStructure structure = new DataSourceTreeStructure(myProject, myEditableDataSourceModel);
 
-		StructureTreeModel<DataSourceTreeStructure> structureModel = new StructureTreeModel<>(structure, myProject);
-		AsyncTreeModel model = new AsyncTreeModel(structureModel, myProject);
-		Tree tree = new Tree(model);
+        StructureTreeModel<DataSourceTreeStructure> structureModel = new StructureTreeModel<>(structure, myProject);
+        AsyncTreeModel model = new AsyncTreeModel(structureModel, myProject);
+        Tree tree = new Tree(model);
 
-		Runnable treeUpdater = () ->
-		{
-			structureModel.invalidate(structure.getRootElement(), true);
-		};
+        Runnable treeUpdater = () ->
+        {
+            structureModel.invalidate(structure.getRootElement(), true);
+        };
 
-		myEditableDataSourceModel.addListener(new DataSourceListener()
-		{
-			@Override
-			public void dataSourceEvent(DataSourceEvent event)
-			{
-				structureModel.invalidate().onSuccess(o ->
-				{
-					if(event.getAction() == DataSourceEvent.Action.ADD)
-					{
-						selectInTree(tree, event.getDataSource(), model);
-					}
-					else if(event.getAction() == DataSourceEvent.Action.REMOVE)
-					{
-						List<? extends EditableDataSource> dataSources = myEditableDataSourceModel.getDataSources();
-						if(dataSources.isEmpty())
-						{
-							selectConfigurable(null, treeUpdater);
-						}
-						else
-						{
-							selectInTree(tree, dataSources.get(0), model);
-						}
-					}
-				});
-			}
-		});
+        myEditableDataSourceModel.addListener(new DataSourceListener() {
+            @Override
+            public void dataSourceEvent(DataSourceEvent event) {
+                structureModel.invalidate().onSuccess(o ->
+                {
+                    if (event.getAction() == DataSourceEvent.Action.ADD) {
+                        selectInTree(tree, event.getDataSource(), model);
+                    }
+                    else if (event.getAction() == DataSourceEvent.Action.REMOVE) {
+                        List<? extends EditableDataSource> dataSources = myEditableDataSourceModel.getDataSources();
+                        if (dataSources.isEmpty()) {
+                            selectConfigurable(null, treeUpdater);
+                        }
+                        else {
+                            selectInTree(tree, dataSources.get(0), model);
+                        }
+                    }
+                });
+            }
+        });
 
-		tree.addTreeSelectionListener(e ->
-		{
-			SwingUtilities.invokeLater(() ->
-			{
-				Object lastUserObject = TreeUtil.getLastUserObject(e.getNewLeadSelectionPath());
+        tree.addTreeSelectionListener(e ->
+        {
+            SwingUtilities.invokeLater(() ->
+            {
+                Object lastUserObject = TreeUtil.getLastUserObject(e.getNewLeadSelectionPath());
 
-				if(lastUserObject instanceof DatabaseSourceNode)
-				{
-					DataSource value = ((DatabaseSourceNode) lastUserObject).getValue();
-					selectConfigurable((EditableDataSource) value, treeUpdater);
-				}
-				else
-				{
-					selectConfigurable(null, treeUpdater);
-				}
-			});
-		});
+                if (lastUserObject instanceof DatabaseSourceNode) {
+                    DataSource value = ((DatabaseSourceNode) lastUserObject).getValue();
+                    selectConfigurable((EditableDataSource) value, treeUpdater);
+                }
+                else {
+                    selectConfigurable(null, treeUpdater);
+                }
+            });
+        });
 
-		tree.setOpaque(false);
-		tree.setRootVisible(false);
-		TreeUtil.expandAll(tree);
+        tree.setOpaque(false);
+        tree.setRootVisible(false);
+        TreeUtil.expandAll(tree);
 
-		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
-		builder.add(new AddDataSourcePopupAction(myEditableDataSourceModel));
-		builder.add(new RemoveDataSourceAction(myEditableDataSourceModel));
-		builder.add(new CopyDataSourceAction(myEditableDataSourceModel));
+        ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
+        builder.add(new AddDataSourcePopupAction(myEditableDataSourceModel));
+        builder.add(new RemoveDataSourceAction(myEditableDataSourceModel));
+        builder.add(new CopyDataSourceAction(myEditableDataSourceModel));
 
-		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
-		toolbar.setTargetComponent(tree);
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
+        toolbar.setTargetComponent(tree);
 
-		BorderLayoutPanel panel = new BorderLayoutPanel();
-		//panel.setBackground(SwingUIDecorator.get(SwingUIDecorator::getSidebarColor));
+        BorderLayoutPanel panel = new BorderLayoutPanel();
+        //panel.setBackground(SwingUIDecorator.get(SwingUIDecorator::getSidebarColor));
 
-		JComponent component = toolbar.getComponent();
-		component.setOpaque(false);
-		//component.setBackground(SwingUIDecorator.get(SwingUIDecorator::getSidebarColor));
-		panel.addToTop(component);
-		panel.addToCenter(tree);
+        JComponent component = toolbar.getComponent();
+        component.setOpaque(false);
+        //component.setBackground(SwingUIDecorator.get(SwingUIDecorator::getSidebarColor));
+        panel.addToTop(component);
+        panel.addToCenter(tree);
 
-		myConfigurablePanel = new JPanel(new BorderLayout());
+        myConfigurablePanel = new JPanel(new BorderLayout());
 
-		DataManager.registerDataProvider(panel, dataId ->
-		{
-			if(dataId == DataSourceKeys.DATASOURCE)
-			{
-				TreePath path = TreeUtil.getSelectedPathIfOne(tree);
-				if(path != null)
-				{
-					Object lastUserObject = TreeUtil.getLastUserObject(path);
-					if(lastUserObject instanceof DatabaseSourceNode)
-					{
-						return ((DatabaseSourceNode) lastUserObject).getValue();
-					}
-				}
-			}
+        ClientProperty.put(panel, UiDataProvider.KEY, sink -> {
+            sink.lazy(DataSourceKeys.DATASOURCE, () -> {
+                TreePath path = TreeUtil.getSelectedPathIfOne(tree);
+                if (path != null) {
+                    Object lastUserObject = TreeUtil.getLastUserObject(path);
+                    if (lastUserObject instanceof DatabaseSourceNode) {
+                        return ((DatabaseSourceNode) lastUserObject).getValue();
+                    }
+                }
+                return null;
+            });
+        });
 
-			return null;
-		});
+        if (mySelectedDataSource != null) {
+            DataSource dataSource = myEditableDataSourceModel.findDataSource(mySelectedDataSource.getId());
 
-		if(mySelectedDataSource != null)
-		{
-			DataSource dataSource = myEditableDataSourceModel.findDataSource(mySelectedDataSource.getId());
+            UiNotifyConnector.doWhenFirstShown(panel, () ->
+            {
+                selectInTree(tree, dataSource, model);
+            });
+        }
+        return Couple.of(panel, myConfigurablePanel);
+    }
 
-			UiNotifyConnector.doWhenFirstShown(panel, () ->
-			{
-				selectInTree(tree, dataSource, model);
-			});
-		}
-		return Couple.of(panel, myConfigurablePanel);
-	}
+    private void selectInTree(Tree tree, DataSource dataSource, AsyncTreeModel model) {
+        model.accept(new TreeVisitor() {
+            @Nonnull
+            @Override
+            public Action visit(@Nonnull TreePath treePath) {
+                Object maybeNode = treePath.getLastPathComponent();
+                if (maybeNode instanceof DefaultMutableTreeNode) {
+                    Object userObject = ((DefaultMutableTreeNode) maybeNode).getUserObject();
 
-	private void selectInTree(Tree tree, DataSource dataSource, AsyncTreeModel model)
-	{
-		model.accept(new TreeVisitor()
-		{
-			@Nonnull
-			@Override
-			public Action visit(@Nonnull TreePath treePath)
-			{
-				Object maybeNode = treePath.getLastPathComponent();
-				if(maybeNode instanceof DefaultMutableTreeNode)
-				{
-					Object userObject = ((DefaultMutableTreeNode) maybeNode).getUserObject();
+                    if (userObject instanceof DatabaseSourceNode && ((DatabaseSourceNode) userObject).getValue().equals(dataSource)) {
+                        return Action.INTERRUPT;
+                    }
+                }
+                return Action.CONTINUE;
+            }
+        }, true).onSuccess(treePath -> {
+            if (treePath != null) {
+                TreeUtil.selectPath(tree, treePath);
+            }
+        });
+    }
 
-					if(userObject instanceof DatabaseSourceNode && ((DatabaseSourceNode) userObject).getValue().equals(dataSource))
-					{
-						return Action.INTERRUPT;
-					}
-				}
-				return Action.CONTINUE;
-			}
-		}, true).onSuccess(treePath -> {
-			if(treePath != null)
-			{
-				TreeUtil.selectPath(tree, treePath);
-			}
-		});
-	}
+    @RequiredUIAccess
+    private void selectConfigurable(@Nullable EditableDataSource dataSource, Runnable treeUpdater) {
+        if (mySelectedConfigurable != null) {
+            try {
+                mySelectedConfigurable.apply();
+            }
+            catch (ConfigurationException ignored) {
+            }
 
-	@RequiredUIAccess
-	private void selectConfigurable(@Nullable EditableDataSource dataSource, Runnable treeUpdater)
-	{
-		if(mySelectedConfigurable != null)
-		{
-			try
-			{
-				mySelectedConfigurable.apply();
-			}
-			catch(ConfigurationException ignored)
-			{
-			}
+            mySelectedConfigurable = null;
+        }
 
-			mySelectedConfigurable = null;
-		}
+        SwingUtilities.invokeLater(() ->
+        {
+            myConfigurablePanel.removeAll();
 
-		SwingUtilities.invokeLater(() ->
-		{
-			myConfigurablePanel.removeAll();
+            myConfigurablePanel.revalidate();
 
-			myConfigurablePanel.revalidate();
+            myConfigurablePanel.repaint();
 
-			myConfigurablePanel.repaint();
+            if (dataSource != null) {
+                DataSourceConfigurable c = new DataSourceConfigurable(myProject, dataSource, treeUpdater);
 
-			if(dataSource != null)
-			{
-				DataSourceConfigurable c = new DataSourceConfigurable(myProject, dataSource, treeUpdater);
+                JComponent component = (JComponent) TargetAWT.to(c.createUIComponent(getDisposable()));
 
-				JComponent component = (JComponent) TargetAWT.to(c.createUIComponent(getDisposable()));
+                c.initialize();
 
-				c.initialize();
+                c.reset();
 
-				c.reset();
+                mySelectedConfigurable = c;
 
-				mySelectedConfigurable = c;
+                myConfigurablePanel.add(component, BorderLayout.CENTER);
+            }
+        });
+    }
 
-				myConfigurablePanel.add(component, BorderLayout.CENTER);
-			}
-		});
-	}
+    @Override
+    @RequiredUIAccess
+    protected void doOKAction() {
+        if (mySelectedConfigurable != null) {
+            try {
+                mySelectedConfigurable.apply();
+            }
+            catch (ConfigurationException ignored) {
+            }
+        }
 
-	@Override
-	@RequiredUIAccess
-	protected void doOKAction()
-	{
-		if(mySelectedConfigurable != null)
-		{
-			try
-			{
-				mySelectedConfigurable.apply();
-			}
-			catch(ConfigurationException ignored)
-			{
-			}
-		}
+        myEditableDataSourceModel.commit();
 
-		myEditableDataSourceModel.commit();
+        super.doOKAction();
+    }
 
-		super.doOKAction();
-	}
+    @Override
+    public void doCancelAction() {
+        myEditableDataSourceModel.dispose();
 
-	@Override
-	public void doCancelAction()
-	{
-		myEditableDataSourceModel.dispose();
+        super.doCancelAction();
+    }
 
-		super.doCancelAction();
-	}
+    @Nullable
+    @Override
+    protected Border createContentPaneBorder() {
+        return JBUI.Borders.empty();
+    }
 
-	@Nullable
-	@Override
-	protected Border createContentPaneBorder()
-	{
-		return JBUI.Borders.empty();
-	}
-
-	@Nullable
-	@Override
-	protected JComponent createSouthPanel()
-	{
-		JComponent southPanel = super.createSouthPanel();
-		if(southPanel != null)
-		{
-			southPanel.setBorder(JBUI.Borders.empty(ourDefaultBorderInsets));
-			return JBUI.Panels.simplePanel(southPanel);
-		}
-		return null;
-	}
+    @Nullable
+    @Override
+    protected JComponent createSouthPanel() {
+        JComponent southPanel = super.createSouthPanel();
+        if (southPanel != null) {
+            southPanel.setBorder(JBUI.Borders.empty(ourDefaultBorderInsets));
+            return JBUI.Panels.simplePanel(southPanel);
+        }
+        return null;
+    }
 }
