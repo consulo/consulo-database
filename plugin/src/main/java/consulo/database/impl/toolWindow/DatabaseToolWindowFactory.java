@@ -81,7 +81,7 @@ public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware {
         DatabaseTreePanel panel = new DatabaseTreePanel(project);
 
         List<AnAction> actions = new ArrayList<>();
-        actions.add(new AddDataSourceAction());
+        actions.add(new AddDataSourceAction(project.getApplication()));
         actions.add(new RemoveDataSourceAction(null));
         actions.add(new EditDataSourceAction());
         actions.add(new RefreshDataSourcesAction());
