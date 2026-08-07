@@ -28,25 +28,21 @@ import jakarta.annotation.Nonnull;
  * @author VISTALL
  * @since 2020-08-18
  */
-public class RefreshDataSourcesAction extends DumbAwareAction
-{
-	public RefreshDataSourcesAction()
-	{
-		super("Refresh Data Sources", null, AllIcons.Actions.Refresh);
-	}
+public class RefreshDataSourcesAction extends DumbAwareAction {
+    public RefreshDataSourcesAction() {
+        super("Refresh Data Sources", null, AllIcons.Actions.Refresh);
+    }
 
-	@RequiredUIAccess
-	@Override
-	public void actionPerformed(@Nonnull AnActionEvent e)
-	{
-		Project project = e.getData(Project.KEY);
-		if(project == null)
-		{
-			return;
-		}
+    @RequiredUIAccess
+    @Override
+    public void actionPerformed(@Nonnull AnActionEvent e) {
+        Project project = e.getData(Project.KEY);
+        if (project == null) {
+            return;
+        }
 
-		DataSourceTransportManager transportManager = DataSourceTransportManager.getInstance(project);
+        DataSourceTransportManager transportManager = DataSourceTransportManager.getInstance(project);
 
-		transportManager.refreshAll();
-	}
+        transportManager.refreshAll();
+    }
 }

@@ -16,15 +16,20 @@
 
 package consulo.database.impl.action;
 
-import consulo.application.AllIcons;
+import consulo.application.Application;
+import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.model.EditableDataSourceModel;
 import consulo.database.datasource.ui.DataSourceKeys;
-import consulo.database.impl.configurable.editor.DataSourcesDialog;
+import consulo.database.impl.configurable.editor.DatabaseSourcesDialogDescriptor;
+import consulo.platform.base.icon.PlatformIconGroup;
 import consulo.project.Project;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.action.AnActionEvent;
 import consulo.ui.ex.action.AnActionWithSyncUpdate;
 import consulo.ui.ex.action.DumbAwareAction;
+import consulo.ui.ex.dialog.Dialog;
+import consulo.ui.ex.dialog.DialogService;
 import jakarta.annotation.Nonnull;
 
 /**
@@ -33,7 +38,7 @@ import jakarta.annotation.Nonnull;
  */
 public class EditDataSourceAction extends DumbAwareAction implements AnActionWithSyncUpdate {
     public EditDataSourceAction() {
-        super("Edit", null, AllIcons.Actions.Edit);
+        super("Edit", null, PlatformIconGroup.actionsEdit());
     }
 
     @RequiredUIAccess
@@ -45,7 +50,14 @@ public class EditDataSourceAction extends DumbAwareAction implements AnActionWit
             return;
         }
 
-        DataSourcesDialog dialog = new DataSourcesDialog(project, dataSource);
+        EditableDataSourceModel editableModel = DataSourceManager.getInstance(project).createEditableModel();
+
+        DialogService dialogService = Application.get().getInstance(DialogService.class);
+
+        DataSource editTarget = editableModel.findDataSource(dataSource.getId());
+
+        Dialog dialog = dialogService.build(project, new DatabaseSourcesDialogDescriptor(project, editableModel, editTarget));
+
         dialog.showAsync();
     }
 

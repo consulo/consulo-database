@@ -32,64 +32,54 @@ import java.util.Collection;
  * @author VISTALL
  * @since 2020-08-13
  */
-public class DataSourceTreeStructure extends AbstractTreeStructure
-{
-	private final DataSourceEditorRootNode myRoot;
+public class DataSourceTreeStructure extends AbstractTreeStructure {
+    private final DataSourceEditorRootNode myRoot;
 
-	public DataSourceTreeStructure(Project project, DataSourceModel dataSourceModel)
-	{
-		myRoot = new DataSourceEditorRootNode(project, dataSourceModel);
-	}
+    public DataSourceTreeStructure(Project project, DataSourceModel dataSourceModel) {
+        myRoot = new DataSourceEditorRootNode(project, dataSourceModel);
+    }
 
-	@Nonnull
-	@Override
-	public Object[] getChildElements(@Nonnull Object element)
-	{
-		TreeNode<?> treeNode = (TreeNode) element;
-		Collection<? extends TreeNode> elements = treeNode.getChildren();
-		elements.forEach(node -> node.setParent(treeNode));
-		return ArrayUtil.toObjectArray(elements);
-	}
+    @Nonnull
+    @Override
+    public Object[] getChildElements(@Nonnull Object element) {
+        TreeNode<?> treeNode = (TreeNode) element;
+        Collection<? extends TreeNode> elements = treeNode.getChildren();
+        elements.forEach(node -> node.setParent(treeNode));
+        return ArrayUtil.toObjectArray(elements);
+    }
 
-	@Override
-	public boolean isValid(@Nonnull Object element)
-	{
-		return element instanceof AbstractTreeNode;
-	}
+    @Override
+    public boolean isValid(@Nonnull Object element) {
+        return element instanceof AbstractTreeNode;
+    }
 
-	@Override
-	public Object getParentElement(@Nonnull Object element)
-	{
-		if(element instanceof TreeNode)
-		{
-			return ((TreeNode) element).getParent();
-		}
-		return null;
-	}
+    @Override
+    public Object getParentElement(@Nonnull Object element) {
+        if (element instanceof TreeNode) {
+            return ((TreeNode) element).getParent();
+        }
+        return null;
+    }
 
-	@Override
-	@Nonnull
-	public NodeDescriptor createDescriptor(@Nonnull final Object element, final NodeDescriptor parentDescriptor)
-	{
-		return (NodeDescriptor) element;
-	}
+    @Override
+    @Nonnull
+    public NodeDescriptor createDescriptor(@Nonnull final Object element, final NodeDescriptor parentDescriptor) {
+        return (NodeDescriptor) element;
+    }
 
-	@Nonnull
-	@Override
-	public Object getRootElement()
-	{
-		return myRoot;
-	}
+    @Nonnull
+    @Override
+    public Object getRootElement() {
+        return myRoot;
+    }
 
-	@Override
-	public void commit()
-	{
+    @Override
+    public void commit() {
 
-	}
+    }
 
-	@Override
-	public boolean hasSomethingToCommit()
-	{
-		return false;
-	}
+    @Override
+    public boolean hasSomethingToCommit() {
+        return false;
+    }
 }

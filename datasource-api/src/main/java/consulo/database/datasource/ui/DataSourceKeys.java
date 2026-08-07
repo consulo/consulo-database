@@ -17,16 +17,15 @@
 package consulo.database.datasource.ui;
 
 import consulo.database.datasource.model.DataSource;
-import consulo.ui.ex.awt.tree.Tree;
+import consulo.ui.Tree;
 import consulo.util.dataholder.Key;
 
 /**
  * @author VISTALL
  * @since 2020-08-12
  */
-public interface DataSourceKeys
-{
-	Key<Tree> TREE = Key.create("datasource.tree");
+public interface DataSourceKeys {
+    Key<Tree<Object>> TREE = Key.create("datasource.tree");
 
-	Key<DataSource> DATASOURCE = Key.create("datasource");
+    Key<DataSource> DATASOURCE = Key.create("datasource");
 }

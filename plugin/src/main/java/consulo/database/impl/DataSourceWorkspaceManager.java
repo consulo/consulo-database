@@ -7,15 +7,14 @@ import consulo.component.persist.PersistentStateComponent;
 import consulo.component.persist.State;
 import consulo.component.persist.Storage;
 import consulo.component.persist.StoragePathMacros;
-import consulo.application.Application;
 import consulo.project.Project;
 import consulo.ui.ex.awt.tree.TreeState;
+import consulo.ui.ex.tree.UITreeState;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.jdom.Element;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * @author VISTALL
@@ -25,56 +24,47 @@ import jakarta.annotation.Nullable;
 @State(name = "DataSourceWorkspaceManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
 @ServiceAPI(ComponentScope.PROJECT)
 @ServiceImpl
-public class DataSourceWorkspaceManager implements PersistentStateComponent<Element>
-{
-	public static DataSourceWorkspaceManager getInstance(@Nonnull Project project)
-	{
-		return project.getInstance(DataSourceWorkspaceManager.class);
-	}
+public class DataSourceWorkspaceManager implements PersistentStateComponent<Element> {
+    public static DataSourceWorkspaceManager getInstance(@Nonnull Project project) {
+        return project.getInstance(DataSourceWorkspaceManager.class);
+    }
 
-	private final Project myProject;
+    private final Project myProject;
 
-	private TreeState myTreeState;
+    private UITreeState myTreeState;
 
-	@Inject
-	public DataSourceWorkspaceManager(Project project)
-	{
-		myProject = project;
-	}
+    @Inject
+    public DataSourceWorkspaceManager(Project project) {
+        myProject = project;
+    }
 
-	public void setTreeState(@Nullable TreeState treeState)
-	{
-		myTreeState = treeState;
-	}
+    public void setTreeState(@Nullable UITreeState treeState) {
+        myTreeState = treeState;
+    }
 
-	@Nullable
-	public TreeState getTreeState()
-	{
-		return myTreeState;
-	}
+    @Nullable
+    public UITreeState getTreeState() {
+        return myTreeState;
+    }
 
-	@Nullable
-	@Override
-	public Element getState()
-	{
-		Element stateElement = new Element("state");
-		TreeState state = myTreeState;
-		if(state != null)
-		{
-			Element element = new Element("tree-state");
-			state.writeExternal(element);
-			stateElement.addContent(element);
-		}
-		return stateElement;
-	}
+    @Nullable
+    @Override
+    public Element getState() {
+        Element stateElement = new Element("state");
+        UITreeState state = myTreeState;
+        if (state != null) {
+            Element element = new Element("tree-state");
+            state.writeExternal(element);
+            stateElement.addContent(element);
+        }
+        return stateElement;
+    }
 
-	@Override
-	public void loadState(Element state)
-	{
-		Element treeState = state.getChild("tree-state");
-		if(treeState != null)
-		{
-			myTreeState = TreeState.createFrom(treeState);
-		}
-	}
+    @Override
+    public void loadState(Element state) {
+        Element treeState = state.getChild("tree-state");
+        if (treeState != null) {
+            myTreeState = UITreeState.createFrom(treeState);
+        }
+    }
 }

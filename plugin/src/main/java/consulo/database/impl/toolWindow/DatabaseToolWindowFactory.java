@@ -88,12 +88,17 @@ public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware {
 
         toolWindow.setTitleActions(actions.toArray(AnAction.EMPTY_ARRAY));
 
-        Content content = factory.createContent(panel.getRootPanel(), null, false);
+        Content content = factory.createUIContent(panel.getRootPanel(), null, false);
 
         content.setDisposer(panel);
 
         contentManager.addContent(content);
 
         contentManager.addUiDataProvider(panel);
+    }
+
+    @Override
+    public boolean isUnified() {
+        return true;
     }
 }

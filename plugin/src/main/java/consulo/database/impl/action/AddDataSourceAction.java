@@ -17,88 +17,83 @@
 package consulo.database.impl.action;
 
 import consulo.application.AllIcons;
+import consulo.application.Application;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.model.EditableDataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
-import consulo.database.impl.configurable.editor.DataSourcesDialog;
+import consulo.database.impl.configurable.editor.DatabaseSourcesDialogDescriptor;
+import consulo.platform.base.icon.PlatformIconGroup;
 import consulo.project.Project;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.action.AnActionEvent;
 import consulo.ui.ex.action.DumbAwareAction;
+import consulo.ui.ex.dialog.Dialog;
+import consulo.ui.ex.dialog.DialogService;
 import consulo.ui.ex.popup.BaseListPopupStep;
 import consulo.ui.ex.popup.JBPopupFactory;
 import consulo.ui.ex.popup.ListPopup;
 import consulo.ui.ex.popup.PopupStep;
 import consulo.ui.image.Image;
-
 import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL
  * @since 2020-08-12
  */
-public class AddDataSourceAction extends DumbAwareAction
-{
-	private class StepImpl extends BaseListPopupStep<DataSourceProvider>
-	{
-		private final Project myProject;
+public class AddDataSourceAction extends DumbAwareAction {
+    private class StepImpl extends BaseListPopupStep<DataSourceProvider> {
+        private final Project myProject;
 
-		private StepImpl(@Nonnull Project project)
-		{
-			super("Choose Data Source", DataSourceProvider.EP_NAME.getExtensionList());
-			myProject = project;
-		}
+        private StepImpl(@Nonnull Project project) {
+            super("Choose Data Source", DataSourceProvider.EP_NAME.getExtensionList());
+            myProject = project;
+        }
 
-		@Nonnull
-		@Override
-		public String getTextFor(DataSourceProvider value)
-		{
-			return value.getName().getValue();
-		}
+        @Nonnull
+        @Override
+        public String getTextFor(DataSourceProvider value) {
+            return value.getName().getValue();
+        }
 
-		@Override
-		public Image getIconFor(DataSourceProvider value)
-		{
-			return value.getIcon();
-		}
+        @Override
+        public Image getIconFor(DataSourceProvider value) {
+            return value.getIcon();
+        }
 
-		@Override
-		public PopupStep onChosen(DataSourceProvider selectedValue, boolean finalChoice)
-		{
-			return doFinalStep(() -> createAndShowDialog(selectedValue));
-		}
+        @Override
+        public PopupStep onChosen(DataSourceProvider selectedValue, boolean finalChoice) {
+            return doFinalStep(() -> createAndShowDialog(selectedValue));
+        }
 
-		@RequiredUIAccess
-		private void createAndShowDialog(DataSourceProvider selectedValue)
-		{
-			EditableDataSourceModel editableModel = DataSourceManager.getInstance(myProject).createEditableModel();
+        @RequiredUIAccess
+        private void createAndShowDialog(DataSourceProvider selectedValue) {
+            EditableDataSourceModel editableModel = DataSourceManager.getInstance(myProject).createEditableModel();
 
-			EditableDataSource newDataSource = editableModel.newDataSource("New " + selectedValue.getName() + " Connection", selectedValue);
+            EditableDataSource newDataSource = editableModel.newDataSource("New " + selectedValue.getName() + " Connection", selectedValue);
 
-			DataSourcesDialog dialog = new DataSourcesDialog(myProject, editableModel, newDataSource);
-			
-			dialog.showAsync();
-		}
-	}
+            DialogService dialogService = Application.get().getInstance(DialogService.class);
 
-	public AddDataSourceAction()
-	{
-		super("Add Datasource", null, AllIcons.General.Add);
-	}
+            Dialog dialog = dialogService.build(myProject, new DatabaseSourcesDialogDescriptor(myProject, editableModel, newDataSource));
 
-	@RequiredUIAccess
-	@Override
-	public void actionPerformed(@Nonnull AnActionEvent e)
-	{
-		Project project = e.getData(Project.KEY);
-		if(project == null)
-		{
-			return;
-		}
+            dialog.showAsync();
+        }
+    }
 
-		ListPopup popup = JBPopupFactory.getInstance().createListPopup(new StepImpl(project));
+    public AddDataSourceAction() {
+        super("Add Datasource", null, PlatformIconGroup.generalAdd());
+    }
 
-		popup.showUnderneathOf(e.getInputEvent().getComponent());
-	}
+    @RequiredUIAccess
+    @Override
+    public void actionPerformed(@Nonnull AnActionEvent e) {
+        Project project = e.getData(Project.KEY);
+        if (project == null) {
+            return;
+        }
+
+        ListPopup popup = JBPopupFactory.getInstance().createListPopup(project, new StepImpl(project));
+
+        popup.showUnderneathOf(e);
+    }
 }
