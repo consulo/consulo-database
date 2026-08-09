@@ -96,9 +96,4 @@ public class DatabaseToolWindowFactory implements ToolWindowFactory, DumbAware {
 
         contentManager.addUiDataProvider(panel);
     }
-
-    @Override
-    public boolean isUnified() {
-        return true;
-    }
 }
