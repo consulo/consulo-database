@@ -32,6 +32,7 @@ import consulo.fileEditor.FileEditorLocation;
 import consulo.fileEditor.FileEditorState;
 import consulo.fileEditor.FileEditorStateLevel;
 import consulo.project.Project;
+import consulo.ui.Component;
 import consulo.ui.UIAccess;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.JBColor;
@@ -43,6 +44,7 @@ import consulo.ui.ex.awt.ClientProperty;
 import consulo.ui.ex.awt.JBLabel;
 import consulo.ui.ex.awt.JBUI;
 import consulo.ui.ex.awt.LoadingDecorator;
+import consulo.ui.ex.awtUnsafe.TargetAWT;
 import consulo.util.concurrent.AsyncResult;
 import consulo.util.dataholder.UserDataHolderBase;
 import jakarta.annotation.Nonnull;
@@ -101,8 +103,7 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
     public void loadData(@Nonnull UIAccess uiAccess) {
         if (myLoading.compareAndSet(false, true)) {
             myLoadingDecorator.startLoading(false);
-            Task.Backgroundable.queue(myProject, "Fetching data...", true, indicator ->
-            {
+            Task.Backgroundable.queue(myProject, "Fetching data...", true, indicator -> {
                 DataSourceTransport transport = null;
                 for (DataSourceTransport dataSourceTransport : DataSourceTransport.EP_NAME.getExtensionList()) {
                     if (dataSourceTransport.accept(myDataSource)) {
@@ -156,6 +157,11 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
         return myLastTransportResult == null ? 0 : myLastTransportResult.getRowsCount();
     }
 
+    @Override
+    public Component getUIComponent() {
+        return TargetAWT.wrap(getComponent());
+    }
+
     @Nonnull
     @Override
     public JComponent getComponent() {
@@ -166,6 +172,11 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
     @Override
     public JComponent getPreferredFocusedComponent() {
         return myLoadingDecorator.getComponent();
+    }
+
+    @Override
+    public @org.jspecify.annotations.Nullable Component getPreferredFocusedUIComponent() {
+        return TargetAWT.wrap(myLoadingDecorator.getComponent());
     }
 
     @Nonnull
