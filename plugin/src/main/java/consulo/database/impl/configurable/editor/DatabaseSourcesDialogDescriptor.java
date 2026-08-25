@@ -117,8 +117,8 @@ public class DatabaseSourcesDialogDescriptor extends DialogDescriptor {
 
 
     @Override
-    public @Nullable Size2D getInitialSize() {
-        return new Size2D(700, 500);
+    public @Nullable WidthAndHeight getInitialSize() {
+        return WidthAndHeight.ofFont(35, 25);
     }
 
     @RequiredUIAccess
