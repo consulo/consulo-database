@@ -28,6 +28,7 @@ import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.database.impl.DataSourceWorkspaceManager;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.disposer.Disposable;
+import consulo.disposer.Disposer;
 import consulo.logging.Logger;
 import consulo.project.Project;
 import consulo.ui.Tree;
@@ -53,7 +54,8 @@ public class DatabaseTreePanel implements Disposable, UiDataProvider {
 
         DatabaseTreeStructure structure = new DatabaseTreeStructure(project);
         TreeStructureWrappenModel<Object> wrapper = new TreeStructureWrappenModel<>(structure);
-        myTree = Tree.create(wrapper.getRootElement(), wrapper, this);
+        myTree = Tree.create(wrapper.getRootElement(), wrapper);
+        Disposer.register(this, myTree.destroyHook());
         myTree.addDoubleClickListener(e -> {
             TreeNode<Object> node = e.getValue();
 

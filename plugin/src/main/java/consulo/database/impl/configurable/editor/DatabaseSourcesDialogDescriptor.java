@@ -26,6 +26,7 @@ import consulo.database.impl.action.RemoveDataSourceAction;
 import consulo.database.impl.configurable.editor.action.AddDataSourcePopupAction;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.disposer.Disposable;
+import consulo.disposer.Disposer;
 import consulo.localize.LocalizeValue;
 import consulo.project.Project;
 import consulo.ui.*;
@@ -128,29 +129,25 @@ public class DatabaseSourcesDialogDescriptor extends DialogDescriptor {
 
         TreeStructureWrappenModel<Object> wrapper = new TreeStructureWrappenModel<>(structure);
 
-        consulo.ui.Tree<Object> tree = Tree.create(wrapper.getRootElement(), wrapper, uiDisposable);
+        consulo.ui.Tree<Object> tree = Tree.create(wrapper.getRootElement(), wrapper);
+        Disposer.register(uiDisposable, tree.destroyHook());
 
         Runnable treeUpdater = tree::refreshAll;
 
-        myEditableDataSourceModel.addListener(new DataSourceListener() {
-            @Override
-            public void dataSourceEvent(DataSourceEvent event) {
-                tree.refreshAll().whenCompleteAsync((o, throwable) -> {
-                    if (event.getAction() == DataSourceEvent.Action.ADD) {
-                        selectInTree(tree, event.getDataSource());
-                    }
-                    else if (event.getAction() == DataSourceEvent.Action.REMOVE) {
-                        List<? extends EditableDataSource> dataSources = myEditableDataSourceModel.getDataSources();
-                        if (dataSources.isEmpty()) {
-                            selectConfigurable(uiDisposable, null, treeUpdater);
-                        }
-                        else {
-                            selectInTree(tree, dataSources.get(0));
-                        }
-                    }
-                }, UIAccess.current());
+        myEditableDataSourceModel.addListener(event -> tree.refreshAll().whenCompleteAsync((o, throwable) -> {
+            if (event.getAction() == DataSourceEvent.Action.ADD) {
+                selectInTree(tree, event.getDataSource());
             }
-        });
+            else if (event.getAction() == DataSourceEvent.Action.REMOVE) {
+                List<? extends EditableDataSource> dataSources = myEditableDataSourceModel.getDataSources();
+                if (dataSources.isEmpty()) {
+                    selectConfigurable(uiDisposable, null, treeUpdater);
+                }
+                else {
+                    selectInTree(tree, dataSources.get(0));
+                }
+            }
+        }, UIAccess.current()));
 
         tree.addSelectListener(e -> {
             UIAccess.current().execute(() -> {
