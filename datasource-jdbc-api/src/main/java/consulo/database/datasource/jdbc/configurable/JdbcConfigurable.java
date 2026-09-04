@@ -26,70 +26,66 @@ import consulo.localize.LocalizeValue;
 import consulo.logging.Logger;
 import consulo.ui.*;
 import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.border.BorderStyle;
 import consulo.ui.layout.DockLayout;
 import consulo.ui.layout.TabbedLayout;
-import consulo.ui.style.StandardColors;
 import consulo.ui.util.FormBuilder;
-
+import consulo.ui.util.Indenter;
 import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL
  * @since 2020-08-16
  */
-public class JdbcConfigurable extends SimpleConfigurableByProperties
-{
-	private static final Logger LOG = Logger.getInstance(JdbcConfigurable.class);
+public class JdbcConfigurable extends SimpleConfigurableByProperties {
+    private static final Logger LOG = Logger.getInstance(JdbcConfigurable.class);
 
-	private final EditableDataSource myDataSource;
+    private final EditableDataSource myDataSource;
 
-	public JdbcConfigurable(EditableDataSource dataSource)
-	{
-		myDataSource = dataSource;
-	}
+    public JdbcConfigurable(EditableDataSource dataSource) {
+        myDataSource = dataSource;
+    }
 
-	@RequiredUIAccess
-	@Nonnull
-	@Override
-	protected Component createLayout(PropertyBuilder propertyBuilder, @Nonnull Disposable uiDisposable)
-	{
-		EditablePropertiesHolder propertiesHolder = myDataSource.getProperties();
+    @RequiredUIAccess
+    @Nonnull
+    @Override
+    protected Component createLayout(PropertyBuilder propertyBuilder, @Nonnull Disposable uiDisposable) {
+        EditablePropertiesHolder propertiesHolder = myDataSource.getProperties();
 
-		TabbedLayout tabs = TabbedLayout.create();
+        TabbedLayout tabs = TabbedLayout.create();
 
-		FormBuilder builder = FormBuilder.create();
+        FormBuilder builder = FormBuilder.create();
 
-		TextBox hostBox = TextBox.create();
-		builder.addLabeled(LocalizeValue.localizeTODO("Host"), hostBox);
-		propertyBuilder.add(hostBox, () -> propertiesHolder.get(GenericPropertyKeys.HOST), it -> propertiesHolder.set(GenericPropertyKeys.HOST, it));
+        TextBox hostBox = TextBox.create();
+        builder.addLabeled(LocalizeValue.localizeTODO("Host"), hostBox);
+        propertyBuilder.add(hostBox, () -> propertiesHolder.get(GenericPropertyKeys.HOST), it -> propertiesHolder.set(GenericPropertyKeys.HOST, it));
 
-		IntBox portBox = IntBox.create();
-		builder.addLabeled(LocalizeValue.localizeTODO("Port"), portBox);
-		propertyBuilder.add(portBox, () -> propertiesHolder.get(GenericPropertyKeys.PORT), it -> propertiesHolder.set(GenericPropertyKeys.PORT, it));
+        IntBox portBox = IntBox.create();
+        builder.addLabeled(LocalizeValue.localizeTODO("Port"), portBox);
+        propertyBuilder.add(portBox, () -> propertiesHolder.get(GenericPropertyKeys.PORT), it -> propertiesHolder.set(GenericPropertyKeys.PORT, it));
 
-		TextBox loginBox = TextBox.create();
-		builder.addLabeled(LocalizeValue.localizeTODO("Login"), loginBox);
-		propertyBuilder.add(loginBox, () -> propertiesHolder.get(GenericPropertyKeys.LOGIN), it -> propertiesHolder.set(GenericPropertyKeys.LOGIN, it));
+        TextBox loginBox = TextBox.create();
+        builder.addLabeled(LocalizeValue.localizeTODO("Login"), loginBox);
+        propertyBuilder.add(loginBox, () -> propertiesHolder.get(GenericPropertyKeys.LOGIN), it -> propertiesHolder.set(GenericPropertyKeys.LOGIN, it));
 
-		PasswordBox passwordBox = PasswordBox.create();
-		builder.addLabeled(LocalizeValue.localizeTODO("Password"), passwordBox);
-		propertyBuilder.add(passwordBox, () -> propertiesHolder.get(GenericPropertyKeys.PASSWORD).getValue(myDataSource), it ->
-		{
-			propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.raw(it));
-		});
+        PasswordBox passwordBox = PasswordBox.create();
+        builder.addLabeled(LocalizeValue.localizeTODO("Password"), passwordBox);
+        propertyBuilder.add(passwordBox, () -> propertiesHolder.get(GenericPropertyKeys.PASSWORD).getValue(myDataSource), it ->
+        {
+            propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.raw(it));
+        });
 
-		TextBox databaseNameBox = TextBox.create();
-		builder.addLabeled(LocalizeValue.localizeTODO("Database Name"), databaseNameBox);
-		propertyBuilder.add(databaseNameBox, () -> propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME), it -> propertiesHolder.set(GenericPropertyKeys.DATABASE_NAME, it));
+        TextBox databaseNameBox = TextBox.create();
+        builder.addLabeled(LocalizeValue.localizeTODO("Database Name"), databaseNameBox);
+        propertyBuilder.add(databaseNameBox, () -> propertiesHolder.get(GenericPropertyKeys.DATABASE_NAME), it -> propertiesHolder.set(GenericPropertyKeys.DATABASE_NAME, it));
 
-		Component component = builder.build();
-		component.addBorders(BorderStyle.EMPTY, null, 10);
-		tabs.addTab("Connection", component);
+        Component component = builder.build();
+        component.paddingBuilder().allSet(Space.MEDIUM).apply();
 
-		DockLayout properties = DockLayout.create();
+        tabs.addTab("Connection", component);
 
-		tabs.addTab("Properties", properties);
-		return tabs;
-	}
+        DockLayout properties = DockLayout.create();
+
+        tabs.addTab("Properties", properties);
+        return tabs;
+    }
 }
