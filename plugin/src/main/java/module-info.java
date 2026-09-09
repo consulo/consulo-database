@@ -36,6 +36,8 @@ module consulo.database {
 
     opens consulo.database.impl.store to consulo.proxy;
 
+    opens consulo.database.impl to consulo.util.xml.serializer;
+
     // TODO remove this in future
     requires java.desktop;
 }
