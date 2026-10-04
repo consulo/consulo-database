@@ -1,0 +1,59 @@
+{
+  "name": "MongoDB Java Driver",
+  "start": {
+    "kind": "java-rt",
+    "agent": "mongo"
+  },
+  "drivers": [
+    {
+      "version": "5.13.0",
+      "artifacts": [
+        {
+          "fileName": "mongodb-driver-sync-5.13.0.jar",
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/5.13.0/mongodb-driver-sync-5.13.0.jar",
+          "sha256": "b1042221132552cdf56f95bcd61d524b745923d7bc3ace1aaa882a7fd51fb94e"
+        },
+        {
+          "fileName": "mongodb-driver-core-5.13.0.jar",
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/5.13.0/mongodb-driver-core-5.13.0.jar",
+          "sha256": "44f0bc54cba2ef1cbfff8ad5f84e0f1bfccf4886661a93b0e4882ed9c4fdb81d"
+        },
+        {
+          "fileName": "bson-5.13.0.jar",
+          "url": "https://repo1.maven.org/maven2/org/mongodb/bson/5.13.0/bson-5.13.0.jar",
+          "sha256": "51f583ee96fda9bc0897e73321c5ae1485102bfd8f95d0d34d7d57919cbc650a"
+        },
+        {
+          "fileName": "bson-record-codec-5.13.0.jar",
+          "url": "https://repo1.maven.org/maven2/org/mongodb/bson-record-codec/5.13.0/bson-record-codec-5.13.0.jar",
+          "sha256": "0f6aca2c3c4b3c63e0c1fea65147c51af02be5d8d940f298abb3dc0906ca1ba0"
+        }
+      ]
+    },
+    {
+      "version": "5.8.1",
+      "artifacts": [
+        {
+          "fileName": "mongodb-driver-sync-5.8.1.jar",
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/5.8.1/mongodb-driver-sync-5.8.1.jar",
+          "sha256": "561582e8f1dc3744f15f830e896fb586b52057ac73bc2716de0c0c1240cca988"
+        },
+        {
+          "fileName": "mongodb-driver-core-5.8.1.jar",
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/5.8.1/mongodb-driver-core-5.8.1.jar",
+          "sha256": "da71106de37fa0542ca41dc1742610d3652b4de7102d1b0c0c774257db301c95"
+        },
+        {
+          "fileName": "bson-5.8.1.jar",
+          "url": "https://repo1.maven.org/maven2/org/mongodb/bson/5.8.1/bson-5.8.1.jar",
+          "sha256": "b3709738208b31558cfb6abe38df715914884e5f615fc66a5784b2e65b06cbfc"
+        },
+        {
+          "fileName": "bson-record-codec-5.8.1.jar",
+          "url": "https://repo1.maven.org/maven2/org/mongodb/bson-record-codec/5.8.1/bson-record-codec-5.8.1.jar",
+          "sha256": "c5243c8a0494aefff88a150b85e240e52aca17b530e9480bdb87aa39ad56b484"
+        }
+      ]
+    }
+  ]
+}

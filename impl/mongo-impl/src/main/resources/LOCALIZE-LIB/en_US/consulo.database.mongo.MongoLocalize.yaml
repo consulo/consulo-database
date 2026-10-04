@@ -1,0 +1,66 @@
+settings.host.label:
+  text: Host
+settings.port.label:
+  text: Port
+settings.login.label:
+  text: Login
+settings.password.label:
+  text: Password
+settings.auth.source.label:
+  text: Authentication database
+settings.database.label:
+  text: Database
+settings.connection.string.label:
+  text: Connection string
+settings.connection.string.placeholder:
+  text: 'mongodb://host1:27017,host2:27017/?replicaSet=rs0'
+settings.connection.string.comment:
+  text: Optional. Replaces host and port.
+settings.connection.string.tooltip:
+  text: Login, password and authentication database are always taken from the fields above.
+error.connection.string.invalid:
+  text: 'Invalid connection string: {0}'
+error.connection.string.password:
+  text: The connection string must not contain a password. Enter it in the Password field.
+error.connection.string.scheme:
+  text: 'Invalid connection string: it must start with mongodb:// or mongodb+srv://'
+error.connection.string.options:
+  text: 'Invalid connection string: options must follow a / after the hosts'
+error.connection.string.host:
+  text: 'Invalid connection string: no host'
+error.connection.string.userinfo:
+  text: User name and password in the connection string must be URL-encoded (RFC 3986)
+error.port.invalid:
+  text: The port must be between 1 and 65535
+progress.starting.runtime:
+  text: Starting MongoDB runtime
+error.runtime.missing:
+  text: 'The MongoDB runtime is not found: {0}'
+error.runtime.start.timeout:
+  text: The MongoDB runtime did not start in time
+error.runtime.exited:
+  text: 'The MongoDB runtime exited with code {0}'
+error.runtime.lost:
+  text: 'Lost the connection to the MongoDB runtime: {0}'
+error.runtime.version:
+  text: 'The MongoDB runtime has protocol version {0}, expected {1}'
+error.runtime.handshake:
+  text: The MongoDB runtime failed the handshake
+error.runtime.stopped:
+  text: The MongoDB runtime is stopped
+progress.listing.databases:
+  text: 'Listing databases of {0}'
+progress.listing.collections:
+  text: 'Listing collections of {0}.{1}'
+progress.fetching.documents:
+  text: 'Fetching documents of {0}.{1}'
+progress.sampling.fields:
+  text: 'Sampling fields of {0}.{1}'
+result.summary.all:
+  text: '{0} documents, {1} fields'
+result.summary.estimated:
+  text: 'First {0} of about {1} documents, {2} fields'
+result.summary.unknown:
+  text: 'First {0} documents, {1} fields'
+result.more.children:
+  text: 'and {0} more'
