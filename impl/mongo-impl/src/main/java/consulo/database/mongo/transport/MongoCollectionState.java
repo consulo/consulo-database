@@ -19,6 +19,8 @@ package consulo.database.mongo.transport;
 
 import consulo.util.xml.serializer.annotation.Transient;
 
+import java.util.Objects;
+
 /**
  * A collection, view or time series collection of a MongoDB database.
  *
@@ -69,5 +71,18 @@ public class MongoCollectionState {
     @Transient
     public boolean isSystem() {
         return myName.startsWith("system.");
+    }
+
+    /**
+     * A collection is identified by its name within its database: a refreshed tree keeps the node of the same collection.
+     */
+    @Override
+    public boolean equals(Object o) {
+        return this == o || o instanceof MongoCollectionState state && Objects.equals(myName, state.myName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(myName);
     }
 }

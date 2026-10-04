@@ -19,6 +19,7 @@ package consulo.database.mongo.transport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A database of a MongoDB data source with its collections, sorted by name. System collections ({@code system.*}) are kept here
@@ -54,5 +55,18 @@ public class MongoDatabaseState {
 
     public void setCollections(List<MongoCollectionState> collections) {
         myCollections = collections;
+    }
+
+    /**
+     * A database is identified by its name: a refreshed tree keeps the node of the same database, with its expansion.
+     */
+    @Override
+    public boolean equals(Object o) {
+        return this == o || o instanceof MongoDatabaseState state && Objects.equals(myName, state.myName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(myName);
     }
 }
