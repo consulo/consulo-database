@@ -20,6 +20,7 @@ import consulo.database.datasource.model.DataSource;
 import jakarta.annotation.Nonnull;
 
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author VISTALL
@@ -63,6 +64,15 @@ public interface SecureString
 	}
 
 	String getValue(@Nonnull DataSource dataSource);
+
+	/**
+	 * The value without blocking the caller: a stored value comes from the credential store, which may be slow or ask the user
+	 */
+	@Nonnull
+	default CompletableFuture<String> getValueAsync(@Nonnull DataSource dataSource)
+	{
+		return CompletableFuture.completedFuture(getValue(dataSource));
+	}
 
 	@Nonnull
 	public static SecureString raw(@Nonnull String rawValue)

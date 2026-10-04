@@ -16,184 +16,308 @@
 
 package consulo.database.impl.editor;
 
+import consulo.application.progress.ProgressIndicator;
 import consulo.application.progress.Task;
+import consulo.component.ProcessCanceledException;
 import consulo.dataContext.UiDataProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.DataSourceTransportResult;
 import consulo.database.datasource.transport.ui.DataSourceTransportResultPresentation;
-import consulo.database.impl.editor.actions.NextPageAction;
-import consulo.database.impl.editor.actions.PageAction;
-import consulo.database.impl.editor.actions.PrevPageAction;
 import consulo.database.impl.editor.actions.RefreshDataAction;
 import consulo.disposer.Disposable;
+import consulo.disposer.Disposer;
 import consulo.fileEditor.FileEditor;
-import consulo.fileEditor.FileEditorLocation;
-import consulo.fileEditor.FileEditorState;
-import consulo.fileEditor.FileEditorStateLevel;
+import consulo.localize.LocalizeValue;
+import consulo.logging.Logger;
 import consulo.project.Project;
 import consulo.ui.Component;
+import consulo.ui.Label;
 import consulo.ui.UIAccess;
 import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.ex.JBColor;
 import consulo.ui.ex.action.ActionGroup;
 import consulo.ui.ex.action.ActionManager;
 import consulo.ui.ex.action.ActionToolbar;
-import consulo.ui.ex.action.AnSeparator;
-import consulo.ui.ex.awt.ClientProperty;
-import consulo.ui.ex.awt.JBLabel;
-import consulo.ui.ex.awt.JBUI;
-import consulo.ui.ex.awt.LoadingDecorator;
-import consulo.ui.ex.awtUnsafe.TargetAWT;
+import consulo.ui.layout.DockLayout;
+import consulo.ui.layout.LoadingLayout;
+import consulo.ui.style.StandardColors;
 import consulo.util.concurrent.AsyncResult;
 import consulo.util.dataholder.UserDataHolderBase;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import consulo.util.lang.ControlFlowException;
+import consulo.util.lang.StringUtil;
 import kava.beans.PropertyChangeListener;
+import org.jspecify.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * The rows of a child of a database - a table, a collection. A presentation which has a view loading its rows by itself (the data
+ * grid, with its own paging and Reload) fills the editor with it. Otherwise the editor fetches the rows through the transport, shows
+ * them with the presentation, and has a toolbar to fetch them again.
+ *
  * @author VISTALL
  * @since 2020-08-19
  */
 public class DataSourceFileEditor extends UserDataHolderBase implements FileEditor {
+    private static final Logger LOG = Logger.getInstance(DataSourceFileEditor.class);
+
     private final Project myProject;
     private final DataSourceVirtualFile myFile;
-    private final LoadingDecorator myLoadingDecorator;
-    private final AtomicBoolean myLoading = new AtomicBoolean();
     private final DataSource myDataSource;
-    private final JPanel myTargetPanel;
 
-    private JComponent myLastResult;
-    private DataSourceTransportResult myLastTransportResult;
+    private final DockLayout myRootLayout;
+    /**
+     * Disposes the view of the rows - the grid and its data source, or the fetched result
+     */
+    private final Disposable myViewDisposable;
+    /**
+     * Holds the fetched result, null when the view loads its rows by itself
+     */
+    private final @Nullable LoadingLayout<DockLayout> myLoadingLayout;
+
+    private final AtomicBoolean myLoading = new AtomicBoolean();
+    private volatile @Nullable ProgressIndicator myLoadingIndicator;
+    private volatile boolean myDisposed;
+
+    private @Nullable Disposable myLastResultDisposable;
 
     @RequiredUIAccess
     public DataSourceFileEditor(Project project, DataSourceVirtualFile file) {
         myProject = project;
         myFile = file;
         myDataSource = myFile.getDataSource();
-        myTargetPanel = new JPanel(new BorderLayout());
-        ClientProperty.put(myTargetPanel, UiDataProvider.KEY, sink -> {
-            sink.set(DataSourceFileEditorKeys.EDITOR, this);
-        });
 
+        myViewDisposable = Disposable.newDisposable("DataSourceFileEditor view");
+        Disposer.register(this, myViewDisposable);
+
+        myRootLayout = DockLayout.create();
+        myRootLayout.putUserData(UiDataProvider.KEY, sink -> sink.set(DataSourceFileEditorKeys.EDITOR, this));
+
+        DataSourceTransportResultPresentation<?> presentation = findPresentation(project, myDataSource);
+        Component childView = presentation == null
+            ? null
+            : presentation.buildComponentForChild(project, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), myViewDisposable);
+
+        if (childView != null) {
+            // it loads the first page once it is shown, and has its own paging and Reload
+            myRootLayout.center(childView);
+            myLoadingLayout = null;
+        }
+        else {
+            myLoadingLayout = createFetchedResultLayout();
+            loadData();
+        }
+    }
+
+    @RequiredUIAccess
+    private LoadingLayout<DockLayout> createFetchedResultLayout() {
         ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
-        builder.add(new PrevPageAction());
-        builder.add(new PageAction());
-        builder.add(new NextPageAction());
-        builder.add(new AnSeparator());
         builder.add(new RefreshDataAction());
 
-        myLoadingDecorator = new LoadingDecorator(myTargetPanel, this, 0);
-
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("DataSourceEditor", builder.build(), true);
-        toolbar.getComponent().setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 1));
-        toolbar.setTargetComponent(myTargetPanel);
+        toolbar.setTargetUIComponent(myRootLayout);
 
-        myTargetPanel.add(toolbar.getComponent(), BorderLayout.NORTH);
+        // the toolbar component itself may be a bridge which ignores borders - so the border goes to a wrapper
+        DockLayout toolbarLayout = DockLayout.create();
+        toolbarLayout.center(toolbar.getUIComponent());
+        toolbarLayout.borderBuilder().bottomSet().apply();
+        myRootLayout.top(toolbarLayout);
+
+        // only the result area is covered while loading, the toolbar stays reachable
+        LoadingLayout<DockLayout> loadingLayout = LoadingLayout.create(DockLayout.create(), myViewDisposable);
+        loadingLayout.setLoadingText(LocalizeValue.localizeTODO("Fetching data..."));
+        myRootLayout.center(loadingLayout);
+        return loadingLayout;
+    }
+
+    public boolean isLoading() {
+        return myLoading.get();
+    }
+
+    /**
+     * Fetches the rows again, unless the view loads them by itself
+     */
+    @RequiredUIAccess
+    public void loadData() {
+        LoadingLayout<DockLayout> loadingLayout = myLoadingLayout;
+        if (loadingLayout == null || myDisposed || !myLoading.compareAndSet(false, true)) {
+            return;
+        }
 
         UIAccess uiAccess = UIAccess.current();
 
-        loadData(uiAccess);
-    }
+        disposeLastResult();
+        loadingLayout.startLoading();
 
-    public void loadData(@Nonnull UIAccess uiAccess) {
-        if (myLoading.compareAndSet(false, true)) {
-            myLoadingDecorator.startLoading(false);
-            Task.Backgroundable.queue(myProject, "Fetching data...", true, indicator -> {
-                DataSourceTransport transport = null;
-                for (DataSourceTransport dataSourceTransport : DataSourceTransport.EP_NAME.getExtensionList()) {
-                    if (dataSourceTransport.accept(myDataSource)) {
-                        transport = dataSourceTransport;
-                        break;
-                    }
+        Project project = myProject;
+        DataSource dataSource = myDataSource;
+        String databaseName = myFile.getDatabaseName();
+        String childId = myFile.getChildId();
+
+        AsyncResult<DataSourceTransportResult> result = AsyncResult.undefined();
+        // done and rejected both end here - on the ui thread
+        result.toCompletableFuture()
+            .whenCompleteAsync((transportResult, error) -> onDataLoaded(loadingLayout, transportResult, error), uiAccess);
+
+        new Task.Backgroundable(project, LocalizeValue.localizeTODO("Fetching data..."), true) {
+            @Override
+            public void run(ProgressIndicator indicator) {
+                myLoadingIndicator = indicator;
+
+                if (myDisposed) {
+                    result.rejectWithThrowable(new ProcessCanceledException());
+                    return;
                 }
 
-                assert transport != null;
+                DataSourceTransport<?> transport = findTransport(project, dataSource);
+                if (transport == null) {
+                    result.reject("There is no transport for data source '" + dataSource.getName() + "'");
+                    return;
+                }
 
-                AsyncResult<DataSourceTransportResult> result = AsyncResult.undefined();
+                transport.fetchData(indicator, project, dataSource, databaseName, childId, result);
+            }
 
-                transport.fetchData(indicator, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), result);
+            @RequiredUIAccess
+            @Override
+            public void onCancel() {
+                rejectIfPending(result, new ProcessCanceledException());
+            }
 
-                result.doWhenDone(o -> {
-                    myLoadingDecorator.stopLoading();
-                    myLoading.set(false);
+            @RequiredUIAccess
+            @Override
+            public void onThrowable(Throwable error) {
+                rejectIfPending(result, error);
 
-                    myLastTransportResult = o;
-                    uiAccess.give(() -> {
-                        if (myLastResult != null) {
-                            myTargetPanel.remove(myLastResult);
-                        }
+                super.onThrowable(error);
+            }
+        }.queue();
+    }
 
-                        JComponent newComponent = buildUI(o, myProject, myDataSource, myFile.getDatabaseName(), myFile.getChildId(), DataSourceFileEditor.this);
-                        myTargetPanel.add(myLastResult = newComponent, BorderLayout.CENTER);
-                    });
-                });
-            });
+    private static void rejectIfPending(AsyncResult<?> result, Throwable error) {
+        if (!result.isProcessed()) {
+            result.rejectWithThrowable(error);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static JComponent buildUI(@Nonnull Object result, @Nonnull Project project, DataSource dataSource, String dbName, String childId, Disposable parent) {
-        DataSourceTransportResultPresentation target = null;
-        for (DataSourceTransportResultPresentation presentation : DataSourceTransportResultPresentation.EP_NAME.getExtensionList()) {
-            if (presentation.accept(dataSource)) {
-                target = presentation;
-                break;
-            }
+    @RequiredUIAccess
+    private void onDataLoaded(LoadingLayout<DockLayout> loadingLayout,
+                              @Nullable DataSourceTransportResult transportResult,
+                              @Nullable Throwable error) {
+        myLoadingIndicator = null;
+        myLoading.set(false);
+
+        if (myDisposed) {
+            return;
         }
 
+        loadingLayout.stopLoading(layout -> {
+            if (error != null) {
+                layout.center(createErrorComponent(error));
+                return;
+            }
+
+            if (transportResult == null) {
+                layout.center(Label.create(LocalizeValue.localizeTODO("No data")));
+                return;
+            }
+
+            Disposable resultDisposable = Disposable.newDisposable("DataSourceFileEditor result");
+            Disposer.register(myViewDisposable, resultDisposable);
+            myLastResultDisposable = resultDisposable;
+
+            try {
+                String databaseName = myFile.getDatabaseName();
+                String childId = myFile.getChildId();
+
+                layout.center(buildUI(transportResult, myProject, myDataSource, databaseName, childId, resultDisposable));
+            }
+            catch (RuntimeException e) {
+                LOG.error(e);
+
+                disposeLastResult();
+
+                layout.center(createErrorComponent(e));
+            }
+        });
+    }
+
+    @RequiredUIAccess
+    private static Component createErrorComponent(Throwable error) {
+        if (error instanceof ControlFlowException) {
+            return Label.create(LocalizeValue.localizeTODO("Fetching data was cancelled"));
+        }
+
+        String message = error.getMessage();
+        if (StringUtil.isEmpty(message)) {
+            message = error.getClass().getSimpleName();
+        }
+
+        Label label = Label.create(LocalizeValue.join(LocalizeValue.localizeTODO("Failed to fetch data: "), LocalizeValue.of(message)));
+        label.setForegroundColor(StandardColors.RED);
+        return label;
+    }
+
+    private static @Nullable DataSourceTransport<?> findTransport(Project project, DataSource dataSource) {
+        return project.getApplication().getExtensionPoint(DataSourceTransport.class).findFirstSafe(it -> it.accept(dataSource));
+    }
+
+    public static @Nullable DataSourceTransportResultPresentation<?> findPresentation(Project project, DataSource dataSource) {
+        return project.getApplication()
+            .getExtensionPoint(DataSourceTransportResultPresentation.class)
+            .findFirstSafe(it -> it.accept(dataSource));
+    }
+
+    /**
+     * @return the parts of a result which are shown in views of their own, see {@link DataSourceTransportResultPresentation#splitResult}
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static List<?> splitResult(@Nullable Object result, Project project, DataSource dataSource) {
+        DataSourceTransportResultPresentation presentation = result == null ? null : findPresentation(project, dataSource);
+        if (presentation == null) {
+            return Collections.singletonList(result);
+        }
+        return presentation.splitResult(result);
+    }
+
+    @RequiredUIAccess
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static Component buildUI(@Nullable Object result,
+                                    Project project,
+                                    DataSource dataSource,
+                                    @Nullable String dbName,
+                                    @Nullable String childId,
+                                    Disposable parent) {
+        if (result == null) {
+            return Label.create(LocalizeValue.localizeTODO("No data"));
+        }
+
+        DataSourceTransportResultPresentation target = findPresentation(project, dataSource);
         if (target == null) {
-            return new JBLabel("Not supported result");
+            return Label.create(LocalizeValue.localizeTODO("Not supported result"));
         }
 
         return target.buildComponentForResult(result, project, dataSource, dbName, childId, parent);
     }
 
-    public long getRowsCount() {
-        return myLastTransportResult == null ? 0 : myLastTransportResult.getRowsCount();
+    private void disposeLastResult() {
+        Disposable lastResultDisposable = myLastResultDisposable;
+        if (lastResultDisposable != null) {
+            myLastResultDisposable = null;
+            Disposer.dispose(lastResultDisposable);
+        }
     }
 
     @Override
     public Component getUIComponent() {
-        return TargetAWT.wrap(getComponent());
+        return myRootLayout;
     }
 
-    @Nonnull
-    @Override
-    public JComponent getComponent() {
-        return myLoadingDecorator.getComponent();
-    }
-
-    @Nullable
-    @Override
-    public JComponent getPreferredFocusedComponent() {
-        return myLoadingDecorator.getComponent();
-    }
-
-    @Override
-    public @org.jspecify.annotations.Nullable Component getPreferredFocusedUIComponent() {
-        return TargetAWT.wrap(myLoadingDecorator.getComponent());
-    }
-
-    @Nonnull
     @Override
     public String getName() {
         return "datasource";
-    }
-
-    @Nonnull
-    @Override
-    public FileEditorState getState(@Nonnull FileEditorStateLevel fileEditorStateLevel) {
-        return FileEditorState.INSTANCE;
-    }
-
-    @Override
-    public void setState(@Nonnull FileEditorState fileEditorState) {
-
     }
 
     @Override
@@ -202,38 +326,25 @@ public class DataSourceFileEditor extends UserDataHolderBase implements FileEdit
     }
 
     @Override
-    public boolean isValid() {
-        return true;
+    public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
     }
 
     @Override
-    public void selectNotify() {
-
-    }
-
-    @Override
-    public void deselectNotify() {
-
-    }
-
-    @Override
-    public void addPropertyChangeListener(@Nonnull PropertyChangeListener propertyChangeListener) {
-
-    }
-
-    @Override
-    public void removePropertyChangeListener(@Nonnull PropertyChangeListener propertyChangeListener) {
-
-    }
-
-    @Nullable
-    @Override
-    public FileEditorLocation getCurrentLocation() {
-        return null;
+    public void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
     }
 
     @Override
     public void dispose() {
+        myDisposed = true;
 
+        // stops the transport session (the rt process) of a fetch which is still running
+        ProgressIndicator indicator = myLoadingIndicator;
+        if (indicator != null) {
+            indicator.cancel();
+        }
+
+        // the grid and its data source - which stops a load of the grid which is still running - or the fetched result
+        myLastResultDisposable = null;
+        Disposer.dispose(myViewDisposable);
     }
 }

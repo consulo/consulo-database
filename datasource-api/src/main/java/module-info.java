@@ -3,9 +3,6 @@
  * @since 06-Jul-22
  */
 module consulo.database.datasource.api {
-	// TODO remove this dependency in future
-	requires java.desktop;
-
 	requires transitive consulo.application.api;
 	requires transitive consulo.component.api;
 	requires transitive consulo.project.api;
@@ -13,7 +10,6 @@ module consulo.database.datasource.api {
 	requires transitive consulo.localize.api;
 	requires transitive consulo.ui.api;
 	requires transitive consulo.ui.ex.api;
-	requires transitive consulo.ui.ex.awt.api;
 
 	requires consulo.configurable.api;
 	requires consulo.language.api;
@@ -25,7 +21,9 @@ module consulo.database.datasource.api {
 
 	exports consulo.database.datasource;
 	exports consulo.database.datasource.configurable;
+	exports consulo.database.datasource.driver;
 	exports consulo.database.datasource.editor;
+	exports consulo.database.datasource.localize;
 	exports consulo.database.datasource.model;
 	exports consulo.database.datasource.provider;
 	exports consulo.database.datasource.transport;

@@ -94,18 +94,6 @@
         </dependency>
         <dependency>
             <groupId>consulo</groupId>
-            <artifactId>consulo-ide-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>consulo</groupId>
-            <artifactId>consulo-language-editor-ui-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>consulo</groupId>
             <artifactId>consulo-localize-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -149,18 +137,6 @@
         <dependency>
             <groupId>consulo</groupId>
             <artifactId>consulo-ui-ex-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>consulo</groupId>
-            <artifactId>consulo-ui-ex-awt-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>consulo</groupId>
-            <artifactId>consulo-util-collection</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

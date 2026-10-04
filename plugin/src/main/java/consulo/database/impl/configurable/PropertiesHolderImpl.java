@@ -16,6 +16,7 @@
 
 package consulo.database.impl.configurable;
 
+import consulo.application.util.concurrent.AppExecutorUtil;
 import consulo.credentialStorage.PasswordSafe;
 import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.PropertiesHolder;
@@ -27,148 +28,140 @@ import org.jdom.Element;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author VISTALL
  * @since 2020-08-16
  */
-public class PropertiesHolderImpl implements PropertiesHolder
-{
-	public static final String TAG_NAME = "property-container";
+public class PropertiesHolderImpl implements PropertiesHolder {
+    public static final String TAG_NAME = "property-container";
 
-	protected static class UnstableValue
-	{
-		public Object value = ObjectUtil.NULL;
+    /**
+     * Stores secure values off the UI thread, one at a time, so a later value of a key never lands before an earlier one.
+     * The holder keeps the raw value meanwhile, so nothing reads the store before the write is done
+     */
+    private static final ExecutorService SECURE_STORE_EXECUTOR = AppExecutorUtil.createBoundedApplicationPoolExecutor("DataSource Secure Store", 1);
 
-		public String xmlValue;
+    protected static class UnstableValue {
+        public Object value = ObjectUtil.NULL;
 
-		public UnstableValue(String key, Object value)
-		{
-			this.value = value;
+        public String xmlValue;
 
-			if(value instanceof SecureString.RawSecureString rawSecureString)
-			{
-				PasswordSafe.getInstance().storePassword(null, StoreSecureStringImpl.class, key, rawSecureString.getRawValue());
-			}
-		}
+        /**
+         * The key of a secure value in the password safe - written to the xml state in place of the value
+         */
+        private final String myStoreKey;
 
-		@SuppressWarnings("unchecked")
-		public <T> T get(GenericPropertyKey<T> key)
-		{
-			if(value != ObjectUtil.NULL)
-			{
-				return (T) value;
-			}
+        public UnstableValue(String storeKey, Object value) {
+            this.value = value;
+            myStoreKey = storeKey;
 
-			if(xmlValue != null)
-			{
-				if(key.getTypeClass() == Integer.class)
-				{
-					T parsed = (T) Integer.valueOf(Integer.parseInt(xmlValue));
-					value = parsed;
-					xmlValue = null;
-					return parsed;
-				}
+            if (value instanceof SecureString.RawSecureString rawSecureString) {
+                String rawValue = rawSecureString.getRawValue();
+                SECURE_STORE_EXECUTOR.execute(() -> PasswordSafe.getInstance().storePassword(null, StoreSecureStringImpl.class, storeKey, rawValue));
+            }
+        }
 
-				if(key.getTypeClass() == String.class)
-				{
-					value = xmlValue;
-					xmlValue = null;
-					return (T) value;
-				}
+        @SuppressWarnings("unchecked")
+        public <T> T get(GenericPropertyKey<T> key) {
+            if (value != ObjectUtil.NULL) {
+                return (T) value;
+            }
 
-				if(key.getTypeClass() == SecureString.class)
-				{
-					value = new StoreSecureStringImpl(xmlValue);
-					xmlValue = null;
-					return (T) value;
-				}
+            if (xmlValue != null) {
+                if (key.getTypeClass() == Integer.class) {
+                    T parsed = (T) Integer.valueOf(Integer.parseInt(xmlValue));
+                    value = parsed;
+                    xmlValue = null;
+                    return parsed;
+                }
 
-				throw new UnsupportedOperationException("Key type " + key.getTypeClass() + " is not supported");
-			}
+                if (key.getTypeClass() == String.class) {
+                    value = xmlValue;
+                    xmlValue = null;
+                    return (T) value;
+                }
 
-			return key.getDefautValue();
-		}
+                if (key.getTypeClass() == SecureString.class) {
+                    value = new StoreSecureStringImpl(xmlValue);
+                    xmlValue = null;
+                    return (T) value;
+                }
 
-		public String getRawStringValue(String key)
-		{
-			if(value instanceof SecureString.RawSecureString rawStringValue)
-			{
-				return rawStringValue.getStoreValue(key);
-			}
+                throw new UnsupportedOperationException("Key type " + key.getTypeClass() + " is not supported");
+            }
 
-			if(value != ObjectUtil.NULL)
-			{
-				return String.valueOf(value);
-			}
+            return key.getDefautValue();
+        }
 
-			return xmlValue;
-		}
-	}
+        public String getRawStringValue() {
+            if (value instanceof SecureString.RawSecureString rawStringValue) {
+                return rawStringValue.getStoreValue(myStoreKey);
+            }
 
-	protected Map<String, UnstableValue> myValues = new HashMap<>();
+            if (value != ObjectUtil.NULL) {
+                return String.valueOf(value);
+            }
 
-	private final String myName;
+            return xmlValue;
+        }
+    }
 
-	public PropertiesHolderImpl(@Nonnull String name)
-	{
-		myName = name;
-	}
+    protected Map<String, UnstableValue> myValues = new HashMap<>();
 
-	@Override
-	@SuppressWarnings("unchecked")
-	@Nullable
-	public <T> T get(@Nonnull GenericPropertyKey<T> key)
-	{
-		UnstableValue value = myValues.get(key.toString());
-		if(value == null)
-		{
-			return key.getDefautValue();
-		}
-		T getValue = value.get(key);
-		if(getValue == null)
-		{
-			return key.getDefautValue();
-		}
-		return getValue;
-	}
+    private final String myName;
 
-	public void copyFrom(PropertiesHolderImpl other)
-	{
-		myValues.clear();
-		myValues.putAll(other.myValues);
-	}
+    public PropertiesHolderImpl(@Nonnull String name) {
+        myName = name;
+    }
 
-	@Nonnull
-	public Element toXmlState()
-	{
-		Element root = new Element(TAG_NAME);
-		root.setAttribute("name", myName);
+    @Override
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public <T> T get(@Nonnull GenericPropertyKey<T> key) {
+        UnstableValue value = myValues.get(key.toString());
+        if (value == null) {
+            return key.getDefautValue();
+        }
+        T getValue = value.get(key);
+        if (getValue == null) {
+            return key.getDefautValue();
+        }
+        return getValue;
+    }
 
-		for(Map.Entry<String, UnstableValue> entry : myValues.entrySet())
-		{
-			Element propertyElement = new Element("property");
-			String key = entry.getKey();
-			propertyElement.setAttribute("name", key);
-			propertyElement.setAttribute("value", String.valueOf(entry.getValue().getRawStringValue(key)));
+    public void copyFrom(PropertiesHolderImpl other) {
+        myValues.clear();
+        myValues.putAll(other.myValues);
+    }
 
-			root.addContent(propertyElement);
-		}
+    @Nonnull
+    public Element toXmlState() {
+        Element root = new Element(TAG_NAME);
+        root.setAttribute("name", myName);
 
-		return root;
-	}
+        for (Map.Entry<String, UnstableValue> entry : myValues.entrySet()) {
+            Element propertyElement = new Element("property");
+            String key = entry.getKey();
+            propertyElement.setAttribute("name", key);
+            propertyElement.setAttribute("value", String.valueOf(entry.getValue().getRawStringValue()));
 
-	public void fromXmlState(@Nonnull Element element)
-	{
-		for(Element propertyElement : element.getChildren("property"))
-		{
-			String name = propertyElement.getAttributeValue("name");
+            root.addContent(propertyElement);
+        }
 
-			String value = propertyElement.getAttributeValue("value");
+        return root;
+    }
 
-			UnstableValue unstableValue = new UnstableValue(name, ObjectUtil.NULL);
-			unstableValue.xmlValue = value;
-			myValues.put(name, unstableValue);
-		}
-	}
+    public void fromXmlState(@Nonnull Element element) {
+        for (Element propertyElement : element.getChildren("property")) {
+            String name = propertyElement.getAttributeValue("name");
+
+            String value = propertyElement.getAttributeValue("value");
+
+            UnstableValue unstableValue = new UnstableValue(name, ObjectUtil.NULL);
+            unstableValue.xmlValue = value;
+            myValues.put(name, unstableValue);
+        }
+    }
 }

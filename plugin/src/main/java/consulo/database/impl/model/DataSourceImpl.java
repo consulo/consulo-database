@@ -54,6 +54,7 @@ public class DataSourceImpl implements DataSource
 
 	public void copyFrom(EditableDataSourceImpl dataSource)
 	{
+		myId = dataSource.getId();
 		myName = dataSource.getName();
 		myProvider = dataSource.getProvider();
 		myApplicationAware = dataSource.isApplicationAware();

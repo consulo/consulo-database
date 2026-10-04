@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 consulo.io
+ * Copyright 2013-2026 consulo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,17 @@
  * limitations under the License.
  */
 
-package consulo.database.impl.editor.actions;
+package consulo.database.impl.driver;
 
-import consulo.platform.base.icon.PlatformIconGroup;
-import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.ex.action.AnActionEvent;
-import consulo.ui.ex.action.DumbAwareAction;
 import jakarta.annotation.Nonnull;
 
+import java.nio.file.Path;
+
 /**
+ * A complete install: its directory and its parsed info.json.
+ *
  * @author VISTALL
- * @since 09/12/2021
+ * @since 2026-10-04
  */
-public class PrevPageAction extends DumbAwareAction
-{
-	public PrevPageAction()
-	{
-		super(PlatformIconGroup.actionsBack());
-	}
-
-	@RequiredUIAccess
-	@Override
-	public void actionPerformed(@Nonnull AnActionEvent anActionEvent)
-	{
-
-	}
+record InstalledDriver(@Nonnull Path directory, @Nonnull DriverInfoJson info) {
 }

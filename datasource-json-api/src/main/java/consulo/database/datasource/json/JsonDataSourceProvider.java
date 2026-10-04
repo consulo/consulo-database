@@ -22,6 +22,5 @@ import consulo.database.datasource.provider.DataSourceProvider;
  * @author VISTALL
  * @since 2020-08-14
  */
-public interface JsonDataSourceProvider extends DataSourceProvider
-{
+public interface JsonDataSourceProvider extends DataSourceProvider {
 }

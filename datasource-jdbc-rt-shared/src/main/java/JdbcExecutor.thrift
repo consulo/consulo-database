@@ -1,10 +1,23 @@
 namespace * consulo.database.jdbc.rt.shared
 
+/**
+ * Every call fails with it. It carries the first SQLException of the cause chain, when there is one.
+ */
 exception FailError
 {
 	1: string message;
 
 	2: string trace;
+
+	/**
+	 * SQLException.getSQLState(), unset when there is no SQLException or the driver reports no state
+	 */
+	3: optional string sqlState;
+
+	/**
+	 * SQLException.getErrorCode(), unset when there is no SQLException
+	 */
+	4: optional i32 vendorCode;
 }
 
 struct JdbcTable
@@ -48,26 +61,144 @@ struct JdbcColum
 	8: i32 size;
 }
 
-struct JdbcQueryResult
+/**
+ * A column of a result set, read from ResultSetMetaData.
+ */
+struct JdbcColumnMeta
 {
-	1: list<string> columns;
+	/**
+	 * getColumnLabel(): the alias when the query gives one, otherwise the column name
+	 */
+	1: string label;
 
-	2: list<JdbcQueryRow> rows;
+	/**
+	 * getColumnName()
+	 */
+	2: string columnName;
+
+	/**
+	 * getColumnType(): a java.sql.Types constant
+	 */
+	3: i32 jdbcType;
+
+	/**
+	 * getColumnTypeName(): the database specific type name, for example int4, timestamptz or VARCHAR
+	 */
+	4: string typeName;
+
+	/**
+	 * getPrecision(), 0 when the driver does not know it
+	 */
+	5: i32 precision;
+
+	/**
+	 * getScale(), 0 when the driver does not know it
+	 */
+	6: i32 scale;
+
+	/**
+	 * isNullable(): ResultSetMetaData.columnNoNulls (0), columnNullable (1) or columnNullableUnknown (2)
+	 */
+	7: i32 nullable;
+
+	/**
+	 * getTableName(), unset when the column belongs to no table, for example an expression
+	 */
+	8: optional string tableName;
+
+	/**
+	 * getSchemaName(), unset when unknown
+	 */
+	9: optional string schemaName;
+
+	/**
+	 * getCatalogName(), unset when unknown
+	 */
+	10: optional string catalogName;
+
+	/**
+	 * isAutoIncrement()
+	 */
+	11: bool autoIncrement;
 }
 
-struct JdbcQueryRow
-{
-	1: list<JdbcValue> values;
-
-	2: i64 index;
-}
-
+/**
+ * The kind of a JdbcValue and the field that holds it. The field of the kind may be unset: that means SQL NULL too, like _null.
+ *
+ * Temporal values travel as ISO-8601 text in stringValue, written by the toString() of the java.time class and read back with
+ * its parse(). The text keeps the full precision (up to nanoseconds) and years outside 0000-9999 (+10000-01-01, -0001-01-01).
+ */
 enum JdbcValueType
 {
-	_int,
-	_string,
-	_bool,
-	_long
+	/**
+	 * intValue: TINYINT, SMALLINT, INTEGER
+	 */
+	_int = 0,
+
+	/**
+	 * stringValue: character types, CLOB, NCLOB, SQLXML, and a value which could not be read as its column type
+	 */
+	_string = 1,
+
+	/**
+	 * boolValue: BOOLEAN, BIT of precision 1
+	 */
+	_bool = 2,
+
+	/**
+	 * longValue: BIGINT
+	 */
+	_long = 3,
+
+	/**
+	 * SQL NULL, no field is set
+	 */
+	_null = 4,
+
+	/**
+	 * doubleValue: REAL, FLOAT, DOUBLE
+	 */
+	_double = 5,
+
+	/**
+	 * stringValue: BigDecimal.toPlainString() of NUMERIC, DECIMAL and unsigned BIGINT
+	 */
+	_decimal = 6,
+
+	/**
+	 * stringValue: LocalDate, for example 2024-02-29
+	 */
+	_date = 7,
+
+	/**
+	 * stringValue: LocalTime (10:15:30.123456), or OffsetTime (10:15:30+02:00) for TIME WITH TIME ZONE
+	 */
+	_time = 8,
+
+	/**
+	 * stringValue: LocalDateTime, for example 2024-02-29T10:15:30.123456
+	 */
+	_timestamp = 9,
+
+	/**
+	 * stringValue: OffsetDateTime, for example 2024-02-29T10:15:30.123456+02:00
+	 */
+	_timestamptz = 10,
+
+	/**
+	 * bytesValue: BINARY, VARBINARY, LONGVARBINARY, BLOB
+	 */
+	_bytes = 11,
+
+	/**
+	 * arrayValue: the elements of an ARRAY, each a JdbcValue of its own kind (an inner array is an _array value)
+	 */
+	_array = 12,
+
+	/**
+	 * stringValue: ResultSet.getString() of a value of any other type; className: the class of ResultSet.getObject()
+	 */
+	_other = 13
 }
 
 struct JdbcValue
@@ -81,6 +212,65 @@ struct JdbcValue
 	4: optional bool boolValue;
 
 	5: optional i64 longValue;
+
+	6: optional double doubleValue;
+
+	7: optional binary bytesValue;
+
+	8: optional list<JdbcValue> arrayValue;
+
+	/**
+	 * _other: the class name of the object the driver returned
+	 */
+	9: optional string className;
+}
+
+struct JdbcQueryRow
+{
+	1: list<JdbcValue> values;
+
+	/**
+	 * The index of the row in the whole result, counting from 0 (the skipped offset rows included)
+	 */
+	2: i64 index;
+}
+
+struct JdbcResultSet
+{
+	1: list<JdbcColumnMeta> columns;
+
+	2: list<JdbcQueryRow> rows;
+
+	/**
+	 * More rows follow the returned ones: the query must run again with a bigger offset to get them
+	 */
+	3: bool hasMore;
+}
+
+/**
+ * One result of Statement.execute(): either a result set or the update count of a statement which returned no rows.
+ */
+struct JdbcStatementResult
+{
+	1: optional JdbcResultSet resultSet;
+
+	/**
+	 * Statement.getUpdateCount(), set when resultSet is not set
+	 */
+	2: optional i64 updateCount;
+}
+
+struct JdbcExecutionResult
+{
+	/**
+	 * In the order the statement returned them
+	 */
+	1: list<JdbcStatementResult> results;
+
+	/**
+	 * The messages of the SQLWarning chains of the connection, the statement and the result sets
+	 */
+	2: list<string> warnings;
 }
 
 service JdbcExecutor
@@ -93,8 +283,17 @@ service JdbcExecutor
 
 	list<JdbcTable> listTables(1: string databaseName) throws (1: FailError fr);
 
-	JdbcQueryResult runQuery(1: string query, 2: list<JdbcValue> params) throws (1: FailError fr);
+	/**
+	 * Runs any SQL (a query, DML or DDL) with Statement.execute() and collects every result with getMoreResults().
+	 * The statement and its result sets are closed before it returns.
+	 *
+	 * @param params the values of the ? placeholders, in order. When empty, the query runs as a plain Statement, so a ? in
+	 *               it is not a placeholder; otherwise as a PreparedStatement
+	 * @param maxRows how many rows each result set returns at most, 0 or less for all of them. The statement gets
+	 *                setMaxRows(offset + maxRows + 1), the extra row only sets JdbcResultSet.hasMore
+	 * @param offset how many leading rows of each result set are skipped, 0 or less for none
+	 */
+	JdbcExecutionResult execute(1: string query, 2: list<JdbcValue> params, 3: i32 maxRows, 4: i32 offset) throws (1: FailError fr);
 
 	void setDatabase(1: string dbName) throws (1: FailError fr);
 }
-

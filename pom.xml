@@ -48,6 +48,8 @@
         <module>datasource-json-api</module>
         <module>datasource-jdbc-rt</module>
         <module>datasource-jdbc-rt-shared</module>
+        <module>datasource-mongo-rt-shared</module>
+        <module>datasource-mongo-rt</module>
         <module>impl/mysql-jdbc-impl</module>
         <module>impl/mariadb-jdbc-impl</module>
         <module>impl/postgresql-jdbc-impl</module>

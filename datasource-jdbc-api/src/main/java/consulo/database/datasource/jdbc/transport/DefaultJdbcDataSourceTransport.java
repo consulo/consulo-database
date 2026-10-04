@@ -19,40 +19,29 @@ package consulo.database.datasource.jdbc.transport;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.application.progress.ProgressIndicator;
 import consulo.component.ProcessCanceledException;
-import consulo.database.datasource.configurable.GenericPropertyKey;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
 import consulo.database.datasource.jdbc.provider.impl.*;
-import consulo.database.datasource.jdbc.transport.columnInfo.BaseColumnInfo;
-import consulo.database.datasource.jdbc.transport.columnInfo.IndexColumnInfo;
-import consulo.database.datasource.jdbc.transport.columnInfo.IntColumnInfo;
-import consulo.database.datasource.jdbc.transport.columnInfo.StringColumnInfo;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransport;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.datasource.transport.DataSourceTransportResult;
-import consulo.database.datasource.ui.TableViewWithHScrolling;
-import consulo.database.jdbc.rt.shared.*;
-import consulo.disposer.Disposable;
+import consulo.database.jdbc.rt.shared.JdbcColum;
+import consulo.database.jdbc.rt.shared.JdbcExecutionResult;
+import consulo.database.jdbc.rt.shared.JdbcExecutor;
+import consulo.database.jdbc.rt.shared.JdbcTable;
+import consulo.database.jdbc.rt.shared.JdbcTablePrimaryKey;
 import consulo.logging.Logger;
 import consulo.project.Project;
-import consulo.ui.ex.awt.ColumnInfo;
-import consulo.ui.ex.awt.JBUI;
-import consulo.ui.ex.awt.ScrollPaneFactory;
-import consulo.ui.ex.awt.UIUtil;
-import consulo.ui.ex.awt.table.ListTableModel;
 import consulo.util.concurrent.AsyncResult;
 import consulo.util.lang.StringUtil;
 import consulo.util.lang.function.ThrowableConsumer;
 import jakarta.annotation.Nonnull;
+import org.apache.thrift.TException;
+import org.jspecify.annotations.Nullable;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -62,6 +51,11 @@ import java.util.List;
 @ExtensionImpl(id = "default", order = "before fake")
 public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcState> {
     private static final Logger LOG = Logger.getInstance(DefaultJdbcDataSourceTransport.class);
+
+    /**
+     * How many rows of a table {@link #fetchData} fetches
+     */
+    public static final int PAGE_SIZE = 500;
 
     @Override
     public boolean accept(@Nonnull DataSource dataSource) {
@@ -133,140 +127,205 @@ public class DefaultJdbcDataSourceTransport implements DataSourceTransport<JdbcS
                           @Nonnull String childId,
                           @Nonnull AsyncResult<DataSourceTransportResult> result) {
         safeCall(indicator, dataSource, result, session ->
-        {
-            session.execute(client -> {
-                client.setDatabase(databaseName);
-                return null;
-            });
-
-            String countQuery = "SELECT COUNT(*) FROM " + childId;
-
-            JdbcQueryResult jdbcQueryResult = session.execute(client -> client.runQuery(countQuery, Collections.emptyList()));
-
-            List<JdbcQueryRow> rows = jdbcQueryResult.getRows();
-
-            JdbcQueryRow row = rows.get(0);
-
-            Number value = (Number) getValue(row, 0);
-
-            long rowsCount = value.longValue();
-
-            // TODO pagging
-            String query = "SELECT * FROM " + childId;
-
-            JdbcQueryResult queryResult = session.execute(client -> client.runQuery(query, Collections.emptyList()));
-
-            result.setDone(new JdbcQueryResultWrapper(queryResult, rowsCount));
-        });
+            result.setDone(fetchTablePage(session, project, dataSource, databaseName, childId, 0, PAGE_SIZE).result()));
     }
 
-    public static JComponent buildResultUI(JdbcQueryResult queryResult, Project project, DataSource dataSource, String dbName, String childId, Disposable parent) {
+    /**
+     * Fetches a page of the rows of a table, together with the count of all its rows, in one session. The rows are ordered by the
+     * primary key, when the cached state of the data source knows it, so that the pages do not overlap. Blocks the calling thread,
+     * which must not be the UI thread.
+     *
+     * @param childId  {@link JdbcTableState#getNameWithScheme()}
+     * @param offset   the index of the first row, counting from 0; less than 0 counts from the end, so {@code -pageSize} gives the
+     *                 last page. An offset past the last row - rows deleted meanwhile - gives the last page
+     * @param pageSize the maximum count of rows; less than 1 fetches every row from the offset on
+     */
+    public static JdbcTablePage fetchTablePage(ProgressIndicator indicator,
+                                               Project project,
+                                               DataSource dataSource,
+                                               String databaseName,
+                                               String childId,
+                                               int offset,
+                                               int pageSize) throws Exception {
+        try (JdbcSession session = new JdbcSession(indicator, dataSource)) {
+            return fetchTablePage(session, project, dataSource, databaseName, childId, offset, pageSize);
+        }
+    }
+
+    private static JdbcTablePage fetchTablePage(JdbcSession session,
+                                                Project project,
+                                                DataSource dataSource,
+                                                String databaseName,
+                                                String childId,
+                                                int offset,
+                                                int pageSize) throws TException {
+        session.execute(client -> {
+            client.setDatabase(databaseName);
+            return null;
+        });
+
+        String quote = getIdentifierQuoteString(dataSource);
+        JdbcTableState tableState = findTableState(project, dataSource, databaseName, childId);
+        String tableReference = buildTableReference(tableState, childId, quote);
+
+        String countQuery = "SELECT COUNT(*) FROM " + tableReference;
+
+        JdbcExecutionResult countResult = session.execute(client -> client.execute(countQuery, List.of(), 1, 0));
+
+        long rowsCount = readCount(new JdbcQueryResultWrapper(countResult));
+
+        int maxRows = Math.max(pageSize, 0);
+        long requestedStart = offset < 0 ? rowsCount + offset : offset;
+        long start;
+        if (requestedStart >= rowsCount) {
+            // past the end, as rows were deleted meanwhile - the last page instead
+            start = maxRows > 0 ? Math.max(0, rowsCount - maxRows) : 0;
+        }
+        else {
+            start = Math.max(0, requestedStart);
+        }
+        int startRow = (int) Math.min(start, Integer.MAX_VALUE);
+
+        String query = "SELECT * FROM " + tableReference + buildOrderBy(tableState, quote);
+
+        JdbcExecutionResult queryResult = session.execute(client -> client.execute(query, List.of(), maxRows, startRow));
+
+        return new JdbcTablePage(new JdbcQueryResultWrapper(queryResult, rowsCount, null), startRow);
+    }
+
+    private static long readCount(JdbcQueryResultWrapper countResult) {
+        List<JdbcResultRow> rows = countResult.getRows();
+        if (rows.isEmpty() || countResult.getColumns().isEmpty()) {
+            return 0;
+        }
+
+        Object value = rows.get(0).getValue(0);
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+
+        if (value instanceof String text) {
+            try {
+                return Long.parseLong(text.trim());
+            }
+            catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Builds quoted table reference for {@code childId}, which is {@link JdbcTableState#getNameWithScheme()}
+     * ({@code scheme.name} or {@code name}).
+     * Each part quoted separately, since table and scheme names can contain dots, spaces, quotes or be in mixed case
+     */
+    private static String buildTableReference(@Nullable JdbcTableState tableState, String childId, String quote) {
+        if (tableState != null && tableState.getName() != null) {
+            String scheme = tableState.getScheme();
+            if (StringUtil.isEmpty(scheme)) {
+                return quoteIdentifier(tableState.getName(), quote);
+            }
+            return quoteIdentifier(scheme, quote) + "." + quoteIdentifier(tableState.getName(), quote);
+        }
+
+        // no cached table state - split name like JdbcTableState#getNameWithScheme() joined it
+        int dotIndex = childId.indexOf('.');
+        if (dotIndex > 0 && dotIndex < childId.length() - 1) {
+            return quoteIdentifier(childId.substring(0, dotIndex), quote) + "." + quoteIdentifier(childId.substring(dotIndex + 1), quote);
+        }
+        return quoteIdentifier(childId, quote);
+    }
+
+    /**
+     * @return {@code " ORDER BY "} and the quoted primary key columns in key order, or an empty string when the primary key is
+     * unknown - the rows then come in the order the database gives, which may differ between two pages
+     */
+    private static String buildOrderBy(@Nullable JdbcTableState tableState, String quote) {
+        if (tableState == null) {
+            return "";
+        }
+
+        List<JdbcPrimaryKeyState> primaryKeys = new ArrayList<>();
+        for (JdbcPrimaryKeyState primaryKey : tableState.getPrimaryKeys()) {
+            if (!StringUtil.isEmpty(primaryKey.getColumnName())) {
+                primaryKeys.add(primaryKey);
+            }
+        }
+
+        if (primaryKeys.isEmpty()) {
+            return "";
+        }
+
+        primaryKeys.sort(Comparator.comparingInt(JdbcPrimaryKeyState::getKeySeq));
+
+        StringBuilder builder = new StringBuilder(" ORDER BY ");
+        for (int i = 0; i < primaryKeys.size(); i++) {
+            if (i > 0) {
+                builder.append(", ");
+            }
+            builder.append(quoteIdentifier(primaryKeys.get(i).getColumnName(), quote));
+        }
+        return builder.toString();
+    }
+
+    /**
+     * {@link java.sql.DatabaseMetaData#getIdentifierQuoteString()} is not reachable via rt protocol, use known dialects
+     */
+    private static String getIdentifierQuoteString(DataSource dataSource) {
+        switch (dataSource.getProvider().getId()) {
+            case "mysql":
+            case "mariadb":
+                // backtick works with and without ANSI_QUOTES sql mode
+                return "`";
+            default:
+                // SQL standard (PostgreSQL etc.)
+                return "\"";
+        }
+    }
+
+    private static String quoteIdentifier(String identifier, String quote) {
+        return quote + identifier.replace(quote, quote + quote) + quote;
+    }
+
+    private static @Nullable JdbcTableState findTableState(Project project,
+                                                           DataSource dataSource,
+                                                           @Nullable String dbName,
+                                                           @Nullable String childId) {
+        if (dbName == null || childId == null) {
+            return null;
+        }
+
         JdbcState dataState = DataSourceTransportManager.getInstance(project).getDataState(dataSource);
-        JdbcTableState tableState = null;
-
-        if (dbName != null) {
-            JdbcDatabaseState databaseState = dataState == null ? null : dataState.getDatabases().get(dbName);
-            if (databaseState != null && childId != null) {
-                tableState = databaseState.getTablesState().findTable(childId);
-            }
+        JdbcDatabaseState databaseState = dataState == null ? null : dataState.getDatabases().get(dbName);
+        if (databaseState == null) {
+            return null;
         }
-
-        List<ColumnInfo<JdbcQueryRow, ?>> list = new ArrayList<>();
-        list.add(new IndexColumnInfo(queryResult));
-
-        int o = 0;
-        for (String col : queryResult.getColumns()) {
-            final int index = o++;
-
-            String max = col;
-            for (JdbcQueryRow row : queryResult.getRows()) {
-                String item = String.valueOf(getValue(row, index));
-
-                if (max == null || item.length() > max.length()) {
-                    max = item;
-                }
-            }
-
-            list.add(createColumn(index, col, max, tableState, parent));
-        }
-
-        ListTableModel<JdbcQueryRow> tableModel = new ListTableModel<>(list.toArray(ColumnInfo[]::new), queryResult.getRows());
-        TableViewWithHScrolling<JdbcQueryRow> tableView = new TableViewWithHScrolling<>(tableModel) {
-            @Nonnull
-            @Override
-            protected JTableHeader createDefaultTableHeader() {
-                JTableHeader header = super.createDefaultTableHeader();
-                header.setFont(BaseColumnInfo.getFont());
-                return header;
-            }
-        };
-
-        for (int i = 0; i < list.size(); i++) {
-            ColumnInfo<JdbcQueryRow, ?> columnInfo = list.get(i);
-
-            TableColumn column = tableView.getColumnModel().getColumn(i);
-
-            DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-            renderer.setIcon(columnInfo.getIcon());
-            renderer.setBackground(UIUtil.getPanelBackground());
-            renderer.setFont(BaseColumnInfo.getFont());
-
-            column.setHeaderRenderer(renderer);
-        }
-        tableView.setHorizontalScrollEnabled(true);
-        tableView.setRowHeight(JBUI.scale(20));
-        tableView.setFont(BaseColumnInfo.getFont());
-
-        return ScrollPaneFactory.createScrollPane(tableView, true);
+        return databaseState.getTablesState().findTable(childId);
     }
 
     @Override
     public void runQuery(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull String query, @Nonnull AsyncResult<DataSourceTransportResult> result) {
-        safeCall(indicator, dataSource, result, session ->
-        {
-            try {
-                JdbcQueryResult execute = session.execute(client -> client.runQuery(query, List.of()));
-                result.setDone(new JdbcQueryResultWrapper(execute, execute.getRowsSize()));
-            }
-            catch (TypeNotPresentException e) {
-                result.rejectWithThrowable(e);
-            }
-        });
+        safeCall(indicator, dataSource, result, session -> result.setDone(executeQuery(session, query)));
     }
 
-    private static BaseColumnInfo<?> createColumn(int index, String name, String preferedSize, JdbcTableState tableState, Disposable parent) {
-        if (tableState != null) {
-            JdbcTableColumState column = tableState.findColumn(name);
-            if (column != null) {
-                switch (column.getJdbcType()) {
-                    case Types.INTEGER:
-                    case Types.SMALLINT:
-                    case Types.TINYINT:
-                        return new IntColumnInfo(index, name, preferedSize, parent);
-                }
-            }
+    /**
+     * Runs any statements - queries, DML or DDL - and fetches every row of their result sets. Blocks the calling thread, which must
+     * not be the UI thread.
+     *
+     * @return the result, which can run the statements again ({@link JdbcQueryResultWrapper#getQuery()})
+     */
+    public static JdbcQueryResultWrapper executeQuery(ProgressIndicator indicator, DataSource dataSource, String query) throws Exception {
+        try (JdbcSession session = new JdbcSession(indicator, dataSource)) {
+            return executeQuery(session, query);
         }
-        return new StringColumnInfo(index, name, preferedSize, parent);
     }
 
-    public static Object getValue(@Nonnull JdbcQueryRow row, int index) {
-        List<JdbcValue> values = row.getValues();
+    private static JdbcQueryResultWrapper executeQuery(JdbcSession session, String query) throws TException {
+        // all rows of a query are fetched, as the result of a query is shown as one page
+        JdbcExecutionResult executionResult = session.execute(client -> client.execute(query, List.of(), 0, 0));
 
-        JdbcValue value = values.get(index);
-
-        JdbcValueType type = value.getType();
-        switch (type) {
-            case _int:
-                return value.getIntValue();
-            case _string:
-                return value.getStringValue();
-            case _bool:
-                return value.isBoolValue();
-            case _long:
-                return value.getLongValue();
-            default:
-                throw new UnsupportedOperationException(type.name());
-        }
+        return new JdbcQueryResultWrapper(executionResult, -1, query);
     }
 
     @Nonnull

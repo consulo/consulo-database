@@ -19,46 +19,48 @@ package consulo.database.datasource.transport;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.application.progress.ProgressIndicator;
 import consulo.database.datasource.model.DataSource;
+import consulo.localize.LocalizeValue;
 import consulo.project.Project;
 import consulo.util.concurrent.AsyncResult;
-
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NullMarked;
 
 /**
+ * Fallback transport for data sources whose provider has no transport. Every operation is rejected.
+ *
  * @author VISTALL
  * @since 2020-08-16
  */
+@NullMarked
 @ExtensionImpl(id = "fake", order = "last")
-public class FakeDataSourceTransport implements DataSourceTransport<FakeResult>
-{
-	@Override
-	public boolean accept(@Nonnull DataSource dataSource)
-	{
-		return true;
-	}
+public class FakeDataSourceTransport implements DataSourceTransport<FakeResult> {
+    @Override
+    public boolean accept(DataSource dataSource) {
+        return true;
+    }
 
-	@Override
-	public void testConnection(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<Void> result)
-	{
-		result.setDone();
-	}
+    @Override
+    public void testConnection(ProgressIndicator indicator, Project project, DataSource dataSource, AsyncResult<Void> result) {
+        // rejectWithThrowable, not reject(String): only a throwable reaches doWhenRejectedWithThrowable listeners
+        result.rejectWithThrowable(noTransportError(dataSource));
+    }
 
-	@Override
-	public void loadInitialData(@Nonnull ProgressIndicator indicator, @Nonnull Project project, @Nonnull DataSource dataSource, @Nonnull AsyncResult<FakeResult> result)
-	{
-		result.rejectWithThrowable(new UnsupportedOperationException());
-	}
+    @Override
+    public void loadInitialData(ProgressIndicator indicator, Project project, DataSource dataSource, AsyncResult<FakeResult> result) {
+        result.rejectWithThrowable(noTransportError(dataSource));
+    }
 
-	@Nonnull
-	@Override
-	public Class<FakeResult> getStateClass()
-	{
-		return FakeResult.class;
-	}
+    @Override
+    public Class<FakeResult> getStateClass() {
+        return FakeResult.class;
+    }
 
-	@Override
-	public int getStateVersion()
-	{
-		return 1;
-	}
+    @Override
+    public int getStateVersion() {
+        return 1;
+    }
+
+    private static UnsupportedOperationException noTransportError(DataSource dataSource) {
+        LocalizeValue message = LocalizeValue.localizeTODO("No transport for " + dataSource.getProvider().getName().get());
+        return new UnsupportedOperationException(message.get());
+    }
 }

@@ -80,6 +80,6 @@ public class AddDataSourcePopupAction extends DumbAwareAction
 	{
 		ListPopup popup = JBPopupFactory.getInstance().createListPopup(new StepImpl());
 
-		popup.showUnderneathOf(e.getInputEvent().getComponent());
+		popup.showUnderneathOf(e);
 	}
 }

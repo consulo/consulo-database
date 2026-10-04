@@ -72,10 +72,19 @@ public class DatabaseSourcesDialogDescriptor extends DialogDescriptor {
     }
 
     @Override
+    @RequiredUIAccess
     public void onHandleValue(AnAction action, DialogValue value) {
         super.onHandleValue(action, value);
 
         if (value == DialogValue.OK_VALUE) {
+            // the selected data source is applied only when another one is selected - its pending changes go with the commit
+            if (mySelectedConfigurable != null) {
+                try {
+                    mySelectedConfigurable.apply();
+                }
+                catch (ConfigurationException ignored) {
+                }
+            }
             myEditableDataSourceModel.commit();
         }
         else {

@@ -60,6 +60,10 @@
                                 <artifact>${project.groupId}:consulo.database-datasource.jdbc.rt:${project.version}</artifact>
                                 <path>rt/consulo.database-datasource.jdbc.rt.jar</path>
                             </copy>
+                            <copy>
+                                <artifact>${project.groupId}:consulo.database-datasource.mongo.rt:${project.version}</artifact>
+                                <path>rt/consulo.database-datasource.mongo.rt.jar</path>
+                            </copy>
                         </copies>
                     </packaging>
                 </configuration>
@@ -235,12 +239,6 @@
         </dependency>
         <dependency>
             <groupId>consulo</groupId>
-            <artifactId>consulo-ui-ex-awt-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>consulo</groupId>
             <artifactId>consulo-util-collection</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -321,6 +319,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>consulo.database-mysql.jdbc.impl</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>consulo.database-datasource.jdbc.rt</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -328,6 +332,19 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>consulo.database-datasource.jdbc.rt.shared</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- the MongoDB runtime jar is copied to rt/ (see copies); the driver jars are downloaded at runtime, never packaged -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>consulo.database-datasource.mongo.rt</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>consulo.database-datasource.mongo.rt.shared</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>

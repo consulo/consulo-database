@@ -22,7 +22,7 @@ import consulo.database.datasource.provider.DataSourceProvider;
 import consulo.util.lang.StringUtil;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author VISTALL
@@ -51,7 +51,12 @@ public abstract class JdbcDataSourceProvider implements DataSourceProvider {
         return builder.toString();
     }
 
-    public abstract void fillDrivers(Map<String, String> map);
+    /**
+     * Every JDBC provider names its drivers. The description of every id must start {@code java-rt} with agent {@code jdbc}: the JDBC
+     * runtime module finds the driver through the {@code java.sql.Driver} service of the driver files.
+     */
+    @Override
+    public abstract List<String> getDriverIds();
 
     public boolean isTableType(@Nullable String type) {
         return "TABLE".equals(type);

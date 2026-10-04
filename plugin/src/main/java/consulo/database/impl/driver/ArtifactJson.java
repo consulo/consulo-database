@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 consulo.io
+ * Copyright 2013-2026 consulo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,22 @@
  * limitations under the License.
  */
 
-package consulo.database.impl.editor.actions;
+package consulo.database.impl.driver;
 
-import consulo.platform.base.icon.PlatformIconGroup;
-import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.ex.action.AnActionEvent;
-import consulo.ui.ex.action.DumbAwareAction;
-import jakarta.annotation.Nonnull;
+import com.dslplatform.json.CompiledJson;
+import jakarta.annotation.Nullable;
 
 /**
+ * One file of a driver: its name in the install directory, the URL it is downloaded from and its SHA-256 in lower-case hex.
+ *
  * @author VISTALL
- * @since 09/12/2021
+ * @since 2026-10-04
  */
-public class NextPageAction extends DumbAwareAction
-{
-	public NextPageAction()
-	{
-		super(PlatformIconGroup.actionsForward());
-	}
+@CompiledJson
+public class ArtifactJson {
+    public @Nullable String fileName;
 
-	@RequiredUIAccess
-	@Override
-	public void actionPerformed(@Nonnull AnActionEvent anActionEvent)
-	{
+    public @Nullable String url;
 
-	}
+    public @Nullable String sha256;
 }

@@ -19,13 +19,14 @@ package consulo.database.datasource.jdbc.ui.tree;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
 import consulo.database.datasource.model.DataSource;
+import consulo.database.datasource.ui.DataSourceOpenableNode;
 import consulo.database.icon.DatabaseIconGroup;
 import consulo.project.Project;
 import consulo.project.ui.view.tree.AbstractTreeNode;
 import consulo.ui.ex.SimpleTextAttributes;
 import consulo.ui.ex.tree.PresentationData;
+import org.jspecify.annotations.NullMarked;
 
-import jakarta.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -33,61 +34,56 @@ import java.util.Collection;
  * @author VISTALL
  * @since 2020-08-18
  */
-public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState>
-{
-	@Nonnull
-	private final DataSource myDataSource;
-	private final String myDbName;
+@NullMarked
+public class DatabaseJdbcTableNode extends AbstractTreeNode<JdbcTableState> implements DataSourceOpenableNode {
+    private final DataSource myDataSource;
+    private final String myDbName;
 
-	public DatabaseJdbcTableNode(Project project, @Nonnull DataSource dataSource, String dbName, @Nonnull JdbcTableState value)
-	{
-		super(project, value);
-		myDataSource = dataSource;
-		myDbName = dbName;
-	}
+    public DatabaseJdbcTableNode(Project project, DataSource dataSource, String dbName, JdbcTableState value) {
+        super(project, value);
+        myDataSource = dataSource;
+        myDbName = dbName;
+    }
 
-	@Nonnull
-	public DataSource getDataSource()
-	{
-		return myDataSource;
-	}
+    @Override
+    public DataSource getDataSource() {
+        return myDataSource;
+    }
 
-	@Nonnull
-	public String getDatabaseName()
-	{
-		return myDbName;
-	}
+    @Override
+    public String getDatabaseName() {
+        return myDbName;
+    }
 
-	@RequiredReadAction
-	@Nonnull
-	@Override
-	public Collection<? extends AbstractTreeNode> getChildren()
-	{
-		return Arrays.asList(new DatabaseJdbcColumnsNode(myProject, getValue()));
-	}
+    @Override
+    public String getChildId() {
+        return getValue().getNameWithScheme();
+    }
 
-	@Override
-	protected void update(PresentationData data)
-	{
-		data.setIcon(DatabaseIconGroup.nodesTable());
+    @RequiredReadAction
+    @Override
+    public Collection<? extends AbstractTreeNode> getChildren() {
+        return Arrays.asList(new DatabaseJdbcColumnsNode(myProject, getValue()));
+    }
 
-		String scheme = getValue().getScheme();
-		if(scheme != null)
-		{
-			data.addText(scheme + ".", SimpleTextAttributes.GRAYED_ATTRIBUTES);
-		}
-		data.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-	}
+    @Override
+    protected void update(PresentationData data) {
+        data.setIcon(DatabaseIconGroup.nodesTable());
 
-	@Override
-	public boolean expandOnDoubleClick()
-	{
-		return false;
-	}
+        String scheme = getValue().getScheme();
+        if (scheme != null) {
+            data.addText(scheme + ".", SimpleTextAttributes.GRAYED_ATTRIBUTES);
+        }
+        data.addText(getValue().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+    }
 
-	@Override
-	public String toString()
-	{
-		return myDbName + ":" + getValue().getName();
-	}
+    @Override
+    public boolean expandOnDoubleClick() {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return myDbName + ":" + getValue().getName();
+    }
 }

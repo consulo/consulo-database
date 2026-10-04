@@ -31,4 +31,15 @@ public interface GenericPropertyKeys
 	GenericPropertyKey<SecureString> PASSWORD = GenericPropertyKey.create("password", SecureString.class, SecureString.EMPTY);
 
 	GenericPropertyKey<String> DATABASE_NAME = GenericPropertyKey.create("database-name", String.class);
+
+	/**
+	 * The selected driver id, one of {@link consulo.database.datasource.provider.DataSourceProvider#getDriverIds()}; unset means the
+	 * preferred driver - the first id.
+	 */
+	GenericPropertyKey<String> DRIVER = GenericPropertyKey.create("driver", String.class);
+
+	/**
+	 * The selected version of the driver; unset means the latest version - the first one its description lists.
+	 */
+	GenericPropertyKey<String> DRIVER_VERSION = GenericPropertyKey.create("driver-version", String.class);
 }

@@ -19,7 +19,7 @@ package consulo.database.datasource.jdbc.configurable;
 import consulo.configurable.SimpleConfigurableByProperties;
 import consulo.database.datasource.configurable.EditablePropertiesHolder;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
-import consulo.database.datasource.configurable.SecureString;
+import consulo.database.datasource.configurable.SecureStringProperty;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.disposer.Disposable;
 import consulo.localize.LocalizeValue;
@@ -69,10 +69,7 @@ public class JdbcConfigurable extends SimpleConfigurableByProperties {
 
         PasswordBox passwordBox = PasswordBox.create();
         builder.addLabeled(LocalizeValue.localizeTODO("Password"), passwordBox);
-        propertyBuilder.add(passwordBox, () -> propertiesHolder.get(GenericPropertyKeys.PASSWORD).getValue(myDataSource), it ->
-        {
-            propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.raw(it));
-        });
+        SecureStringProperty.bind(propertyBuilder, passwordBox, propertiesHolder, GenericPropertyKeys.PASSWORD, myDataSource);
 
         TextBox databaseNameBox = TextBox.create();
         builder.addLabeled(LocalizeValue.localizeTODO("Database Name"), databaseNameBox);

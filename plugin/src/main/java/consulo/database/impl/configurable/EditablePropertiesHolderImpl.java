@@ -22,15 +22,25 @@ import consulo.database.datasource.configurable.GenericPropertyKey;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
+import java.util.UUID;
+import java.util.function.Supplier;
+
 /**
  * @author VISTALL
  * @since 2020-08-16
  */
 public class EditablePropertiesHolderImpl extends PropertiesHolderImpl implements EditablePropertiesHolder
 {
-	public EditablePropertiesHolderImpl(@Nonnull String name)
+	private final Supplier<UUID> myOwnerId;
+
+	/**
+	 * @param ownerId the id of the data source which owns the properties - a secure value is kept in the password safe under a key of
+	 *                that data source, so data sources never share a password
+	 */
+	public EditablePropertiesHolderImpl(@Nonnull String name, @Nonnull Supplier<UUID> ownerId)
 	{
 		super(name);
+		myOwnerId = ownerId;
 	}
 
 	@Override
@@ -42,7 +52,7 @@ public class EditablePropertiesHolderImpl extends PropertiesHolderImpl implement
 		}
 		else
 		{
-			myValues.put(key.toString(), new UnstableValue(key.toString(), value));
+			myValues.put(key.toString(), new UnstableValue(key + "@" + myOwnerId.get(), value));
 		}
 	}
 }

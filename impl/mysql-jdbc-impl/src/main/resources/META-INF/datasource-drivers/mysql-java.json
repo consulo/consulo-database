@@ -1,0 +1,29 @@
+{
+  "name": "MySQL Connector/J",
+  "start": {
+    "kind": "java-rt",
+    "agent": "jdbc"
+  },
+  "drivers": [
+    {
+      "version": "26.7.0",
+      "artifacts": [
+        {
+          "fileName": "mysql-connector-j-26.7.0.jar",
+          "url": "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/26.7.0/mysql-connector-j-26.7.0.jar",
+          "sha256": "69084713593a4aa8d07c383619b9639276f08bccf8faf1c562178147d389b1e1"
+        }
+      ]
+    },
+    {
+      "version": "8.0.21",
+      "artifacts": [
+        {
+          "fileName": "mysql-connector-java-8.0.21.jar",
+          "url": "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar",
+          "sha256": "2f62d886270a75ebc8e8fd89127d4a30ccc711f02256ade2cfb7090817132003"
+        }
+      ]
+    }
+  ]
+}

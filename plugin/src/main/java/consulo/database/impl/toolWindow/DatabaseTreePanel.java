@@ -20,11 +20,10 @@ import consulo.component.messagebus.MessageBusConnection;
 import consulo.dataContext.DataSink;
 import consulo.dataContext.UiDataProvider;
 import consulo.database.datasource.editor.DataSourceEditorManager;
-import consulo.database.datasource.jdbc.provider.impl.JdbcTableState;
-import consulo.database.datasource.jdbc.ui.tree.DatabaseJdbcTableNode;
 import consulo.database.datasource.model.DataSourceListener;
 import consulo.database.datasource.transport.DataSourceTransportListener;
 import consulo.database.datasource.ui.DataSourceKeys;
+import consulo.database.datasource.ui.DataSourceOpenableNode;
 import consulo.database.impl.DataSourceWorkspaceManager;
 import consulo.database.impl.toolWindow.node.DatabaseSourceNode;
 import consulo.disposer.Disposable;
@@ -59,13 +58,13 @@ public class DatabaseTreePanel implements Disposable, UiDataProvider {
         myTree.addDoubleClickListener(e -> {
             TreeNode<Object> node = e.getValue();
 
-            Object nodeValue = node.getValue();
-
-            if (nodeValue instanceof DatabaseJdbcTableNode) {
-                DatabaseJdbcTableNode jdbcTableNode = (DatabaseJdbcTableNode) nodeValue;
-                JdbcTableState value = jdbcTableNode.getValue();
-                String fullName = value.getNameWithScheme();
-                DataSourceEditorManager.getInstance(project).openEditor(jdbcTableNode.getDataSource(), jdbcTableNode.getDatabaseName(), fullName);
+            // any node which has an editor - a jdbc table, a mongo collection and so on
+            if (node.getValue() instanceof DataSourceOpenableNode openableNode) {
+                DataSourceEditorManager.getInstance(project).openEditor(
+                    openableNode.getDataSource(),
+                    openableNode.getDatabaseName(),
+                    openableNode.getChildId()
+                );
             }
         });
 

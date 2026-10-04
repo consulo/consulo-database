@@ -105,12 +105,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>consulo</groupId>
-			<artifactId>consulo-ui-ex-awt-api</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>consulo.database-datasource.api</artifactId>
 			<version>${project.version}</version>

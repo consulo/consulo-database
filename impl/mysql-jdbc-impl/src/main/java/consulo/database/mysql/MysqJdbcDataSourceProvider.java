@@ -33,7 +33,7 @@ import consulo.ui.image.Image;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author VISTALL
@@ -78,8 +78,14 @@ public class MysqJdbcDataSourceProvider extends JdbcDataSourceProvider {
         propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
     }
 
+    @Nonnull
     @Override
-    public void fillDrivers(Map<String, String> map) {
-        map.put("mysql-connector-java-8.0.21.jar", "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar");
+    public List<String> getDriverIds() {
+        return List.of("mysql-java");
+    }
+
+    @Override
+    public boolean isTableType(@Nullable String type) {
+        return super.isTableType(type) || "SYSTEM TABLE".equals(type);
     }
 }

@@ -40,7 +40,7 @@ public class EditableDataSourceImpl extends DataSourceImpl implements EditableDa
 		myProvider = original.getProvider();
 		myApplicationAware = original.isApplicationAware();
 
-		myPropertiesHolder = new EditablePropertiesHolderImpl(CONTAINER_NAME);
+		myPropertiesHolder = new EditablePropertiesHolderImpl(CONTAINER_NAME, this::getId);
 		myPropertiesHolder.copyFrom(original.myPropertiesHolder);
 	}
 
@@ -48,7 +48,7 @@ public class EditableDataSourceImpl extends DataSourceImpl implements EditableDa
 	{
 		myName = name;
 		myProvider = provider;
-		myPropertiesHolder = new EditablePropertiesHolderImpl(CONTAINER_NAME);
+		myPropertiesHolder = new EditablePropertiesHolderImpl(CONTAINER_NAME, this::getId);
 	}
 
 	@Nonnull

@@ -21,7 +21,13 @@ import org.apache.thrift.TException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +38,10 @@ import java.util.Properties;
  * @since 2020-08-16
  */
 public class JdbcExecutorImpl implements JdbcExecutor.Iface {
+    // guards against a driver which never ends its results or links its warnings into a cycle
+    private static final int MAX_STATEMENT_RESULTS = 10_000;
+    private static final int MAX_WARNINGS = 1_000;
+
     private Connection myConnection;
     private String myUrl;
     private Properties myProperties;
@@ -40,7 +50,12 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
     public void connect(String url, Map<String, String> params) throws FailError, TException {
         myUrl = url;
         myProperties = new Properties();
-        myProperties.putAll(params);
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            // properties can not hold null - a key without value is not passed to the driver at all
+            if (entry.getValue() != null) {
+                myProperties.setProperty(entry.getKey(), entry.getValue());
+            }
+        }
 
         try {
             myConnection = DriverManager.getConnection(myUrl, myProperties);
@@ -48,7 +63,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
         catch (Throwable e) {
             e.printStackTrace();
 
-            throw new FailError(e.getMessage(), getStackTrace(e));
+            throw createFailError(e);
         }
     }
 
@@ -88,7 +103,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
                 List<JdbcTable> list = new ArrayList<>();
 
                 DatabaseMetaData md = useConn.getMetaData();
-                ResultSet rs = md.getTables(null, null, "%", null);
+                ResultSet rs = md.getTables(databaseName, null, "%", null);
                 while (rs.next()) {
                     String tableSchem = rs.getString("TABLE_SCHEM");
                     String tableName = rs.getString("TABLE_NAME");
@@ -96,7 +111,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
 
                     List<JdbcColum> columList = new ArrayList<>();
 
-                    ResultSet columns = md.getColumns(null, null, tableName, null);
+                    ResultSet columns = md.getColumns(databaseName, null, tableName, null);
                     while (columns.next()) {
                         String colName = columns.getString("COLUMN_NAME");
                         int jdbcColType = columns.getInt("DATA_TYPE");
@@ -134,90 +149,316 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
     }
 
     @Override
-    public JdbcQueryResult runQuery(String query, List<JdbcValue> params) throws FailError, TException {
+    public JdbcExecutionResult execute(String query, List<JdbcValue> params, int maxRows, int offset) throws FailError, TException {
         return call(conn ->
         {
-            PreparedStatement statement = conn.prepareStatement(query);
-            int i = 1;
-            for (JdbcValue param : params) {
-                switch (param.getType()) {
-                    case _int:
-                        statement.setInt(1, param.getIntValue());
-                        break;
-                    case _long:
-                        statement.setLong(1, param.getLongValue());
-                        break;
-                    case _string:
-                        statement.setString(i, param.getStringValue());
-                        break;
-                    case _bool:
-                        statement.setBoolean(i, param.isBoolValue());
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(param.getType() + " not handled");
+            int skipRows = Math.max(offset, 0);
+            int limitRows = Math.max(maxRows, 0);
+
+            List<JdbcStatementResult> results = new ArrayList<>();
+            List<String> warnings = new ArrayList<>();
+
+            conn.clearWarnings();
+
+            // without parameters a plain statement runs the text as is: a ? in it (an operator, a string) is no placeholder
+            boolean prepared = !params.isEmpty();
+            Statement statement = prepared ? conn.prepareStatement(query) : conn.createStatement();
+            try {
+                if (prepared) {
+                    bindParameters((PreparedStatement) statement, params);
                 }
 
-                i++;
-            }
+                if (limitRows > 0) {
+                    // one row more than requested tells whether more rows follow
+                    long statementMaxRows = (long) skipRows + limitRows + 1;
+                    statement.setMaxRows((int) Math.min(statementMaxRows, Integer.MAX_VALUE));
+                }
 
-            ResultSet resultSet = statement.executeQuery();
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            List<String> columns = new ArrayList<>();
-            int[] columnsTypes = new int[columnCount];
-            for (int j = 0; j < columnCount; j++) {
-                String columnClassName = metaData.getColumnName(j + 1);
-                columns.add(columnClassName);
-                columnsTypes[j] = metaData.getColumnType(j + 1);
-            }
-
-            JdbcQueryResult result = new JdbcQueryResult();
-            result.setColumns(columns);
-
-            List<JdbcQueryRow> rows = new ArrayList<>();
-            result.setRows(rows);
-
-            while (resultSet.next()) {
-                JdbcQueryRow row = new JdbcQueryRow();
-                rows.add(row);
-                List<JdbcValue> values = new ArrayList<>();
-                row.setValues(values);
-
-                for (int j = 0; j < columnCount; j++) {
-                    int columnType = columnsTypes[j];
-
-                    JdbcValue value = new JdbcValue();
-                    values.add(value);
-                    switch (columnType) {
-                        case Types.BIGINT:
-                            value.setType(JdbcValueType._long);
-                            value.setLongValue(resultSet.getLong(j + 1));
+                boolean isResultSet = prepared ? ((PreparedStatement) statement).execute() : statement.execute(query);
+                while (results.size() < MAX_STATEMENT_RESULTS) {
+                    if (isResultSet) {
+                        ResultSet resultSet = statement.getResultSet();
+                        if (resultSet == null) {
                             break;
-                        case Types.INTEGER:
-                        case Types.SMALLINT:
-                        case Types.TINYINT:
-                            value.setType(JdbcValueType._int);
-                            value.setIntValue(resultSet.getInt(j + 1));
-                            break;
-                        case Types.BOOLEAN:
-                            value.setType(JdbcValueType._bool);
-                            value.setBoolValue(resultSet.getBoolean(j + 1));
-                            break;
-                        case Types.VARCHAR:
-                            value.setType(JdbcValueType._string);
-                            value.setStringValue(resultSet.getString(j + 1));
-                            break;
-                        default:
-                            // FIXME [VISTALL] fallback
-                            value.setType(JdbcValueType._string);
-                            value.setStringValue(resultSet.getString(j + 1));
-                            break;
+                        }
+
+                        try {
+                            results.add(new JdbcStatementResult().setResultSet(readResultSet(resultSet, skipRows, limitRows)));
+
+                            collectWarnings(resultSet.getWarnings(), warnings);
+                        }
+                        finally {
+                            closeQuietly(resultSet);
+                        }
                     }
+                    else {
+                        int updateCount = statement.getUpdateCount();
+                        if (updateCount == -1) {
+                            break;
+                        }
+
+                        results.add(new JdbcStatementResult().setUpdateCount(updateCount));
+                    }
+
+                    isResultSet = statement.getMoreResults();
+                }
+
+                collectWarnings(statement.getWarnings(), warnings);
+                collectWarnings(conn.getWarnings(), warnings);
+            }
+            finally {
+                closeQuietly(statement);
+            }
+
+            return new JdbcExecutionResult(results, warnings);
+        });
+    }
+
+    private static JdbcResultSet readResultSet(ResultSet resultSet, int skipRows, int limitRows) throws SQLException {
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        int columnCount = metaData == null ? 0 : metaData.getColumnCount();
+
+        List<JdbcColumnMeta> columns = new ArrayList<>(columnCount);
+        JdbcColumnKind[] kinds = new JdbcColumnKind[columnCount];
+        for (int i = 0; i < columnCount; i++) {
+            JdbcColumnMeta column = readColumnMeta(metaData, i + 1);
+            columns.add(column);
+            kinds[i] = JdbcColumnKind.of(column.getJdbcType(), column.getTypeName(), column.getPrecision());
+        }
+
+        List<JdbcQueryRow> rows = new ArrayList<>();
+        boolean hasMore = false;
+        long rowIndex = 0;
+        while (resultSet.next()) {
+            if (rowIndex < skipRows) {
+                rowIndex++;
+                continue;
+            }
+
+            if (limitRows > 0 && rows.size() >= limitRows) {
+                hasMore = true;
+                break;
+            }
+
+            List<JdbcValue> values = new ArrayList<>(columnCount);
+            for (int i = 0; i < columnCount; i++) {
+                values.add(JdbcValueReader.read(resultSet, i + 1, kinds[i]));
+            }
+
+            rows.add(new JdbcQueryRow(values, rowIndex));
+            rowIndex++;
+        }
+
+        return new JdbcResultSet(columns, rows, hasMore);
+    }
+
+    private static JdbcColumnMeta readColumnMeta(ResultSetMetaData metaData, int index) throws SQLException {
+        JdbcColumnMeta column = new JdbcColumnMeta();
+
+        String columnName = metaData.getColumnName(index);
+        String label = metaData.getColumnLabel(index);
+
+        column.setColumnName(columnName == null ? "" : columnName);
+        column.setLabel(label == null || label.isEmpty() ? column.getColumnName() : label);
+        column.setJdbcType(metaData.getColumnType(index));
+
+        String typeName = metaData.getColumnTypeName(index);
+        column.setTypeName(typeName == null ? "" : typeName);
+
+        // the optional parts of the metadata - some drivers throw instead of answering
+        try {
+            column.setPrecision(metaData.getPrecision(index));
+        }
+        catch (SQLException | RuntimeException e) {
+            column.setPrecision(0);
+        }
+
+        try {
+            column.setScale(metaData.getScale(index));
+        }
+        catch (SQLException | RuntimeException e) {
+            column.setScale(0);
+        }
+
+        try {
+            column.setNullable(metaData.isNullable(index));
+        }
+        catch (SQLException | RuntimeException e) {
+            column.setNullable(ResultSetMetaData.columnNullableUnknown);
+        }
+
+        try {
+            column.setAutoIncrement(metaData.isAutoIncrement(index));
+        }
+        catch (SQLException | RuntimeException e) {
+            column.setAutoIncrement(false);
+        }
+
+        String tableName = readOptionalName(metaData, index, NameKind.TABLE);
+        if (tableName != null) {
+            column.setTableName(tableName);
+        }
+
+        String schemaName = readOptionalName(metaData, index, NameKind.SCHEMA);
+        if (schemaName != null) {
+            column.setSchemaName(schemaName);
+        }
+
+        String catalogName = readOptionalName(metaData, index, NameKind.CATALOG);
+        if (catalogName != null) {
+            column.setCatalogName(catalogName);
+        }
+
+        return column;
+    }
+
+    private enum NameKind {
+        TABLE,
+        SCHEMA,
+        CATALOG
+    }
+
+    /**
+     * @return the name, or null when the driver does not know it - drivers answer an empty string for that
+     */
+    private static String readOptionalName(ResultSetMetaData metaData, int index, NameKind kind) {
+        try {
+            String name = switch (kind) {
+                case TABLE -> metaData.getTableName(index);
+                case SCHEMA -> metaData.getSchemaName(index);
+                case CATALOG -> metaData.getCatalogName(index);
+            };
+            return name == null || name.isEmpty() ? null : name;
+        }
+        catch (SQLException | RuntimeException e) {
+            return null;
+        }
+    }
+
+    private static void bindParameters(PreparedStatement statement, List<JdbcValue> params) throws SQLException {
+        int index = 1;
+        for (JdbcValue param : params) {
+            bindParameter(statement, index, param);
+            index++;
+        }
+    }
+
+    private static void bindParameter(PreparedStatement statement, int index, JdbcValue param) throws SQLException {
+        JdbcValueType type = param.getType();
+        // an unset value field is SQL NULL too
+        if (type == null || type == JdbcValueType._null || !isValueSet(param, type)) {
+            statement.setNull(index, getNullSqlType(type));
+            return;
+        }
+
+        switch (type) {
+            case _int -> statement.setInt(index, param.getIntValue());
+            case _long -> statement.setLong(index, param.getLongValue());
+            case _bool -> statement.setBoolean(index, param.isBoolValue());
+            case _double -> statement.setDouble(index, param.getDoubleValue());
+            case _string -> statement.setString(index, param.getStringValue());
+            case _decimal -> statement.setBigDecimal(index, new BigDecimal(param.getStringValue()));
+            case _date -> {
+                LocalDate date = LocalDate.parse(param.getStringValue());
+                setObject(statement, index, date, () -> statement.setDate(index, Date.valueOf(date)));
+            }
+            case _time -> {
+                String text = param.getStringValue();
+                if (JdbcValueReader.hasOffset(text)) {
+                    OffsetTime time = OffsetTime.parse(text);
+                    setObject(statement, index, time, () -> statement.setString(index, text));
+                }
+                else {
+                    LocalTime time = LocalTime.parse(text);
+                    setObject(statement, index, time, () -> statement.setTime(index, Time.valueOf(time)));
                 }
             }
-            return result;
-        });
+            case _timestamp -> {
+                LocalDateTime dateTime = LocalDateTime.parse(param.getStringValue());
+                setObject(statement, index, dateTime, () -> statement.setTimestamp(index, Timestamp.valueOf(dateTime)));
+            }
+            case _timestamptz -> {
+                OffsetDateTime dateTime = OffsetDateTime.parse(param.getStringValue());
+                setObject(statement, index, dateTime, () -> statement.setTimestamp(index, Timestamp.from(dateTime.toInstant())));
+            }
+            case _bytes -> statement.setBytes(index, param.getBytesValue());
+            // the text goes to the server untyped, so it can be cast to json, uuid, interval and so on
+            case _other -> statement.setObject(index, param.getStringValue(), Types.OTHER);
+            case _array -> throw new SQLFeatureNotSupportedException("Array parameters are not supported");
+            default -> throw new SQLFeatureNotSupportedException(type + " parameters are not supported");
+        }
+    }
+
+    private interface SqlAction {
+        void run() throws SQLException;
+    }
+
+    /**
+     * java.time objects need a driver with JDBC 4.2 support - an older one gets the java.sql value
+     */
+    private static void setObject(PreparedStatement statement, int index, Object value, SqlAction fallback) throws SQLException {
+        try {
+            statement.setObject(index, value);
+        }
+        catch (SQLException | RuntimeException e) {
+            fallback.run();
+        }
+    }
+
+    private static boolean isValueSet(JdbcValue value, JdbcValueType type) {
+        return switch (type) {
+            case _int -> value.isSetIntValue();
+            case _long -> value.isSetLongValue();
+            case _bool -> value.isSetBoolValue();
+            case _double -> value.isSetDoubleValue();
+            case _bytes -> value.isSetBytesValue();
+            case _array -> value.isSetArrayValue();
+            case _null -> false;
+            default -> value.isSetStringValue();
+        };
+    }
+
+    private static int getNullSqlType(JdbcValueType type) {
+        if (type == null) {
+            return Types.NULL;
+        }
+
+        return switch (type) {
+            case _int -> Types.INTEGER;
+            case _long -> Types.BIGINT;
+            case _bool -> Types.BOOLEAN;
+            case _double -> Types.DOUBLE;
+            case _string -> Types.VARCHAR;
+            case _decimal -> Types.DECIMAL;
+            case _date -> Types.DATE;
+            case _time -> Types.TIME;
+            case _timestamp -> Types.TIMESTAMP;
+            case _timestamptz -> Types.TIMESTAMP_WITH_TIMEZONE;
+            case _bytes -> Types.VARBINARY;
+            case _array -> Types.ARRAY;
+            case _other -> Types.OTHER;
+            default -> Types.NULL;
+        };
+    }
+
+    private static void collectWarnings(SQLWarning warning, List<String> warnings) {
+        SQLWarning current = warning;
+        int count = 0;
+        while (current != null && count < MAX_WARNINGS) {
+            String message = current.getMessage();
+            warnings.add(message == null ? current.toString() : message);
+
+            current = current.getNextWarning();
+            count++;
+        }
+    }
+
+    private static void closeQuietly(AutoCloseable closeable) {
+        try {
+            closeable.close();
+        }
+        catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -261,12 +502,40 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
         return url.substring(0, pathStart + 1) + databaseName;
     }
 
-    private String getStackTrace(Throwable t) {
+    private static String getStackTrace(Throwable t) {
         StringWriter writer = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(writer)) {
             t.printStackTrace(printWriter);
         }
         return writer.getBuffer().toString();
+    }
+
+    private static FailError createFailError(Throwable e) {
+        String message = e.getMessage();
+
+        FailError error = new FailError(message == null ? e.getClass().getName() : message, getStackTrace(e));
+
+        SQLException sqlException = findSqlException(e);
+        if (sqlException != null) {
+            String sqlState = sqlException.getSQLState();
+            if (sqlState != null) {
+                error.setSqlState(sqlState);
+            }
+            error.setVendorCode(sqlException.getErrorCode());
+        }
+        return error;
+    }
+
+    private static SQLException findSqlException(Throwable e) {
+        Throwable current = e;
+        // the depth limit guards against a cause chain with a cycle
+        for (int depth = 0; current != null && depth < 64; depth++) {
+            if (current instanceof SQLException sqlException) {
+                return sqlException;
+            }
+            current = current.getCause();
+        }
+        return null;
     }
 
     protected <T> T call(ThwroableFunction<T, Connection> callable) throws FailError {
@@ -280,7 +549,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
         catch (Throwable e) {
             e.printStackTrace();
 
-            throw new FailError(e.getMessage(), getStackTrace(e));
+            throw createFailError(e);
         }
     }
 }

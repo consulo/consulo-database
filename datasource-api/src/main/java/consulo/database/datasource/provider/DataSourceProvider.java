@@ -30,6 +30,8 @@ import consulo.ui.image.Image;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
+import java.util.List;
+
 /**
  * @author VISTALL
  * @since 2020-08-12
@@ -64,5 +66,15 @@ public interface DataSourceProvider {
     @Nullable
     default <T> T getDefaultValue(GenericPropertyKey<T> key) {
         return null;
+    }
+
+    /**
+     * @return the ids of the drivers this provider runs on, the preferred one first, for example {@code mysql-java}; empty when the
+     * provider needs no driver. Every id has its description {@code META-INF/datasource-drivers/<id>.json} in the module of the
+     * provider: how the driver is started, and its versions, newest first
+     */
+    @Nonnull
+    default List<String> getDriverIds() {
+        return List.of();
     }
 }

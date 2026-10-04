@@ -2,3 +2,21 @@ toolwindow.title:
   text: Database
 label.application.aware.text:
   text: Application aware
+notification.refresh.failed.title:
+  text: Failed to refresh data source
+notification.refresh.no.transport.text:
+  text: There is no transport for the data source provider {0}
+progress.testing.connection:
+  text: Testing connection
+progress.refreshing.data.sources:
+  text: Refreshing data sources...
+progress.executing.query:
+  text: Executing query...
+progress.downloading.driver:
+  text: 'Downloading {0}'
+error.driver.checksum:
+  text: 'The downloaded {0} does not match its checksum'
+label.driver:
+  text: Driver
+driver.latest:
+  text: 'Latest ({0})'

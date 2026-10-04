@@ -19,8 +19,6 @@ package consulo.database.impl.editor;
 import consulo.database.datasource.model.DataSource;
 import consulo.language.file.light.LightVirtualFile;
 import consulo.virtualFileSystem.VirtualFileSystem;
-import consulo.virtualFileSystem.archive.ArchiveFileSystem;
-import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL
@@ -31,41 +29,41 @@ public class DataSourceVirtualFile extends LightVirtualFile {
     private final String myDatabaseName;
     private final String myChildId;
     private final VirtualFileSystem myVirtualFileSystem;
+    private final String myPath;
 
-    public DataSourceVirtualFile(@Nonnull DataSource dataSource, @Nonnull String databaseName, @Nonnull String childId, @Nonnull VirtualFileSystem virtualFileSystem) {
+    public DataSourceVirtualFile(DataSource dataSource, String databaseName, String childId, VirtualFileSystem virtualFileSystem) {
         super("[" + dataSource.getName() + "] " + childId, DataSourceFileType.INSTANCE, "");
 
         myDataSource = dataSource;
         myDatabaseName = databaseName;
         myChildId = childId;
         myVirtualFileSystem = virtualFileSystem;
+        myPath = DataSourceVirtualFileSystem.buildPath(dataSource, databaseName, childId);
     }
 
-    @Nonnull
     public String getDatabaseName() {
         return myDatabaseName;
     }
 
-    @Nonnull
     public String getChildId() {
         return myChildId;
     }
 
-    @Nonnull
     public DataSource getDataSource() {
         return myDataSource;
     }
 
-    @Nonnull
     @Override
     public VirtualFileSystem getFileSystem() {
         return myVirtualFileSystem;
     }
 
-    @Nonnull
+    /**
+     * The db name and the child id are escaped, see {@link DataSourceVirtualFileSystem#buildPath}
+     */
     @Override
     public String getPath() {
-        return myDataSource.getId() + ArchiveFileSystem.ARCHIVE_SEPARATOR + myDatabaseName + "/" + myChildId;
+        return myPath;
     }
 
     @Override

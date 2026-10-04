@@ -16,10 +16,13 @@
 
 package consulo.database.impl.configurable;
 
+import consulo.credentialStorage.CredentialAttributes;
 import consulo.credentialStorage.PasswordSafe;
 import consulo.database.datasource.configurable.SecureString;
 import consulo.database.datasource.model.DataSource;
 import jakarta.annotation.Nonnull;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author VISTALL
@@ -35,6 +38,16 @@ public class StoreSecureStringImpl implements SecureString {
     @Override
     public String getValue(@Nonnull DataSource dataSource) {
         return PasswordSafe.getInstance().getPassword(null, StoreSecureStringImpl.class, myXmlValue);
+    }
+
+    @Nonnull
+    @Override
+    public CompletableFuture<String> getValueAsync(@Nonnull DataSource dataSource) {
+        // the same attributes the password was stored with
+        CredentialAttributes attributes = new CredentialAttributes(StoreSecureStringImpl.class.getName(), myXmlValue, StoreSecureStringImpl.class);
+        return PasswordSafe.getInstance()
+            .getAsync(attributes)
+            .thenApply(credentials -> credentials == null ? null : credentials.getPasswordAsString());
     }
 
     @Override

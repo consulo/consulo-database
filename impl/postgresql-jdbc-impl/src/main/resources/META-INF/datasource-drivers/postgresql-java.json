@@ -1,0 +1,29 @@
+{
+  "name": "PostgreSQL JDBC Driver",
+  "start": {
+    "kind": "java-rt",
+    "agent": "jdbc"
+  },
+  "drivers": [
+    {
+      "version": "42.7.13",
+      "artifacts": [
+        {
+          "fileName": "postgresql-42.7.13.jar",
+          "url": "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.13/postgresql-42.7.13.jar",
+          "sha256": "6e0e4cc2d8cae902084f8a2b18728b073a6fd9d1f87c9d8bff8f298c18185b93"
+        }
+      ]
+    },
+    {
+      "version": "42.7.10",
+      "artifacts": [
+        {
+          "fileName": "postgresql-42.7.10.jar",
+          "url": "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.10/postgresql-42.7.10.jar",
+          "sha256": "cab1cd67cfa25c25de4348e532298028288a877ba01c77d1619fe45416193387"
+        }
+      ]
+    }
+  ]
+}

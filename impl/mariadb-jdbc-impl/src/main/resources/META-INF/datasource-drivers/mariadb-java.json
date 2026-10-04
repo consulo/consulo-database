@@ -1,0 +1,29 @@
+{
+  "name": "MariaDB Connector/J",
+  "start": {
+    "kind": "java-rt",
+    "agent": "jdbc"
+  },
+  "drivers": [
+    {
+      "version": "3.5.10",
+      "artifacts": [
+        {
+          "fileName": "mariadb-java-client-3.5.10.jar",
+          "url": "https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/3.5.10/mariadb-java-client-3.5.10.jar",
+          "sha256": "919b8c1c771d9ee3465811462f242c9543ab401e140c64988ddbf1d8abcb18b2"
+        }
+      ]
+    },
+    {
+      "version": "2.6.2",
+      "artifacts": [
+        {
+          "fileName": "mariadb-java-client-2.6.2.jar",
+          "url": "https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.6.2/mariadb-java-client-2.6.2.jar",
+          "sha256": "f7263dd9c68168304603f3444f8cfeec00ae68eeed711271f4a377f977473d27"
+        }
+      ]
+    }
+  ]
+}

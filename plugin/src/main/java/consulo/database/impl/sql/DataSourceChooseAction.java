@@ -16,9 +16,10 @@
 
 package consulo.database.impl.sql;
 
-import consulo.annotation.access.RequiredReadAction;
 import consulo.application.ReadAction;
+import consulo.dataContext.DataContext;
 import consulo.database.datasource.DataSourceManager;
+import consulo.database.datasource.json.JsonDataSourceProvider;
 import consulo.database.datasource.model.DataSource;
 import consulo.fileEditor.util.FileContentUtil;
 import consulo.language.psi.PsiFile;
@@ -32,13 +33,12 @@ import consulo.sql.language.psi.SqlFile;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.action.ActionGroup;
 import consulo.ui.ex.action.AnActionEvent;
+import consulo.ui.ex.action.ComboBoxAction;
 import consulo.ui.ex.action.DumbAwareAction;
 import consulo.ui.ex.action.Presentation;
-import consulo.ui.ex.awt.action.ComboBoxAction;
 import consulo.virtualFileSystem.VirtualFile;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -50,25 +50,39 @@ import java.util.function.Supplier;
  */
 public class DataSourceChooseAction extends ComboBoxAction {
     private final DataSourceManager myDataSourceManager;
-    private final Supplier<UUID> myGetter;
+    private final Supplier<@Nullable UUID> myGetter;
     private final Consumer<UUID> mySetter;
 
-    public DataSourceChooseAction(DataSourceManager dataSourceManager, Supplier<UUID> getter, Consumer<UUID> setter) {
+    public DataSourceChooseAction(DataSourceManager dataSourceManager, Supplier<@Nullable UUID> getter, Consumer<UUID> setter) {
         myDataSourceManager = dataSourceManager;
         myGetter = getter;
         mySetter = setter;
     }
 
-    @Nonnull
+    /**
+     * The console sends SQL text - so document data sources (MongoDB and so on) are not offered
+     */
+    public static boolean isSqlConsoleDataSource(DataSource dataSource) {
+        return !(dataSource.getProvider() instanceof JsonDataSourceProvider);
+    }
+
     @Override
-    @RequiredReadAction
-    protected ActionGroup createPopupActionGroup(JComponent button) {
+    @RequiredUIAccess
+    protected ActionGroup createPopupActionGroup(DataContext context) {
+        List<? extends DataSource> dataSources = ReadAction.compute(myDataSourceManager::getDataSources);
+
         ActionGroup.Builder itemBuild = ActionGroup.newImmutableBuilder();
-        for (DataSource dataSource : myDataSourceManager.getDataSources()) {
-            itemBuild.add(new DumbAwareAction(dataSource.getName(), "", dataSource.getProvider().getIcon()) {
+        for (DataSource dataSource : dataSources) {
+            if (!isSqlConsoleDataSource(dataSource)) {
+                continue;
+            }
+
+            LocalizeValue text = LocalizeValue.of(dataSource.getName());
+
+            itemBuild.add(new DumbAwareAction(text, LocalizeValue.empty(), dataSource.getProvider().getIcon()) {
                 @RequiredUIAccess
                 @Override
-                public void actionPerformed(@Nonnull AnActionEvent e) {
+                public void actionPerformed(AnActionEvent e) {
                     mySetter.accept(dataSource.getId());
 
                     updatePresentation(DataSourceChooseAction.this.getTemplatePresentation());
@@ -95,19 +109,19 @@ public class DataSourceChooseAction extends ComboBoxAction {
         return itemBuild.build();
     }
 
+    /**
+     * Runs on a background thread (see {@link consulo.ui.ex.action.AnActionWithSyncUpdate#update})
+     */
     @Override
-    @RequiredUIAccess
-    public void update(@Nonnull AnActionEvent e) {
-        Presentation presentation = e.getPresentation();
-        updatePresentation(presentation);
+    public void update(AnActionEvent e) {
+        updatePresentation(e.getPresentation());
     }
 
-    @RequiredUIAccess
     protected void updatePresentation(Presentation presentation) {
         UUID dataSourceId = myGetter.get();
 
         DataSource source = dataSourceId == null ? null : ReadAction.compute(() -> myDataSourceManager.findDataSource(dataSourceId));
-        if (source == null) {
+        if (source == null || !isSqlConsoleDataSource(source)) {
             presentation.setIcon(null);
             presentation.setText(LocalizeValue.localizeTODO("<Select DataSource>"));
         }

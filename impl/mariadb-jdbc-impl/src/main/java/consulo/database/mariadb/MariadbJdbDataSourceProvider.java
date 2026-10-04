@@ -33,7 +33,7 @@ import consulo.ui.image.Image;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author VISTALL
@@ -78,8 +78,14 @@ public class MariadbJdbDataSourceProvider extends JdbcDataSourceProvider {
         propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
     }
 
+    @Nonnull
     @Override
-    public void fillDrivers(Map<String, String> map) {
-        map.put("mariadb-java-client-2.6.2.jar", "https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.6.2/mariadb-java-client-2.6.2.jar");
+    public List<String> getDriverIds() {
+        return List.of("mariadb-java");
+    }
+
+    @Override
+    public boolean isTableType(@Nullable String type) {
+        return super.isTableType(type) || "SYSTEM TABLE".equals(type);
     }
 }

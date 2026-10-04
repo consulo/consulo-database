@@ -25,6 +25,7 @@ import consulo.language.psi.PsiDocumentManager;
 import consulo.language.psi.PsiFile;
 import consulo.project.Project;
 import consulo.sql.language.SqlFileType;
+import consulo.ui.annotation.RequiredUIAccess;
 import jakarta.annotation.Nonnull;
 
 /**
@@ -32,28 +33,24 @@ import jakarta.annotation.Nonnull;
  * @since 2020-10-31
  */
 @ExtensionImpl
-public class SqlEditorFactoryListener implements EditorFactoryListener
-{
-	@Override
-	public void editorCreated(@Nonnull EditorFactoryEvent event)
-	{
-		Editor editor = event.getEditor();
-		if(editor instanceof EditorEx)
-		{
-			Project project = editor.getProject();
-			if(project == null)
-			{
-				return;
-			}
+public class SqlEditorFactoryListener implements EditorFactoryListener {
+    @Override
+    @RequiredUIAccess
+    public void editorCreated(@Nonnull EditorFactoryEvent event) {
+        Editor editor = event.getEditor();
+        if (editor instanceof EditorEx) {
+            Project project = editor.getProject();
+            if (project == null) {
+                return;
+            }
 
-			PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+            PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
 
-			if(psiFile != null && psiFile.getViewProvider().getFileType() == SqlFileType.INSTANCE)
-			{
-				SqlExecutePanel panel = new SqlExecutePanel(project, editor, psiFile.getName());
+            if (psiFile != null && psiFile.getViewProvider().getFileType() == SqlFileType.INSTANCE) {
+                SqlExecutePanel panel = new SqlExecutePanel(project, editor, psiFile.getName());
 
-				editor.setHeaderComponent(panel.getPanel());
-			}
-		}
-	}
+                editor.setHeaderComponent(panel.getUIComponent());
+            }
+        }
+    }
 }

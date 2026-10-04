@@ -34,7 +34,7 @@ import consulo.ui.image.Image;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author VISTALL
@@ -79,9 +79,10 @@ public class PostgresqlJdbcDataSourceProvider extends JdbcDataSourceProvider {
         propertiesHolder.set(GenericPropertyKeys.PASSWORD, SecureString.EMPTY);
     }
 
+    @Nonnull
     @Override
-    public void fillDrivers(Map<String, String> map) {
-        map.put("postgresql-42.7.10.jar", "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.10/postgresql-42.7.10.jar");
+    public List<String> getDriverIds() {
+        return List.of("postgresql-java");
     }
 
     @Override

@@ -19,23 +19,26 @@ package consulo.database.datasource.jdbc.transport;
 import consulo.application.progress.ProgressIndicator;
 import consulo.application.util.concurrent.AppExecutorUtil;
 import consulo.component.ProcessCanceledException;
-import consulo.container.boot.ContainerPathManager;
 import consulo.container.plugin.PluginManager;
 import consulo.database.datasource.configurable.GenericPropertyKeys;
 import consulo.database.datasource.configurable.SecureString;
+import consulo.database.datasource.driver.DataSourceDriver;
+import consulo.database.datasource.driver.DataSourceDriverRegistry;
+import consulo.database.datasource.driver.DataSourceDriverStart;
 import consulo.database.datasource.jdbc.provider.JdbcDataSourceProvider;
+import consulo.database.datasource.localize.DataSourceLocalize;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.jdbc.rt.shared.JdbcExecutor;
-import consulo.ide.util.DownloadUtil;
 import consulo.platform.Platform;
+import consulo.process.ExecutionException;
 import consulo.process.ProcessHandler;
 import consulo.process.cmd.SimpleJavaParameters;
 import consulo.process.event.ProcessEvent;
 import consulo.process.event.ProcessListener;
-import consulo.util.collection.ContainerUtil;
 import consulo.util.dataholder.Key;
 import consulo.util.io.ClassPathUtil;
 import consulo.util.io.NetUtil;
+import consulo.util.lang.StringUtil;
 import consulo.util.lang.ref.SimpleReference;
 import jakarta.annotation.Nonnull;
 import org.apache.thrift.TException;
@@ -45,14 +48,10 @@ import org.apache.thrift.transport.TSocket;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -72,6 +71,11 @@ public class JdbcSession implements AutoCloseable {
         ERROR
     }
 
+    /**
+     * The only start this session runs: the JDBC runtime module of the plugin in a JVM, with the driver files on its class path.
+     */
+    private static final DataSourceDriverStart DRIVER_START = new DataSourceDriverStart(DataSourceDriverStart.JAVA_RT, "jdbc");
+
     private ProcessHandler myProcessHandler;
 
     private Future<?> myWatcherTask = CompletableFuture.completedFuture(null);
@@ -89,7 +93,13 @@ public class JdbcSession implements AutoCloseable {
     public JdbcSession(@Nonnull ProgressIndicator indicator, @Nonnull DataSource dataSource) throws Exception {
         JdbcDataSourceProvider provider = (JdbcDataSourceProvider) dataSource.getProvider();
 
-        Path driverPath = prepareJdbcDriver(indicator, provider);
+        DataSourceDriver driver = DataSourceDriverRegistry.getInstance().resolve(indicator, dataSource);
+        if (!DRIVER_START.equals(driver.start())) {
+            throw new ExecutionException(DataSourceLocalize.errorDriverStartUnsupported(driver.name(),
+                driver.version(),
+                driver.start().kind(),
+                driver.start().agent()));
+        }
 
         String jdbcUrl = provider.buildJdbcUrl(dataSource);
 
@@ -98,9 +108,16 @@ public class JdbcSession implements AutoCloseable {
         String login = dataSource.getProperties().get(GenericPropertyKeys.LOGIN);
         SecureString password = dataSource.getProperties().get(GenericPropertyKeys.PASSWORD);
 
+        // a value which is not set gets no key: the protocol can not send null, and the driver then uses its own default
         Map<String, String> properties = new HashMap<>();
-        properties.put("user", login);
-        properties.put("password", password.getValue(dataSource));
+        if (!StringUtil.isEmpty(login)) {
+            properties.put("user", login);
+        }
+
+        String passwordValue = password == null ? null : password.getValue(dataSource);
+        if (!StringUtil.isEmpty(passwordValue)) {
+            properties.put("password", passwordValue);
+        }
 
         SimpleReference<Integer> exitCodeRef = SimpleReference.create();
 
@@ -113,7 +130,9 @@ public class JdbcSession implements AutoCloseable {
         simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(JdbcExecutor.class));
         simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(TServer.class));
         simpleJavaParameters.getClassPath().add(ClassPathUtil.getJarPathForClass(Logger.class));
-        simpleJavaParameters.getClassPath().add(driverPath.toFile());
+        for (Path file : driver.files()) {
+            simpleJavaParameters.getClassPath().add(file.toFile());
+        }
         simpleJavaParameters.setMainClass("consulo.database.jdbc.rt.Main");
         simpleJavaParameters.setJdkHome(java_home);
         simpleJavaParameters.getProgramParametersList().add(String.valueOf(myPort));
@@ -141,8 +160,7 @@ public class JdbcSession implements AutoCloseable {
             }
         });
 
-        myWatcherTask = AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() ->
-        {
+        myWatcherTask = AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(() -> {
             // process terminated
             if (exitCodeRef.get() != null) {
                 myWatcherTask.cancel(false);
@@ -218,27 +236,6 @@ public class JdbcSession implements AutoCloseable {
 
             throw e;
         }
-    }
-
-    @Nonnull
-    private Path prepareJdbcDriver(@Nonnull ProgressIndicator indicator, @Nonnull JdbcDataSourceProvider provider) throws IOException {
-        LinkedHashMap<String, String> drivers = new LinkedHashMap<>();
-
-        provider.fillDrivers(drivers);
-
-        Map.Entry<String, String> selectedDriver = ContainerUtil.getFirstItem(drivers.entrySet());
-
-        Path driverPath = Paths.get(ContainerPathManager.get().getSystemPath(), "datasource-drivers", provider.getId(), selectedDriver.getKey());
-
-        if (!Files.exists(driverPath)) {
-            String url = selectedDriver.getValue();
-
-            Files.createDirectories(driverPath.getParent());
-
-            DownloadUtil.downloadContentToFile(indicator, url, driverPath.toFile());
-        }
-
-        return driverPath;
     }
 
     @Override

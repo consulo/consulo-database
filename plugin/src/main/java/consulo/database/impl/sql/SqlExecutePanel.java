@@ -17,31 +17,35 @@
 package consulo.database.impl.sql;
 
 import consulo.annotation.access.RequiredReadAction;
+import consulo.application.ReadAction;
 import consulo.codeEditor.Editor;
 import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.DataSource;
 import consulo.database.datasource.transport.DataSourceTransportManager;
 import consulo.database.impl.editor.DataSourceFileEditor;
 import consulo.disposer.Disposable;
+import consulo.localize.LocalizeValue;
 import consulo.platform.base.icon.PlatformIconGroup;
 import consulo.project.Project;
 import consulo.project.ui.view.MessageView;
 import consulo.project.ui.wm.ToolWindowId;
 import consulo.project.ui.wm.ToolWindowManager;
+import consulo.ui.Component;
 import consulo.ui.NotificationType;
 import consulo.ui.UIAccess;
 import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.ex.action.*;
-import consulo.ui.ex.awt.JBUI;
-import consulo.ui.ex.awt.UIUtil;
+import consulo.ui.ex.action.ActionGroup;
+import consulo.ui.ex.action.ActionManager;
+import consulo.ui.ex.action.ActionToolbar;
+import consulo.ui.ex.action.AnActionEvent;
+import consulo.ui.ex.action.DumbAwareAction;
 import consulo.ui.ex.content.Content;
 import consulo.ui.ex.content.ContentManager;
-import consulo.util.collection.ContainerUtil;
-import consulo.util.concurrent.AsyncResult;
+import consulo.ui.layout.DockLayout;
+import consulo.util.lang.ControlFlowException;
+import consulo.util.lang.StringUtil;
+import org.jspecify.annotations.Nullable;
 
-import jakarta.annotation.Nonnull;
-import javax.swing.*;
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -50,90 +54,130 @@ import java.util.UUID;
  * @author VISTALL
  * @since 2020-10-31
  */
-public class SqlExecutePanel
-{
-	private JPanel myPanel = new JPanel(new BorderLayout());
+public class SqlExecutePanel {
+    private final DockLayout myRootLayout;
 
-	private UUID myDataSourceId;
+    // read by DataSourceChooseAction#update on a background thread
+    private volatile @Nullable UUID myDataSourceId;
 
-	@RequiredReadAction
-	public SqlExecutePanel(@Nonnull Project project, Editor editor, String fileName)
-	{
-		DataSourceManager dataSourceManager = DataSourceManager.getInstance(project);
+    @RequiredUIAccess
+    public SqlExecutePanel(Project project, Editor editor, String fileName) {
+        DataSourceManager dataSourceManager = DataSourceManager.getInstance(project);
 
-		List<? extends DataSource> dataSources = dataSourceManager.getDataSources();
-		if(!dataSources.isEmpty())
-		{
-			myDataSourceId = ContainerUtil.getFirstItem(dataSources).getId();
-		}
+        // the first data source which can run SQL - document data sources are not offered by the chooser
+        for (DataSource dataSource : dataSourceManager.getDataSources()) {
+            if (DataSourceChooseAction.isSqlConsoleDataSource(dataSource)) {
+                myDataSourceId = dataSource.getId();
+                break;
+            }
+        }
 
-		ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
-		builder.add(new DumbAwareAction("Execute", null, PlatformIconGroup.actionsExecute())
-		{
-			@RequiredUIAccess
-			@Override
-			public void actionPerformed(@Nonnull AnActionEvent anActionEvent)
-			{
-				UIAccess uiAccess = UIAccess.current();
+        ActionGroup.Builder builder = ActionGroup.newImmutableBuilder();
+        builder.add(new DumbAwareAction(LocalizeValue.localizeTODO("Execute"), LocalizeValue.empty(), PlatformIconGroup.actionsExecute()) {
+            @RequiredUIAccess
+            @Override
+            public void actionPerformed(AnActionEvent e) {
+                UUID dataSourceId = myDataSourceId;
+                if (dataSourceId == null) {
+                    return;
+                }
 
-				DataSourceTransportManager transportManager = DataSourceTransportManager.getInstance(project);
+                DataSource dataSource = ReadAction.compute(() -> dataSourceManager.findDataSource(dataSourceId));
+                if (dataSource == null || !DataSourceChooseAction.isSqlConsoleDataSource(dataSource)) {
+                    return;
+                }
 
-				DataSource dataSource = dataSourceManager.findDataSource(myDataSourceId);
+                execute(project, editor, fileName, dataSource);
+            }
+        });
 
-				assert dataSource != null;
+        builder.add(new DataSourceChooseAction(dataSourceManager, () -> myDataSourceId, it -> myDataSourceId = it));
 
-				String text = editor.getDocument().getText();
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("SqlExecute", builder.build(), true);
+        toolbar.setTargetUIComponent(editor.getUIComponent());
 
-				AsyncResult<Object> query = transportManager.runQuery(dataSource, text);
-				query.doWhenRejectedWithThrowable(e ->
-				{
-					uiAccess.give(() ->
-					{
-						MessageView messageView = MessageView.getInstance(project);
+        myRootLayout = DockLayout.create();
+        myRootLayout.left(toolbar.getUIComponent());
+        myRootLayout.borderBuilder().bottomSet().apply();
+    }
 
-						messageView.runWhenInitialized(() ->
-						{
-							ToolWindowManager.getInstance(project).notifyByBalloon(ToolWindowId.MESSAGES_WINDOW, NotificationType.ERROR, e.getMessage());
-						});
-					});
-				});
-				query.doWhenDone((result) ->
-				{
-					uiAccess.give(() ->
-					{
-						MessageView messageView = MessageView.getInstance(project);
+    @RequiredUIAccess
+    private static void execute(Project project, Editor editor, String fileName, DataSource dataSource) {
+        UIAccess uiAccess = UIAccess.current();
 
-						messageView.runWhenInitialized(() ->
-						{
-							ContentManager contentManager = messageView.getContentManager();
+        DataSourceTransportManager transportManager = DataSourceTransportManager.getInstance(project);
 
-							Disposable uiDisposable = Disposable.newDisposable();
+        String text = editor.getDocument().getText();
 
-							JComponent component = DataSourceFileEditor.buildUI(result, project, dataSource, null, null, uiDisposable);
-							Content content = contentManager.getFactory().createContent(component, fileName + ": " + LocalDateTime.now(), true);
-							content.setDisposer(uiDisposable);
+        // done and rejected (with or without a throwable) both end here - on the ui thread
+        transportManager.runQuery(dataSource, text).toCompletableFuture().whenCompleteAsync((result, error) -> {
+            if (error != null) {
+                showError(project, error);
+            }
+            else {
+                showResult(project, uiAccess, fileName, dataSource, result);
+            }
+        }, uiAccess);
+    }
 
-							contentManager.addContent(content);
-							contentManager.setSelectedContent(content);
+    @RequiredUIAccess
+    private static void showError(Project project, Throwable error) {
+        if (error instanceof ControlFlowException) {
+            // canceled by user
+            return;
+        }
 
-							uiAccess.give(() -> messageView.getToolWindow().activate(null));
-						});
-					});
-				});
-			}
-		});
+        String message = error.getMessage();
+        if (StringUtil.isEmpty(message)) {
+            message = error.getClass().getSimpleName();
+        }
 
-		builder.add(new DataSourceChooseAction(dataSourceManager, () -> myDataSourceId, it -> myDataSourceId = it));
+        String balloonText = message;
+        MessageView messageView = MessageView.getInstance(project);
+        messageView.runWhenInitialized(() -> {
+            ToolWindowManager.getInstance(project).notifyByBalloon(ToolWindowId.MESSAGES_WINDOW, NotificationType.ERROR, balloonText);
+        });
+    }
 
-		ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("SqlExecute", builder.build(), true);
-		toolbar.setTargetComponent(editor.getComponent());
+    /**
+     * Adds a tab to the Messages tool window for every part of the result - for every result set of a script, or one tab with the
+     * update counts when there is no result set.
+     */
+    @RequiredUIAccess
+    private static void showResult(Project project, UIAccess uiAccess, String fileName, DataSource dataSource, @Nullable Object result) {
+        MessageView messageView = MessageView.getInstance(project);
 
-		myPanel.add(toolbar.getComponent(), BorderLayout.WEST);
-		myPanel.setBorder(JBUI.Borders.customLine(UIUtil.getBorderColor(), 0, 0, 1, 0));
-	}
+        messageView.runWhenInitialized(() -> {
+            ContentManager contentManager = messageView.getContentManager();
 
-	public JPanel getPanel()
-	{
-		return myPanel;
-	}
+            List<?> parts = DataSourceFileEditor.splitResult(result, project, dataSource);
+            LocalDateTime time = LocalDateTime.now();
+
+            @Nullable Content firstContent = null;
+            for (int i = 0; i < parts.size(); i++) {
+                Disposable uiDisposable = Disposable.newDisposable();
+
+                Component component = DataSourceFileEditor.buildUI(parts.get(i), project, dataSource, null, null, uiDisposable);
+
+                String title = parts.size() == 1 ? fileName + ": " + time : fileName + " (" + (i + 1) + "/" + parts.size() + "): " + time;
+                Content content = contentManager.getFactory().createUIContent(component, title, true);
+                content.setDisposer(uiDisposable);
+
+                contentManager.addContent(content);
+                if (firstContent == null) {
+                    firstContent = content;
+                }
+            }
+
+            if (firstContent != null) {
+                contentManager.setSelectedContent(firstContent);
+            }
+
+            uiAccess.give(() -> messageView.getToolWindow().activate(null));
+        });
+    }
+
+    public Component getUIComponent() {
+        return myRootLayout;
+    }
 }

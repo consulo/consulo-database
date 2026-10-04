@@ -5,6 +5,7 @@
 module consulo.database {
     requires consulo.database.datasource.api;
     requires consulo.database.datasource.jdbc.api;
+    requires consulo.database.datasource.json.api;
 
     requires consulo.sql.language.api;
 
@@ -16,6 +17,7 @@ module consulo.database {
     requires consulo.datacontext.api;
     requires consulo.disposer.api;
     requires consulo.file.editor.api;
+    requires consulo.ide.api;
     requires consulo.language.api;
     requires consulo.localize.api;
     requires consulo.logging.api;
@@ -26,7 +28,6 @@ module consulo.database {
     requires consulo.proxy;
     requires consulo.ui.api;
     requires consulo.ui.ex.api;
-    requires consulo.ui.ex.awt.api;
     requires consulo.util.collection;
     requires consulo.util.concurrent;
     requires consulo.util.dataholder;
@@ -34,10 +35,9 @@ module consulo.database {
     requires consulo.util.xml.serializer;
     requires consulo.virtual.file.system.api;
 
+    requires com.dslplatform.json;
+
     opens consulo.database.impl.store to consulo.proxy;
 
     opens consulo.database.impl to consulo.util.xml.serializer;
-
-    // TODO remove this in future
-    requires java.desktop;
 }

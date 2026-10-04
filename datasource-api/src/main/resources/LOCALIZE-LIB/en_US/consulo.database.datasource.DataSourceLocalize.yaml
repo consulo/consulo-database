@@ -1,0 +1,2 @@
+error.driver.start.unsupported:
+  text: 'The driver {0} {1} cannot be started: start kind {2} with agent {3} is not supported'

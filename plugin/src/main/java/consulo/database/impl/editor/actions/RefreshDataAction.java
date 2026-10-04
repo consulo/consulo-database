@@ -16,32 +16,39 @@
 
 package consulo.database.impl.editor.actions;
 
-import consulo.application.AllIcons;
 import consulo.database.impl.editor.DataSourceFileEditor;
 import consulo.database.impl.editor.DataSourceFileEditorKeys;
-import consulo.ui.UIAccess;
+import consulo.localize.LocalizeValue;
+import consulo.platform.base.icon.PlatformIconGroup;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.action.AnActionEvent;
+import consulo.ui.ex.action.AnActionWithSyncUpdate;
 import consulo.ui.ex.action.DumbAwareAction;
-import jakarta.annotation.Nonnull;
 
 /**
  * @author VISTALL
  * @since 2020-08-30
  */
-public class RefreshDataAction extends DumbAwareAction
-{
-	public RefreshDataAction()
-	{
-		super("Reload data", null, AllIcons.Actions.Refresh);
-	}
+public class RefreshDataAction extends DumbAwareAction implements AnActionWithSyncUpdate {
+    public RefreshDataAction() {
+        super(LocalizeValue.localizeTODO("Reload data"), LocalizeValue.empty(), PlatformIconGroup.actionsRefresh());
+    }
 
-	@RequiredUIAccess
-	@Override
-	public void actionPerformed(@Nonnull AnActionEvent e)
-	{
-		DataSourceFileEditor editor = e.getRequiredData(DataSourceFileEditorKeys.EDITOR);
+    @RequiredUIAccess
+    @Override
+    public void actionPerformed(AnActionEvent e) {
+        DataSourceFileEditor editor = e.getData(DataSourceFileEditorKeys.EDITOR);
+        if (editor == null) {
+            return;
+        }
 
-		editor.loadData(UIAccess.current());
-	}
+        editor.loadData();
+    }
+
+    @Override
+    public void update(AnActionEvent e) {
+        DataSourceFileEditor editor = e.getData(DataSourceFileEditorKeys.EDITOR);
+
+        e.getPresentation().setEnabled(editor != null && !editor.isLoading());
+    }
 }
