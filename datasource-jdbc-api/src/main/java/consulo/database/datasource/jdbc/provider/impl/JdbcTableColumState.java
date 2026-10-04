@@ -20,6 +20,8 @@ import consulo.component.persist.PersistentStateComponent;
 import consulo.util.xml.serializer.XmlSerializerUtil;
 import jakarta.annotation.Nullable;
 
+import java.util.Objects;
+
 /**
  * @author VISTALL
  * @since 2020-08-15
@@ -93,6 +95,21 @@ public class JdbcTableColumState implements PersistentStateComponent<JdbcTableCo
 	public void setSize(int size)
 	{
 		mySize = size;
+	}
+
+	/**
+	 * A column is identified by its name within its table: a refreshed tree keeps the node of the same column.
+	 */
+	@Override
+	public boolean equals(Object o)
+	{
+		return this == o || o instanceof JdbcTableColumState state && Objects.equals(myName, state.myName);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hashCode(myName);
 	}
 
 	@Nullable

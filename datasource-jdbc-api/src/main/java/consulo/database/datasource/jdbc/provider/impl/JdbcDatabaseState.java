@@ -21,6 +21,8 @@ import consulo.util.xml.serializer.XmlSerializerUtil;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
+import java.util.Objects;
+
 /**
  * @author VISTALL
  * @since 2020-08-18
@@ -60,6 +62,21 @@ public class JdbcDatabaseState implements PersistentStateComponent<JdbcDatabaseS
 	public void setTablesState(JdbcTablesState tablesState)
 	{
 		myTablesState = tablesState;
+	}
+
+	/**
+	 * A database is identified by its name: a refreshed tree keeps the node of the same database, with its expansion.
+	 */
+	@Override
+	public boolean equals(Object o)
+	{
+		return this == o || o instanceof JdbcDatabaseState state && Objects.equals(myName, state.myName);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hashCode(myName);
 	}
 
 	@Nullable

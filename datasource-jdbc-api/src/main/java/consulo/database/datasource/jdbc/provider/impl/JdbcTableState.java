@@ -24,6 +24,7 @@ import jakarta.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author VISTALL
@@ -122,6 +123,22 @@ public class JdbcTableState implements PersistentStateComponent<JdbcTableState>
 	public String getScheme()
 	{
 		return myScheme;
+	}
+
+	/**
+	 * A table is identified by its scheme and name: a refreshed tree keeps the node of the same table, with its expansion.
+	 */
+	@Override
+	public boolean equals(Object o)
+	{
+		return this == o ||
+			o instanceof JdbcTableState state && Objects.equals(myScheme, state.myScheme) && Objects.equals(myName, state.myName);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(myScheme, myName);
 	}
 
 	@Nullable
