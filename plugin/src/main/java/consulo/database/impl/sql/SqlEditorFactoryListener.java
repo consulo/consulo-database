@@ -38,7 +38,7 @@ public class SqlEditorFactoryListener implements EditorFactoryListener {
     @RequiredUIAccess
     public void editorCreated(@Nonnull EditorFactoryEvent event) {
         Editor editor = event.getEditor();
-        if (editor instanceof EditorEx) {
+        if (editor instanceof EditorEx editorEx) {
             Project project = editor.getProject();
             if (project == null) {
                 return;
@@ -49,7 +49,7 @@ public class SqlEditorFactoryListener implements EditorFactoryListener {
             if (psiFile != null && psiFile.getViewProvider().getFileType() == SqlFileType.INSTANCE) {
                 SqlExecutePanel panel = new SqlExecutePanel(project, editor, psiFile.getName());
 
-                editor.setHeaderComponent(panel.getUIComponent());
+                editorEx.setPermanentHeaderComponent(panel.getUIComponent());
             }
         }
     }
