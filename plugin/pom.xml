@@ -325,6 +325,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>consulo.database-sqlite.jdbc.impl</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>consulo.database-datasource.jdbc.rt</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>

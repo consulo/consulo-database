@@ -41,6 +41,8 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
     // guards against a driver which never ends its results or links its warnings into a cycle
     private static final int MAX_STATEMENT_RESULTS = 10_000;
     private static final int MAX_WARNINGS = 1_000;
+    // the name of the database of a driver without catalogs, like the main database of SQLite
+    private static final String SINGLE_DATABASE = "main";
 
     private Connection myConnection;
     private String myUrl;
@@ -87,6 +89,9 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
             while (tables.next()) {
                 databases.add(tables.getString("TABLE_CAT"));
             }
+            if (databases.isEmpty()) {
+                databases.add(SINGLE_DATABASE);
+            }
             return databases;
         });
     }
@@ -103,7 +108,8 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
                 List<JdbcTable> list = new ArrayList<>();
 
                 DatabaseMetaData md = useConn.getMetaData();
-                ResultSet rs = md.getTables(databaseName, null, "%", null);
+                String catalog = hasCatalogs(useConn) ? databaseName : null;
+                ResultSet rs = md.getTables(catalog, null, "%", null);
                 while (rs.next()) {
                     String tableSchem = rs.getString("TABLE_SCHEM");
                     String tableName = rs.getString("TABLE_NAME");
@@ -111,7 +117,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
 
                     List<JdbcColum> columList = new ArrayList<>();
 
-                    ResultSet columns = md.getColumns(databaseName, null, tableName, null);
+                    ResultSet columns = md.getColumns(catalog, null, tableName, null);
                     while (columns.next()) {
                         String colName = columns.getString("COLUMN_NAME");
                         int jdbcColType = columns.getInt("DATA_TYPE");
@@ -126,7 +132,7 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
                     }
 
                     List<JdbcTablePrimaryKey> primaryKeyList = new ArrayList<>();
-                    ResultSet primaryKeys = md.getPrimaryKeys(databaseName, tableSchem, tableName);
+                    ResultSet primaryKeys = md.getPrimaryKeys(catalog, tableSchem, tableName);
                     while (primaryKeys.next()) {
                         String columnName = primaryKeys.getString("COLUMN_NAME");
                         short keySeq = primaryKeys.getShort("KEY_SEQ");
@@ -477,13 +483,22 @@ public class JdbcExecutorImpl implements JdbcExecutor.Iface {
 
     private Connection openConnectionToDatabase(String databaseName) throws SQLException {
         String currentCatalog = myConnection.getCatalog();
-        if (databaseName.equals(currentCatalog)) {
+        if (databaseName.equals(currentCatalog) || !hasCatalogs(myConnection)) {
             return null;
         }
 
         // PostgreSQL requires a separate connection per database
         String newUrl = replaceDatabaseInUrl(myUrl, databaseName);
         return DriverManager.getConnection(newUrl, myProperties);
+    }
+
+    /**
+     * A driver without catalogs, like SQLite, has one database: the one connected to; it is listed as {@link #SINGLE_DATABASE}
+     */
+    private static boolean hasCatalogs(Connection connection) throws SQLException {
+        try (ResultSet catalogs = connection.getMetaData().getCatalogs()) {
+            return catalogs.next();
+        }
     }
 
     private static String replaceDatabaseInUrl(String url, String databaseName) {

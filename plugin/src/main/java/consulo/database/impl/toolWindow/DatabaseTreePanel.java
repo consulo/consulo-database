@@ -22,6 +22,14 @@ import consulo.dataContext.UiDataProvider;
 import consulo.database.datasource.editor.DataSourceEditorManager;
 import consulo.database.datasource.model.DataSourceListener;
 import consulo.database.datasource.transport.DataSourceTransportListener;
+import consulo.database.datasource.ui.DataSourceActionGroups;
+import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.event.ContextMenuEvent;
+import consulo.ui.ex.action.ActionGroup;
+import consulo.ui.ex.action.ActionManager;
+import consulo.ui.ex.action.ActionPlaces;
+import consulo.ui.ex.action.ActionPopupMenu;
+import jakarta.annotation.Nullable;
 import consulo.database.datasource.ui.DataSourceKeys;
 import consulo.database.datasource.ui.DataSourceOpenableNode;
 import consulo.database.impl.DataSourceWorkspaceManager;
@@ -85,7 +93,27 @@ public class DatabaseTreePanel implements Disposable, UiDataProvider {
             myTree.expandAll(2);
         }
 
+        myTree.putUserData(UiDataProvider.KEY, this);
+        myTree.addContextMenuListener(event -> showContextMenu(project, event));
+
         myRootPanel = ScrollableLayout.create(myTree, ScrollableLayoutOptions.builder().build());
+    }
+
+    @RequiredUIAccess
+    private void showContextMenu(Project project, ContextMenuEvent event) {
+        ActionManager actionManager = project.getApplication().getInstance(ActionManager.class);
+        if (!(actionManager.getAction(DataSourceActionGroups.TREE_POPUP) instanceof ActionGroup group)) {
+            return;
+        }
+
+        ActionPopupMenu menu = actionManager.createActionPopupMenu(ActionPlaces.getActionGroupPopupPlace(DataSourceActionGroups.TREE_POPUP), group);
+        menu.setTargetComponent(myTree);
+        menu.show(event.getComponent(), event.getInputDetails().getX(), event.getInputDetails().getY());
+    }
+
+    private @Nullable Object getSelectedValue() {
+        TreeNode<Object> node = myTree.getSelectedNode();
+        return node == null ? null : node.getValue();
     }
 
     public consulo.ui.Component getRootPanel() {
@@ -96,15 +124,16 @@ public class DatabaseTreePanel implements Disposable, UiDataProvider {
     public void uiDataSnapshot(DataSink sink) {
         sink.set(DataSourceKeys.TREE, myTree);
         sink.lazy(DataSourceKeys.DATASOURCE, () -> {
-            TreeNode<Object> node = myTree.getSelectedNode();
-            if (node != null) {
-                Object lastUserObject = node.getValue();
-                if (lastUserObject instanceof DatabaseSourceNode) {
-                    return ((DatabaseSourceNode) lastUserObject).getValue();
-                }
+            Object value = getSelectedValue();
+            if (value instanceof DatabaseSourceNode sourceNode) {
+                return sourceNode.getValue();
+            }
+            if (value instanceof DataSourceOpenableNode openableNode) {
+                return openableNode.getDataSource();
             }
             return null;
         });
+        sink.lazy(DataSourceKeys.OPENABLE_NODE, () -> getSelectedValue() instanceof DataSourceOpenableNode openableNode ? openableNode : null);
     }
 
     @Override

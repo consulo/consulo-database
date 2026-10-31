@@ -53,6 +53,7 @@
         <module>impl/mysql-jdbc-impl</module>
         <module>impl/mariadb-jdbc-impl</module>
         <module>impl/postgresql-jdbc-impl</module>
+        <module>impl/sqlite-jdbc-impl</module>
         <module>impl/mongo-impl</module>
         <module>plugin</module>
     </modules>

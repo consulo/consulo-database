@@ -21,12 +21,16 @@ import consulo.database.datasource.DataSourceManager;
 import consulo.database.datasource.model.EditableDataSource;
 import consulo.database.datasource.model.EditableDataSourceModel;
 import consulo.database.datasource.provider.DataSourceProvider;
+import consulo.database.datasource.ui.DataSourceActionGroups;
 import consulo.database.impl.configurable.editor.DatabaseSourcesDialogDescriptor;
 import consulo.platform.base.icon.PlatformIconGroup;
 import consulo.project.Project;
 import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.ex.action.ActionGroup;
+import consulo.ui.ex.action.ActionManager;
 import consulo.ui.ex.action.AnAction;
 import consulo.ui.ex.action.AnActionEvent;
+import consulo.ui.ex.action.AnSeparator;
 import consulo.ui.ex.action.DumbAwareAction;
 import consulo.ui.ex.action.DumbAwareActionGroup;
 import consulo.ui.ex.dialog.Dialog;
@@ -76,7 +80,15 @@ public class AddDataSourceAction extends DumbAwareActionGroup {
 
     @Override
     public AnAction[] getChildren(AnActionEvent anActionEvent) {
-        List<Child> children = new ArrayList<>();
+        List<AnAction> children = new ArrayList<>();
+        // actions of other plugins, like adding the data sources a project configures
+        if (myApplication.getInstance(ActionManager.class).getAction(DataSourceActionGroups.ADD_DATA_SOURCE) instanceof ActionGroup group) {
+            AnAction[] groupChildren = group.getChildren(anActionEvent);
+            if (groupChildren.length > 0) {
+                children.addAll(List.of(groupChildren));
+                children.add(AnSeparator.create());
+            }
+        }
         myApplication.getExtensionPoint(DataSourceProvider.class).forEach(provider -> children.add(new Child(provider)));
         return children.toArray(AnAction[]::new);
     }

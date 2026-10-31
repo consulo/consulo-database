@@ -1,0 +1,19 @@
+{
+  "name": "SQLite JDBC (Xerial)",
+  "start": {
+    "kind": "java-rt",
+    "agent": "jdbc"
+  },
+  "drivers": [
+    {
+      "version": "3.54.1.0",
+      "artifacts": [
+        {
+          "fileName": "sqlite-jdbc-3.54.1.0.jar",
+          "url": "https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.54.1.0/sqlite-jdbc-3.54.1.0.jar",
+          "sha256": "f8dce420a6016278497f4f0560f65602b9db858de141b541cf91a4644ebe4639"
+        }
+      ]
+    }
+  ]
+}

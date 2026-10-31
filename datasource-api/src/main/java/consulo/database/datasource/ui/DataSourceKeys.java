@@ -28,4 +28,9 @@ public interface DataSourceKeys {
     Key<Tree<Object>> TREE = Key.create("datasource.tree");
 
     Key<DataSource> DATASOURCE = Key.create("datasource");
+
+    /**
+     * The selected node of the data source tree which has an editor, for example a JDBC table
+     */
+    Key<DataSourceOpenableNode> OPENABLE_NODE = Key.create("datasource.openable.node");
 }
